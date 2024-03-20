@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, NavLink, Navigate, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
 // import { Icons } from "@/components/icons";
@@ -22,9 +22,11 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { Bell, Search, Users } from "lucide-react";
+import { Bell, Users } from "lucide-react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+
+import SearchDialog from "./dialogs/SearchDialog";
+import { UserAuth } from "@/contexts/AuthContext";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -61,8 +63,12 @@ const components: { title: string; href: string; description: string }[] = [
 
 export function Navbar() {
   const navigate = useNavigate();
+
+  const auth = UserAuth();
+  const user: boolean = auth?.user;
+
   const handleLogOut = () => {
-    console.log("Hello");
+    auth?.setUser(null);
     navigate("/");
   };
 
@@ -83,7 +89,6 @@ export function Navbar() {
                       className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                       href="/"
                     >
-                      {/* <Icons.logo className="h-6 w-6" /> */}
                       <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
                       <p className="text-sm leading-tight text-muted-foreground">
                         Beautifully designed components built with Radix UI and Tailwind CSS.
@@ -115,68 +120,78 @@ export function Navbar() {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <NavigationMenuItem asChild>
-            <Link to="/create-post">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>Create</NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
+
+          {user && (
+            <NavigationMenuItem asChild>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                <Link to="/create-post">Create</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          )}
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className="w-full relative">
-        <Input type="text" placeholder="Search" />
-        <Search className=" absolute right-3 top-1/2 w-5 h-5 cursor-pointer -translate-y-[50%] text-slate-500" />
-      </div>
+      {user ? (
+        <div className="flex gap-5 ml-auto">
+          <SearchDialog />
+          <Button variant="outline" size="icon">
+            <Bell className="w-5 h-5" />
+          </Button>
+          <Button variant="outline" size="icon">
+            <Users className="w-5 h-5" />
+          </Button>
 
-      <div className="flex gap-5">
-        <Button variant="outline" size="icon">
-          <Bell className="w-5 h-5" />
-        </Button>
-        <Button variant="outline" size="icon">
-          <Users className="w-5 h-5" />
-        </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild className=" cursor-pointer">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 mr-10">
-            <DropdownMenuLabel>Sery Vathana</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <NavLink to={"/profile"}>Profile</NavLink>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <NavLink to={"/profile/setting"}>Setting</NavLink>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <NavLink to={"/profile?post=my-posts"}>My Posts</NavLink>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <NavLink to={"/create-post"}>Create Posts</NavLink>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <NavLink to={"/profile?post=saved-posts"}>Saved Posts</NavLink>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>My Groups</DropdownMenuItem>
-              <DropdownMenuItem>Create Groups</DropdownMenuItem>
-              <DropdownMenuItem>Pending Invites</DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleLogOut()}>Log out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className=" cursor-pointer">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 mr-10">
+              <DropdownMenuLabel>Sery Vathana</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                  <NavLink to={"/profile"}>Profile</NavLink>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <NavLink to={"/profile/setting"}>Setting</NavLink>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                  <NavLink to={"/profile?post=my-posts"}>My Posts</NavLink>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <NavLink to={"/create-post"}>Create Posts</NavLink>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <NavLink to={"/profile?post=saved-posts"}>Saved Posts</NavLink>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>My Groups</DropdownMenuItem>
+                <DropdownMenuItem>Create Groups</DropdownMenuItem>
+                <DropdownMenuItem>Pending Invites</DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleLogOut()}>Log out</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ) : (
+        <div className="flex gap-5 ml-auto">
+          <Button variant={"secondary"} asChild>
+            <Link to={"/login"}>Login</Link>
+          </Button>
+          <Button variant={"default"} asChild>
+            <Link to={"/register"}>Register</Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
