@@ -27,8 +27,6 @@ const CreatePostPage = () => {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // auth?.setUser({ email: values.email });
-
     const reqBody = {
       title: values.title,
       description: values.description,
@@ -41,7 +39,7 @@ const CreatePostPage = () => {
     setTempImgURL('');
   }
 
-  function handleTempFileUpload(e) {
+  function handleTempFileUpload(e: any) {
     setUploadFile(e.target.files[0]);
     const url = URL.createObjectURL(e.target.files[0]);
     setTempImgURL(url);
