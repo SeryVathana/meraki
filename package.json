@@ -1,12 +1,14 @@
 {
   "name": "meraki",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-install": "cd ./frontend && npm i && cd ../",
+    "dev-frontend": "cd ./frontend && npm run dev"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "description": ""
 }
