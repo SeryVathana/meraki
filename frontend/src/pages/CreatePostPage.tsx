@@ -52,17 +52,20 @@ const CreatePostPage = () => {
 
   return (
     <div className='w-full h-auto'>
-      <div className='max-w-screen-xl h-[70vh] mx-auto mt-20 flex'>
-        <div className='w-1/2 h-full flex justify-center'>
+      <div className='w-full flex justify-center my-10'>
+        <h1 className='font-semibold text-3xl'>Create Post</h1>
+      </div>
+      <div className='max-w-screen-xl h-[70vh] mx-auto flex gap-20 justify-center'>
+        <div className='w-1/2 max-w-[500px] h-full flex justify-center'>
           {tempImgURL ? (
-            <div className='w-[500px] rounded-2xl overflow-hidden relative'>
+            <div className='w-full rounded-2xl overflow-hidden relative'>
               <img src={tempImgURL} alt={tempImgURL} className='w-full rounded-2xl' />
               <Button size='icon' variant='destructive' className='absolute top-5 right-5' onClick={() => handleRemoveTempImg()}>
                 <Trash className='w-5' />
               </Button>
             </div>
           ) : (
-            <div className='w-[500px] h-[500px] relative bg-gray-100 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200'>
+            <div className='w-full h-[500px] relative bg-gray-100 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200'>
               <input
                 type='file'
                 className='absolute inset-0 w-full h-full opacity-0 z-50'
@@ -86,10 +89,10 @@ const CreatePostPage = () => {
             </div>
           )}
         </div>
-        <div className='w-1/2 h-full '>
-          <div className='w-2/3'>
+        <div className='w-1/2 max-w-[500px] h-full '>
+          <div className=''>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 w-[400px]'>
+              <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 '>
                 <FormField
                   control={form.control}
                   name='title'

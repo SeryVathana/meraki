@@ -32,6 +32,7 @@ const ProfilePage = () => {
         </div>
 
         <h1 className='text-4xl font-bold tracking-tight lg:text-3xl'>Sery Vathana</h1>
+        <h3 className='text-slate-500'>@znaazmz</h3>
         <h3 className='text-slate-500'>yooseryvathana@gmail.com</h3>
 
         <div className='flex gap-5'>
