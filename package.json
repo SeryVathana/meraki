@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev-install": "cd ./frontend && npm i && cd ../",
-    "dev-frontend": "cd ./frontend && npm run dev"
+    "dev-i": "cd ./frontend && npm i && cd ../",
+    "dev-client": "cd ./frontend && npm run dev"
   },
   "keywords": [],
   "author": "",

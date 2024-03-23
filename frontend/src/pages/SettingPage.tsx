@@ -10,12 +10,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 const generalChangeSchema = z.object({
-  first_name: z.string(),
-  last_name: z.string(),
-  username: z.string(),
-  email: z.string(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  username: z.string().optional(),
 });
 const passwordChangeSchema = z.object({
   old_password: z.string(),
@@ -37,6 +47,9 @@ const SettingPage = () => {
   });
 
   function onSubmitGeneral(values: z.infer<typeof generalChangeSchema>) {
+    if (!values.first_name && !values.last_name && !values.username) {
+      return;
+    }
     console.log(values);
   }
   function onSubmitPassword(values: z.infer<typeof passwordChangeSchema>) {
@@ -50,7 +63,7 @@ const SettingPage = () => {
   useEffect(() => {
     setFirstName('Sery');
     setLastName('Vathana');
-    setUsername('Username');
+    setUsername('znaamz');
     setEmail('yooseryvathana@gmail.com');
   }, []);
 
@@ -72,71 +85,126 @@ const SettingPage = () => {
 
           <div className='space-y-16'>
             <div>
-              <h1 className='my-5 text-lg font-semibold'>General Setting</h1>
-              <Form {...generalForm}>
-                <form onSubmit={generalForm.handleSubmit(onSubmitGeneral)} className='space-y-4 '>
-                  <FormField
-                    control={generalForm.control}
-                    name='first_name'
-                    render={({ field }) => (
-                      <FormItem className='flex items-center gap-10'>
-                        <FormLabel className='w-1/2'>First Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder='' type='text' defaultValue={firstName} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={generalForm.control}
-                    name='last_name'
-                    render={({ field }) => (
-                      <FormItem className='flex items-center gap-10'>
-                        <FormLabel className='w-1/2'>Last Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder='' type='text' defaultValue={lastName} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={generalForm.control}
-                    name='username'
-                    render={({ field }) => (
-                      <FormItem className='flex items-center gap-10'>
-                        <FormLabel className='w-1/2'>Username</FormLabel>
-                        <FormControl>
-                          <Input placeholder='' type='text' defaultValue={username} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={generalForm.control}
-                    name='email'
-                    render={({ field }) => (
-                      <FormItem className='flex items-center gap-10'>
-                        <FormLabel className='w-1/2'>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder='' type='text' defaultValue={email} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className='w-full flex justify-end'>
-                    <Button type='submit'>Submit Change</Button>
+              <h1 className='my-5 text-lg font-semibold'>General Information</h1>
+              <div className='space-y-6'>
+                <div className='flex items-center gap-10'>
+                  <Label className='w-1/2'>Email</Label>
+                  <div className='w-full'>
+                    <p className='float-start'>{email}</p>
                   </div>
-                </form>
-              </Form>
+                </div>
+                <div className='flex items-center gap-10'>
+                  <Label className='w-1/2'>First Name</Label>
+                  <div className='w-full'>
+                    <p className='float-start'>{firstName}</p>
+                  </div>
+                </div>
+                <div className='flex items-center gap-10'>
+                  <Label className='w-1/2'>Last Name</Label>
+                  <div className='w-full'>
+                    <p className='float-start'>{lastName}</p>
+                  </div>
+                </div>
+                <div className='flex items-center gap-10'>
+                  <Label className='w-1/2'>Username</Label>
+                  <div className='w-full'>
+                    <p className='float-start'>@{username}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className='w-full flex justify-end mt-5'>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant='default'>Edit Profile</Button>
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[425px] lg:max-w-screen-sm'>
+                    <DialogHeader>
+                      <DialogTitle>Edit profile</DialogTitle>
+                      <DialogDescription>Make changes to your profile here. Click save when you're done.</DialogDescription>
+                    </DialogHeader>
+
+                    <Form {...generalForm}>
+                      <form onSubmit={generalForm.handleSubmit(onSubmitGeneral)} className='space-y-4 '>
+                        <FormField
+                          control={generalForm.control}
+                          name='first_name'
+                          render={({ field }) => (
+                            <FormItem className='flex items-center gap-10'>
+                              <FormLabel className='w-1/3'>First Name</FormLabel>
+                              <div className='w-2/3 space-y-2'>
+                                <FormControl>
+                                  <Input
+                                    placeholder=''
+                                    type='text'
+                                    {...field}
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={generalForm.control}
+                          name='last_name'
+                          render={({ field }) => (
+                            <FormItem className='flex items-center gap-10'>
+                              <FormLabel className='w-1/3'>Last Name</FormLabel>
+                              <div className='w-2/3 space-y-2'>
+                                <FormControl>
+                                  <Input
+                                    placeholder=''
+                                    type='text'
+                                    {...field}
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={generalForm.control}
+                          name='username'
+                          render={({ field }) => (
+                            <FormItem className='flex items-center gap-10'>
+                              <FormLabel className='w-1/3'>Username</FormLabel>
+                              <div className='w-2/3 space-y-2'>
+                                <FormControl>
+                                  <Input
+                                    placeholder=''
+                                    type='text'
+                                    {...field}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+
+                        <DialogTrigger asChild>
+                          <Button type='submit' className='float-end'>
+                            Save Changes
+                          </Button>
+                        </DialogTrigger>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
             <div>
               <h1 className='my-5 text-lg font-semibold'>Credential Setting</h1>
               <Form {...passwordForm}>
-                <form onSubmit={passwordForm.handleSubmit(onSubmitPassword)} className='space-y-4 '>
+                <form onSubmit={passwordForm.handleSubmit(onSubmitPassword)} className='space-y-2 '>
                   <FormField
                     control={passwordForm.control}
                     name='old_password'
@@ -177,7 +245,7 @@ const SettingPage = () => {
                     )}
                   />
 
-                  <div className='w-full flex justify-end'>
+                  <div className='w-full flex justify-end pt-5'>
                     <Button type='submit'>Change Password</Button>
                   </div>
                 </form>
