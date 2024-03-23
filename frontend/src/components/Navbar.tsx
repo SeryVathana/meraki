@@ -74,7 +74,7 @@ export function Navbar() {
   };
 
   return (
-    <div className='py-5 px-10 flex items-center gap-10 w-full sticky top-0 z-10 bg-white border-b-2 border-slate-50'>
+    <div className='py-5 px-10 flex items-center gap-10 w-full sticky top-0 z-10 bg-white'>
       <NavLink to={'/'}>
         <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-xl'>Meraki</h1>
       </NavLink>

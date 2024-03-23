@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { link } from 'fs';
 
 const PostDetailPage = () => {
   const { postId } = useParams();
@@ -84,79 +85,22 @@ const PostDetailPage = () => {
 
             <div className='h-auto flex-col flex-1 flex-grow max-h-[200px] my-5'>
               <div className='flex flex-col'>
-                <div className='flex gap-3'>
+                <div className='flex gap-3 items-start'>
                   <Avatar className='w-8 h-8 min-w-8 min-h-8'>
                     <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' className='w-8 rounded-full' />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
 
                   <div>
-                    <p className='line-clamp-2'>
+                    <p className='line-clamp-2 text-sm'>
                       <span className='font-bold'>Sery Vathana</span>: Lorem ipsum dolor sit amet consectetur adipisicing elit.
                       Dolor, repellendus magnam eos cum odit, odio ea, fugiat maxime assumenda ducimus eveniet perspiciatis fugit
                       id voluptas iusto cupiditate sapiente sunt vel inventore? Molestiae.
                     </p>
-                    <p className='float-end'>see more</p>
-                    <div className='flex gap-5 my-3'>
-                      <h1>Like</h1>
-                      <h1>Reply</h1>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex gap-3'>
-                  <Avatar className='w-8 h-8 min-w-8 min-h-8'>
-                    <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' className='w-8 rounded-full' />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-
-                  <div>
-                    <p className='line-clamp-2'>
-                      <span className='font-bold'>Sery Vathana</span>: Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Dolor, repellendus magnam eos cum odit, odio ea, fugiat maxime assumenda ducimus eveniet perspiciatis fugit
-                      id voluptas iusto cupiditate sapiente sunt vel inventore? Molestiae.
-                    </p>
-                    <p className='float-end'>see more</p>
-                    <div className='flex gap-5 my-3'>
-                      <h1>Like</h1>
-                      <h1>Reply</h1>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex gap-3'>
-                  <Avatar className='w-8 h-8 min-w-8 min-h-8'>
-                    <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' className='w-8 rounded-full' />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-
-                  <div>
-                    <p className='line-clamp-2'>
-                      <span className='font-bold'>Sery Vathana</span>: Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Dolor, repellendus magnam eos cum odit, odio ea, fugiat maxime assumenda ducimus eveniet perspiciatis fugit
-                      id voluptas iusto cupiditate sapiente sunt vel inventore? Molestiae.
-                    </p>
-                    <p className='float-end'>see more</p>
-                    <div className='flex gap-5 my-3'>
-                      <h1>Like</h1>
-                      <h1>Reply</h1>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex gap-3'>
-                  <Avatar className='w-8 h-8 min-w-8 min-h-8'>
-                    <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' className='w-8 rounded-full' />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-
-                  <div>
-                    <p className='line-clamp-2'>
-                      <span className='font-bold'>Sery Vathana</span>: Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Dolor, repellendus magnam eos cum odit, odio ea, fugiat maxime assumenda ducimus eveniet perspiciatis fugit
-                      id voluptas iusto cupiditate sapiente sunt vel inventore? Molestiae.
-                    </p>
-                    <p className='float-end'>see more</p>
-                    <div className='flex gap-5 my-3'>
-                      <h1>Like</h1>
-                      <h1>Reply</h1>
+                    <button className='float-end mr-5 text-sm hover:text-gray-400'>see more</button>
+                    <div className='flex gap-4 my-3 text-sm'>
+                      <h1>2d</h1>
+                      <button className='float-end mr-5 text-sm hover:text-gray-400'>Reply</button>
                     </div>
                   </div>
                 </div>
@@ -164,7 +108,7 @@ const PostDetailPage = () => {
             </div>
           </div>
           <div className='flex w-full space-x-2 bg-white pt-2'>
-            <Textarea placeholder='Type your message here.' />
+            <Textarea placeholder='Add comment here.' />
             <Button type='submit' variant={'secondary'} className='min-h-[60px] py-0'>
               <SendHorizonal />
             </Button>
