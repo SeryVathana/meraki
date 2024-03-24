@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input';
-import { Check, ChevronsUpDown, Trash, Upload } from 'lucide-react';
+import { Globe, Lock, Trash, Upload, Users } from 'lucide-react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -9,44 +9,17 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useState } from 'react';
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
 });
 
-const frameworks = [
-  {
-    value: 'next.js',
-    label: 'Next.js',
-  },
-  {
-    value: 'sveltekit',
-    label: 'SvelteKit',
-  },
-  {
-    value: 'nuxt.js',
-    label: 'Nuxt.js',
-  },
-  {
-    value: 'remix',
-    label: 'Remix',
-  },
-  {
-    value: 'astro',
-    label: 'Astro',
-  },
-];
-
 const CreatePostPage = () => {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [tempImgURL, setTempImgURL] = useState<string>('');
-
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -88,7 +61,7 @@ const CreatePostPage = () => {
       <div className='max-w-screen-xl h-[70vh] mx-auto flex gap-20 justify-center'>
         <div className='w-1/2 max-w-[500px] h-full flex justify-center'>
           {tempImgURL ? (
-            <div className='w-full rounded-2xl overflow-hidden relative'>
+            <div className='w-full rounded-2xl overflow-hidden relative border-[1px]'>
               <img src={tempImgURL} alt={tempImgURL} className='w-full rounded-2xl' />
               <Button size='icon' variant='destructive' className='absolute top-5 right-5' onClick={() => handleRemoveTempImg()}>
                 <Trash className='w-5' />
@@ -98,7 +71,7 @@ const CreatePostPage = () => {
             <div className='w-full h-[500px] relative bg-gray-100 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200'>
               <input
                 type='file'
-                className='absolute inset-0 w-full h-full opacity-0 z-50'
+                className='absolute inset-0 w-full h-full opacity-0 z-50 cursor-pointer'
                 onChange={(e) => handleTempFileUpload(e)}
               />
               <Upload className='my-5' />
@@ -107,13 +80,6 @@ const CreatePostPage = () => {
                   <span>Drag and drop</span>
                   <span className='text-indigo-600'> or browse </span>
                   <span>to upload</span>
-                  <input
-                    id='file-upload'
-                    name='file-upload'
-                    type='file'
-                    className='sr-only w-[100px]'
-                    onChange={(e) => handleTempFileUpload(e)}
-                  />
                 </label>
               </h3>
             </div>
@@ -143,50 +109,42 @@ const CreatePostPage = () => {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Input placeholder='Add description' type='text' {...field} />
+                        <Textarea placeholder='Add description' className='max-h-[200px]' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <Button variant='outline' role='combobox' aria-expanded={open} className='w-[200px] justify-between'>
-                        {value ? frameworks.find((framework) => framework.value === value)?.label : 'Select framework...'}
-                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-[200px] p-0'>
-                      <Command>
-                        <CommandInput placeholder='Search framework...' />
-                        <CommandEmpty>No framework found.</CommandEmpty>
-
-                        <CommandList>
-                          {frameworks.map((framework) => {
-                            return (
-                              <CommandItem
-                                key={framework.value}
-                                value={framework.value}
-                                onSelect={(currentValue) => {
-                                  setValue(currentValue === value ? '' : currentValue);
-                                  setOpen(false);
-                                }}
-                              >
-                                <Check className={cn('mr-2 h-4 w-4', value === framework.value ? 'opacity-100' : 'opacity-0')} />
-                                {framework.label}
-                              </CommandItem>
-                            );
-                          })}
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                <div className='flex flex-col gap-3'>
+                  <FormLabel>Post Audience</FormLabel>
+                  <div className='flex gap-5'>
+                    <Select defaultValue='global'>
+                      <SelectTrigger className='w-fit'>
+                        <SelectValue placeholder='Hi' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='global'>
+                          <div className='flex items-center gap-2 mr-3'>
+                            <Globe className='h-4 text-gray-600' />
+                            <p>Global</p>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value='private'>
+                          <div className='flex items-center gap-2 mr-3'>
+                            <Lock className='h-4 text-gray-600' />
+                            <p>Private</p>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className='w-full flex justify-end'>
-                  <Button type='submit'>Publish</Button>
+                  <Button type='submit' disabled={!tempImgURL}>
+                    Publish
+                  </Button>
                 </div>
               </form>
             </Form>
