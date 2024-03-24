@@ -1,8 +1,3 @@
-import * as React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-
-import { cn } from '@/lib/utils';
-// import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -22,11 +17,14 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Bell, Users } from 'lucide-react';
-import { Button } from './ui/button';
-
-import SearchDialog from './dialogs/SearchDialog';
 import { UserAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
+import { Bell } from 'lucide-react';
+import * as React from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import MyGroupsDialog from './dialogs/MyGroupsDialog';
+import SearchDialog from './dialogs/SearchDialog';
+import { Button } from './ui/button';
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -138,9 +136,8 @@ export function Navbar() {
           <Button variant='outline' size='icon'>
             <Bell className='w-5 h-5' />
           </Button>
-          <Button variant='outline' size='icon'>
-            <Users className='w-5 h-5' />
-          </Button>
+
+          <MyGroupsDialog />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild className=' cursor-pointer'>
