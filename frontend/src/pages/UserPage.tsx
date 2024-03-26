@@ -1,18 +1,38 @@
 import PostsContainer from '@/components/PostsContainer';
+import FollowDialog from '@/components/dialogs/FollowDialog';
 import GroupsDialog from '@/components/dialogs/GroupsDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { DatabaseZap, Pen } from 'lucide-react';
+import { Pen } from 'lucide-react';
+import { useState } from 'react';
 
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 
-const ProfilePage = () => {
-  const [postParams] = useSearchParams('my-posts');
+const UserPage = () => {
+  const [postParams] = useSearchParams('');
+  const idParam = postParams.get('id') || '';
+
+  const [followedUsers, setFollowedUsers] = useState<string[]>([]);
 
   const navigate = useNavigate();
 
-  const myParam = postParams.get('post');
+  const handleFollow = (id: string) => {
+    if (followedUsers.includes(id)) {
+      setFollowedUsers((prev) => {
+        const indexToRemove = prev.indexOf(id);
+        if (indexToRemove !== -1) {
+          // Create a new array without the item to remove
+          const updatedPosts = [...prev.slice(0, indexToRemove), ...prev.slice(indexToRemove + 1)];
+          return updatedPosts;
+        }
+        // If the item is not found, return the original array
+        return prev;
+      });
+    } else {
+      setFollowedUsers([...followedUsers, id]);
+    }
+  };
 
   return (
     <div className=''>
@@ -36,26 +56,20 @@ const ProfilePage = () => {
         <h3 className='text-slate-500'>@znaazmz</h3>
         <h3 className='text-slate-500'>yooseryvathana@gmail.com</h3>
 
-        <div className='flex gap-5'>
-          <p>1 follower</p>
-
-          <p>2 following</p>
+        <div className='flex'>
+          <FollowDialog type='followers' user_id={idParam} />
+          <FollowDialog type='followings' user_id={idParam} />
         </div>
 
         <div className='flex gap-5 mt-5'>
-          <GroupsDialog user_id='1' isIcon={false} />
-          <Button className='rounded-full' onClick={() => navigate('/profile/setting')}>
-            Edit Profile
+          <GroupsDialog user_id={idParam} isIcon={false} />
+          <Button
+            className='rounded-full'
+            variant={followedUsers.includes(idParam) ? 'default' : 'secondary'}
+            onClick={() => handleFollow(idParam)}
+          >
+            {followedUsers.includes(idParam) ? 'Follow' : 'Followed'}
           </Button>
-        </div>
-
-        <div className='flex gap-10 mt-10'>
-          <NavLink to={'/profile?post=my-posts'} className={cn(myParam === 'my-posts' || !myParam ? 'underline' : '')}>
-            Created
-          </NavLink>
-          <NavLink to={'/profile?post=saved-posts'} className={cn(myParam === 'saved-posts' ? 'underline' : '')}>
-            Saved
-          </NavLink>
         </div>
       </div>
       <PostsContainer />
@@ -63,4 +77,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default UserPage;

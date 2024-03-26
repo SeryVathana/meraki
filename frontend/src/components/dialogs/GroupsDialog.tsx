@@ -27,19 +27,25 @@ const myGroups = [
   },
 ];
 
-const MyGroupsDialog = () => {
+const GroupsDialog = ({ user_id, isIcon }: { user_id: string; isIcon: boolean }) => {
   const navigate = useNavigate();
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant={'outline'} size={'icon'}>
-          <Users className='w-5 h-5' />
-        </Button>
+        {isIcon ? (
+          <Button variant={'outline'} size={'icon'}>
+            <Users className='w-5 h-5' />
+          </Button>
+        ) : (
+          <Button variant={'secondary'} className='rounded-full'>
+            Groups
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px] lg:max-w-screen-sm'>
         <DialogHeader>
           <DialogTitle className='my-3 flex items-center'>
-            My Groups <span className='text-sm text-muted-foreground ml-5'>{myGroups.length} Groups</span>
+            {user_id}: My Groups <span className='text-sm text-muted-foreground ml-5'>{myGroups.length} Groups</span>
           </DialogTitle>
           <div className='flex gap-2'>
             <div className='relative w-full mr-auto'>
@@ -88,7 +94,7 @@ const MyGroupsDialog = () => {
                   key={group.id}
                   className='flex w-full justify-start gap-5 py-7'
                   variant={'outline'}
-                  onClick={() => navigate(`group/${group.id}`)}
+                  onClick={() => navigate(`/group?id=${group.id}`)}
                 >
                   <Avatar className=''>
                     <AvatarImage src={group.img_url} />
@@ -110,4 +116,4 @@ const MyGroupsDialog = () => {
   );
 };
 
-export default MyGroupsDialog;
+export default GroupsDialog;

@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 import { Bell } from 'lucide-react';
 import * as React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import MyGroupsDialog from './dialogs/MyGroupsDialog';
+import GroupsDialog from './dialogs/GroupsDialog';
 import SearchDialog from './dialogs/SearchDialog';
 import { Button } from './ui/button';
 
@@ -137,7 +137,7 @@ export function Navbar() {
             <Bell className='w-5 h-5' />
           </Button>
 
-          <MyGroupsDialog />
+          <GroupsDialog user_id='1' isIcon={true} />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild className=' cursor-pointer'>

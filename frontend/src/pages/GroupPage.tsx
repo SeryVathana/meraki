@@ -5,10 +5,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dot } from 'lucide-react';
 import { useState } from 'react';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 
 const GroupPage = () => {
   const [isPublicGroup, setIsPublicGroup] = useState<boolean>(true);
   const [isJoined, setIsJoined] = useState<boolean>(true);
+
+  const [pageParams] = useSearchParams('');
+
+  const params = pageParams.get('id');
+
+  if (!params) {
+    return <Navigate to={'/'} />;
+  }
 
   return (
     <div className='flex flex-col items-center'>
@@ -22,13 +31,13 @@ const GroupPage = () => {
             />
           </AspectRatio>
         </div>
-        <Avatar className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-40 h-40 border-4 border-white'>
+        <Avatar className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3 w-40 h-40 border-4 border-white'>
           <AvatarImage src='https://github.com/shadcn.png' />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </div>
 
-      <div className='flex flex-col items-center mt-24 gap-5'>
+      <div className='flex flex-col items-center mt-16 gap-5'>
         <h1 className='text-4xl font-bold tracking-tight lg:text-3xl'>Kab Jak</h1>
 
         <div className='flex gap-5'>

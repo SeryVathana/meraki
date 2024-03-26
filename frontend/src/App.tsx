@@ -11,6 +11,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import RegisterPage from './pages/RegisterPage';
 import PostDetailPage from './pages/PostDetailPage';
 import GroupPage from './pages/GroupPage';
+import UserPage from './pages/UserPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -45,7 +46,7 @@ const router = createBrowserRouter(
         }
       />
       <Route
-        path='post/:postId'
+        path='post'
         element={
           // <ProtectedRoute>
           <PostDetailPage />
@@ -53,10 +54,18 @@ const router = createBrowserRouter(
         }
       />
       <Route
-        path='group/:groupId'
+        path='group'
         element={
           // <ProtectedRoute>
           <GroupPage />
+          // </ProtectedRoute>
+        }
+      />
+      <Route
+        path='user'
+        element={
+          // <ProtectedRoute>
+          <UserPage />
           // </ProtectedRoute>
         }
       />
