@@ -1,8 +1,8 @@
 import PostsContainer from '@/components/PostsContainer';
-import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { PostType } from '@/types/types';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { v4 } from 'uuid';
 
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
-import { ChevronRight, Heart, MessageCircle, Pin, SendHorizonal, ThumbsUp, Users } from 'lucide-react';
+import { ChevronRight, Heart, Pin, SendHorizonal, Users } from 'lucide-react';
 import mockData from '../db/mock-post.json';
 
 import { cn } from '@/lib/utils';
@@ -31,20 +31,22 @@ const mock_comments = [
       },
     ],
   },
-  // {
-  //   id: '2',
-  //   comment: 'Hello work',
-  //   replies: [],
-  // },
-  // {
-  //   id: '3',
-  //   comment: 'Bye work',
-  //   replies: [],
-  // },
+  {
+    id: '2',
+    comment: 'Hello work',
+    replies: [],
+  },
+  {
+    id: '3',
+    comment: 'Bye work',
+    replies: [],
+  },
 ];
 
 const PostDetailPage = () => {
-  const { postId } = useParams();
+  const [postId] = useSearchParams('');
+  const idParam = postId.get('id');
+
   const [post, setPost] = useState<PostType>();
 
   const [comments, setComments] = useState<any[]>(mock_comments);
@@ -52,10 +54,11 @@ const PostDetailPage = () => {
   const [inputComment, setInputComment] = useState<string>('');
   const [inputReply, setInputReply] = useState<string>('');
 
-  const imgRef = useRef(null);
-
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const [replyToId, setReplyToId] = useState<string>('');
+
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [isPinned, setIsPinned] = useState<boolean>(false);
 
   const handleMakeReply = (cmtId: string) => {
     if (replyToId != cmtId) {
@@ -113,7 +116,7 @@ const PostDetailPage = () => {
 
   useEffect(() => {
     mockData.map(async (data) => {
-      if (String(data.id) == postId) {
+      if (String(data.id) == idParam) {
         setPost(data);
 
         return data;
@@ -121,13 +124,13 @@ const PostDetailPage = () => {
     });
 
     window.scrollTo(0, 0);
-  }, [postId]);
+  }, [idParam]);
 
   return (
     <div>
       <div className={cn(' h-[80vh] relative mb-10 max-w-screen-lg mx-auto grid grid-cols-2 gap-10 border-[1px] rounded-2xl')}>
         <div className={cn('w-full h-[80vh] bg-slate-100 border-r-[1px] border-b-[1px] rounded-l-2xl')}>
-          <img ref={imgRef} src={post?.img_url} alt='Image' className={cn('object-contain h-full mx-auto')} />
+          <img src={post?.img_url} alt='Image' className={cn('object-contain h-full mx-auto')} />
         </div>
         <div className={cn('relative flex flex-col pt-5 max-h-[80vh]')}>
           <div className={cn('flex flex-col pr-5  overflow-auto')}>
@@ -167,8 +170,9 @@ const PostDetailPage = () => {
               <button
                 className={cn(
                   'w-1/2 flex items-center justify-center py-3 group hover:bg-gray-50 text-gray-500',
-                  true && 'text-red-500'
+                  isLiked && 'text-red-500'
                 )}
+                onClick={() => setIsLiked(!isLiked)}
               >
                 <Heart className='h-5' />
               </button>
@@ -176,8 +180,9 @@ const PostDetailPage = () => {
               <button
                 className={cn(
                   'w-1/2 flex items-center justify-center py-3 group hover:bg-gray-50 text-gray-500',
-                  true && 'text-red-500'
+                  isPinned && 'text-red-500'
                 )}
+                onClick={() => setIsPinned(!isPinned)}
               >
                 <Pin className='h-5' />
               </button>
@@ -201,7 +206,7 @@ const PostDetailPage = () => {
                               <span className='font-semibold'>Sery Vathana</span> {comment.comment}
                             </p>
 
-                            <div className='flex gap-4 my-3 text-sm'>
+                            <div className='flex items-center gap-4 mb-3 mt-1 text-sm'>
                               <h1>2d</h1>
                               <button
                                 className='float-end text-sm hover:text-gray-400'
@@ -225,7 +230,7 @@ const PostDetailPage = () => {
                           <div className='flex w-full gap-2 bg-white pl-10 mb-5'>
                             <Textarea
                               placeholder='Add reply here.'
-                              className='border-2'
+                              className='border-2 max-h-[100px]'
                               value={inputReply}
                               onChange={(e) => setInputReply(e.target.value)}
                             />
@@ -257,7 +262,7 @@ const PostDetailPage = () => {
                                       <span className='font-semibold'>Sery Vathana</span> {reply.comment}
                                     </p>
 
-                                    <div className='flex gap-4 my-3 text-sm'>
+                                    <div className='flex items-center  gap-4 mb-3 mt-1 text-sm'>
                                       <h1>2d</h1>
                                       <button
                                         className='float-end text-sm hover:text-gray-400'
@@ -281,7 +286,7 @@ const PostDetailPage = () => {
                                   <div className='flex w-full gap-2 bg-white pl-10 mb-5'>
                                     <Textarea
                                       placeholder='Add reply here.'
-                                      className='border-2'
+                                      className='border-2  max-h-[100px]'
                                       value={inputReply}
                                       onChange={(e) => setInputReply(e.target.value)}
                                     />
@@ -310,7 +315,7 @@ const PostDetailPage = () => {
           <div className='sticky bottom-0 flex w-full gap-2  pt-5 pb-5 pr-3 mt-auto border-t-[1px]'>
             <Textarea
               placeholder='Add comment here.'
-              className='border-2'
+              className='border-2  max-h-[100px]'
               value={inputComment}
               onChange={(e) => setInputComment(e.target.value)}
             />
