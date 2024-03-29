@@ -57,11 +57,11 @@ const FollowDialog = ({ user_id, type }: { user_id: string; type: string }) => {
     <Dialog>
       <DialogTrigger asChild>
         {selectedType == 'followers' ? (
-          <Button variant={'link'} className='rounded-full'>
+          <Button variant={'link'} className='rounded-full px-0'>
             3 followers
           </Button>
         ) : (
-          <Button variant={'link'} className='rounded-full'>
+          <Button variant={'link'} className='rounded-full px-0'>
             3 followings
           </Button>
         )}
@@ -122,9 +122,9 @@ const FollowDialog = ({ user_id, type }: { user_id: string; type: string }) => {
           </TabsList>
           <TabsContent value='followers'>
             <div className='flex flex-col gap-2 max-h-[500px] overflow-y-auto overflow-x-hidden'>
-              {followers.map((user) => {
+              {followers.map((user, index) => {
                 return (
-                  <DialogTrigger asChild>
+                  <DialogTrigger asChild key={index}>
                     <Button
                       key={user.id}
                       className='flex w-full justify-start gap-5 py-7'
@@ -155,9 +155,9 @@ const FollowDialog = ({ user_id, type }: { user_id: string; type: string }) => {
           </TabsContent>
           <TabsContent value='followings'>
             <div className='flex flex-col gap-2 max-h-[500px] overflow-y-auto overflow-x-hidden'>
-              {followings.map((user) => {
+              {followings.map((user, index) => {
                 return (
-                  <DialogTrigger asChild>
+                  <DialogTrigger asChild key={index}>
                     <Button
                       key={user.id}
                       className='flex w-full justify-start gap-5 py-7'

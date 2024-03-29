@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/navigation-menu';
 import { UserAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { Bell } from 'lucide-react';
 import * as React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import GroupsDialog from './dialogs/GroupsDialog';
@@ -63,6 +62,8 @@ const components: { title: string; href: string; description: string }[] = [
 export function Navbar() {
   const navigate = useNavigate();
 
+  const [openDropDown, setOpenDropDown] = React.useState<boolean>(false);
+
   const auth = UserAuth();
   const user: boolean = auth?.user;
 
@@ -74,7 +75,7 @@ export function Navbar() {
   return (
     <div className='py-5 px-10 flex items-center gap-10 w-full sticky top-0 z-10 bg-white'>
       <NavLink to={'/'}>
-        <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-xl'>Meraki</h1>
+        <h1 className='scroll-m-20 text-4xl text-primary font-extrabold tracking-tight lg:text-xl '>Meraki</h1>
       </NavLink>
       <NavigationMenu>
         <NavigationMenuList>
@@ -133,13 +134,10 @@ export function Navbar() {
       {user ? (
         <div className='flex gap-5 ml-auto'>
           <SearchDialog />
-          <Button variant='outline' size='icon'>
-            <Bell className='w-5 h-5' />
-          </Button>
 
-          <GroupsDialog user_id='1' isIcon={true} />
+          <GroupsDialog user_id='1' type='icon' />
 
-          <DropdownMenu>
+          <DropdownMenu open={openDropDown} onOpenChange={() => setOpenDropDown(!openDropDown)}>
             <DropdownMenuTrigger asChild className=' cursor-pointer'>
               <Avatar>
                 <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
@@ -171,7 +169,9 @@ export function Navbar() {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem>My Groups</DropdownMenuItem>
+                <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
+                  <GroupsDialog user_id='1' type='drop-down-link' />
+                </DropdownMenuItem>
                 <DropdownMenuItem>Create Groups</DropdownMenuItem>
                 <DropdownMenuItem>Pending Invites</DropdownMenuItem>
               </DropdownMenuGroup>

@@ -52,7 +52,7 @@ const CreateGroupPostDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant='default' className='rounded-full'>
+        <Button variant='default' className=''>
           Create Post
         </Button>
       </DialogTrigger>
