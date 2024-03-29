@@ -37,32 +37,22 @@ const UserPage = () => {
   return (
     <div className=''>
       <div className='flex flex-col gap-2 items-center my-10'>
-        <div className='w-32 h-32 rounded-full relative group'>
-          <input type='file' className='absolute inset-0 w-full h-full opacity-0 z-50 rounded-full cursor-pointer' />
-
-          <label htmlFor='file-upload' className='relative '>
-            <Avatar className='w-32 h-32  group-hover:border-2 border-gray-200'>
-              <AvatarImage src='https://github.com/shadcn.png' />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-
-            <div className='w-full h-full absolute top-0 left-0 rounded-full  opacity-0 group-hover:opacity-80 bg-gray-800 flex justify-center items-center'>
-              <Pen className='text-white ' />
-            </div>
-          </label>
-        </div>
+        <Avatar className='w-32 h-32'>
+          <AvatarImage src='https://github.com/shadcn.png' />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
 
         <h1 className='text-4xl font-bold tracking-tight lg:text-3xl'>Sery Vathana</h1>
         <h3 className='text-slate-500'>@znaazmz</h3>
         <h3 className='text-slate-500'>yooseryvathana@gmail.com</h3>
 
-        <div className='flex'>
+        <div className='flex gap-5'>
           <FollowDialog type='followers' user_id={idParam} />
           <FollowDialog type='followings' user_id={idParam} />
         </div>
 
-        <div className='flex gap-5 mt-5'>
-          <GroupsDialog user_id={idParam} isIcon={false} />
+        <div className='flex gap-5'>
+          <GroupsDialog user_id={idParam} type='button' />
           <Button
             className='rounded-full'
             variant={followedUsers.includes(idParam) ? 'default' : 'secondary'}

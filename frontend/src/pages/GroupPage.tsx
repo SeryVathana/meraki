@@ -3,9 +3,20 @@ import CreateGroupPostDialog from '@/components/dialogs/CreateGroupPostDialog';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Dot } from 'lucide-react';
+import { Dot, Ellipsis, EllipsisVertical, Pen } from 'lucide-react';
 import { useState } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import GroupMembersDialog from '@/components/dialogs/GroupMembersDialog';
+import GroupPendingRequests from '@/components/dialogs/GroupPendingRequests';
+import GroupAddMembersDialog from '@/components/dialogs/GroupAddMembersDialog';
 
 const GroupPage = () => {
   const [isPublicGroup, setIsPublicGroup] = useState<boolean>(true);
@@ -21,40 +32,64 @@ const GroupPage = () => {
 
   return (
     <div className='flex flex-col items-center'>
-      <div className='w-full h-[35vh] bg-gray-400 relative rounded-2xl'>
-        <div className='w-full h-full overflow-hidden rounded-xl'>
-          <AspectRatio ratio={16 / 9}>
-            <img
-              src='https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-              alt='Image'
-              className='object-cover rounded-xl'
-            />
-          </AspectRatio>
+      <div className='relative w-full h-[35vh] bg-gray-400 rounded-2xl'>
+        <img
+          src='https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+          alt='Image'
+          className='w-full h-full object-cover rounded-xl'
+        />
+        <Button className=' relative group top-0 right-0 rounded-xl cursor-pointer'>
+          <input type='file' className='absolute inset-0 w-full h-full opacity-0' />
+        </Button>
+        <div className='z-40  group absolute rounded-full bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3 border-4 border-white'>
+          <input type='file' className='absolute inset-0 z-50 w-full h-full opacity-0 rounded-full  cursor-pointer' />
+
+          <label htmlFor='file-upload' className='relative '>
+            <Avatar className=' w-40 h-40 border-gray-200'>
+              <AvatarImage src='https://github.com/shadcn.png' />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+
+            <div className='w-full h-full absolute top-0 left-0 rounded-full  opacity-0 group-hover:opacity-80 bg-gray-800 flex justify-center items-center'>
+              <Pen className='text-white ' />
+            </div>
+          </label>
         </div>
-        <Avatar className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3 w-40 h-40 border-4 border-white'>
-          <AvatarImage src='https://github.com/shadcn.png' />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
       </div>
 
-      <div className='flex flex-col items-center mt-16 gap-5'>
-        <h1 className='text-4xl font-bold tracking-tight lg:text-3xl'>Kab Jak</h1>
+      <div className='flex flex-col items-center gap-5 relative w-full mt-5'>
+        <h1 className='text-4xl font-bold tracking-tight lg:text-3xl  mt-12'>Kab Jak</h1>
 
-        <div className='flex gap-5'>
+        <div className='flex items-center gap-5'>
           <p>Public group</p>
-          <Dot className='mt-[1px]' />
-          <p>1200 members</p>
+          <Dot className='' />
+          <GroupMembersDialog group_id='1' type='link' />
         </div>
 
-        <div className='flex gap-5'>
-          {isJoined ? (
-            <div className='w-full flex justify-end mt-5'>
-              <CreateGroupPostDialog />
-            </div>
-          ) : (
-            <Button className='rounded-full'>Request Join</Button>
-          )}
-          {/* <Button className='rounded-full'>Edit Profile</Button> */}
+        <div className='w-full flex justify-center gap-5'>
+          {isJoined ? <CreateGroupPostDialog /> : <Button className='rounded-full'>Request Join</Button>}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className='' size={'icon'} variant={'secondary'}>
+                <Ellipsis className='w-5' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem asChild>
+                <GroupMembersDialog group_id='1' type='dropdown' />
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <GroupPendingRequests group_id='1' type='dropdown' />
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <GroupAddMembersDialog group_id='1' type='dropdown' />
+              </DropdownMenuItem>
+              <DropdownMenuItem>Edit group</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Leave group</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className='mt-10'>{isPublicGroup && isJoined ? <PostsContainer /> : <h1>Join group to see posts</h1>}</div>

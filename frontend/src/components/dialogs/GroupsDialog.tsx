@@ -27,19 +27,23 @@ const myGroups = [
   },
 ];
 
-const GroupsDialog = ({ user_id, isIcon }: { user_id: string; isIcon: boolean }) => {
+const GroupsDialog = ({ user_id, type }: { user_id: string; type: string }) => {
   const navigate = useNavigate();
   return (
     <Dialog>
       <DialogTrigger asChild>
-        {isIcon ? (
+        {type == 'icon' ? (
           <Button variant={'outline'} size={'icon'}>
             <Users className='w-5 h-5' />
           </Button>
-        ) : (
+        ) : type == 'button' ? (
           <Button variant={'secondary'} className='rounded-full'>
             Groups
           </Button>
+        ) : type == 'drop-down-link' ? (
+          <p className='text-sm w-full px-2 py-1 hover:bg-slate-100 rounded-sm'>My Groups</p>
+        ) : (
+          ''
         )}
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px] lg:max-w-screen-sm'>
@@ -87,9 +91,9 @@ const GroupsDialog = ({ user_id, isIcon }: { user_id: string; isIcon: boolean })
           </div>
         </DialogHeader>
         <div className='flex flex-col gap-2 max-h-[500px] overflow-y-auto overflow-x-hidden'>
-          {myGroups.map((group) => {
+          {myGroups.map((group, index) => {
             return (
-              <DialogTrigger asChild>
+              <DialogTrigger asChild key={index}>
                 <Button
                   key={group.id}
                   className='flex w-full justify-start gap-5 py-7'
