@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input';
-import { Globe, Lock, Trash, Upload, Users } from 'lucide-react';
+import { Globe, Lock, Trash, Upload, Users, X } from 'lucide-react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -20,6 +20,7 @@ const formSchema = z.object({
 const CreatePostPage = () => {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [tempImgURL, setTempImgURL] = useState<string>('');
+  const [isGlobal, setIsGlobal] = useState<boolean>(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,6 +34,7 @@ const CreatePostPage = () => {
     const reqBody = {
       title: values.title,
       description: values.description,
+      is_global: isGlobal,
       img_url: tempImgURL,
     };
 
@@ -40,6 +42,10 @@ const CreatePostPage = () => {
 
     setUploadFile(null);
     setTempImgURL('');
+    setIsGlobal(true);
+
+    form.clearErrors();
+    form.reset();
   }
 
   function handleTempFileUpload(e: any) {
@@ -58,13 +64,13 @@ const CreatePostPage = () => {
       <div className='w-full flex justify-center my-10'>
         <h1 className='font-semibold text-3xl'>Create Post</h1>
       </div>
-      <div className='max-w-screen-xl h-[70vh] mx-auto flex gap-20 justify-center'>
+      <div className='max-w-screen-xl min-h-[500px] mx-auto flex gap-20 justify-center'>
         <div className='w-1/2 max-w-[500px] h-full flex justify-center'>
           {tempImgURL ? (
-            <div className='w-full rounded-2xl overflow-hidden relative border-[1px]'>
-              <img src={tempImgURL} alt={tempImgURL} className='w-full rounded-2xl' />
-              <Button size='icon' variant='destructive' className='absolute top-5 right-5' onClick={() => handleRemoveTempImg()}>
-                <Trash className='w-5' />
+            <div className='h-[500px] rounded-2xl overflow-hidden relative border-[1px]'>
+              <img src={tempImgURL} alt={tempImgURL} className='w-full h-full object-contain' />
+              <Button size='icon' variant='outline' className='absolute top-5 right-5' onClick={() => handleRemoveTempImg()}>
+                <X className='w-5' />
               </Button>
             </div>
           ) : (
@@ -117,11 +123,14 @@ const CreatePostPage = () => {
                 />
 
                 <div className='flex flex-col gap-3'>
-                  <FormLabel>Post Audience</FormLabel>
+                  <FormLabel>Post privacy</FormLabel>
                   <div className='flex gap-5'>
-                    <Select defaultValue='global'>
+                    <Select
+                      value={isGlobal ? 'global' : 'private'}
+                      onValueChange={(value) => setIsGlobal(() => (value === 'global' ? true : false))}
+                    >
                       <SelectTrigger className='w-fit'>
-                        <SelectValue placeholder='Hi' />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value='global'>

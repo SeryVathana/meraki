@@ -3,17 +3,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
-import PostsContainer from '../PostsContainer';
+import SearchResultContainer from '../SearchResultContainer';
 
 export function SearchDialog() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const handleSearch = (e: any) => {
     setSearchTerm(e.target.value);
   };
 
+  const handleSearchDialog = () => {
+    setOpenDialog(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
       <DialogTrigger asChild>
         <Button variant='outline' size='icon'>
           <Search className='w-5 h-5' />
@@ -21,15 +26,15 @@ export function SearchDialog() {
       </DialogTrigger>
       <DialogContent className='max-w-screen-xl h-[90vh]'>
         <DialogHeader>
-          <div className='w-[500px] relative mx-auto'>
-            <Input type='text' placeholder='Search' onChange={(e) => handleSearch(e)} />
-            <Search className=' absolute right-3 top-1/2 w-5 h-5 cursor-pointer -translate-y-[50%] text-slate-500' />
+          <div className='w-full relative mx-auto  sm:px-5'>
+            <Input type='text' className='' placeholder='Search' onChange={(e) => handleSearch(e)} />
+            <Search className=' absolute right-3 sm:mr-5 top-1/2 w-5 h-5 cursor-pointer -translate-y-[50%] text-slate-500' />
           </div>
-          <DialogTitle>Search: {searchTerm}</DialogTitle>
+          <DialogTitle className='pt-5 text-start sm:px-5'>Search: {searchTerm}</DialogTitle>
         </DialogHeader>
 
-        <div className='overflow-auto w-full h-full px-5'>
-          <PostsContainer />
+        <div className='overflow-auto w-full h-full px-1 sm:px-5'>
+          <SearchResultContainer handleSearchDialog={handleSearchDialog} />
         </div>
       </DialogContent>
     </Dialog>
