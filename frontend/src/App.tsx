@@ -12,6 +12,9 @@ import RegisterPage from './pages/RegisterPage';
 import PostDetailPage from './pages/PostDetailPage';
 import GroupPage from './pages/GroupPage';
 import UserPage from './pages/UserPage';
+import CreateGroupPage from './pages/CreateGroupPage';
+import FolderPage from './pages/FolderPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -45,30 +48,50 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path='create-group'
+        element={
+          <ProtectedRoute>
+            <CreateGroupPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path='post'
         element={
-          // <ProtectedRoute>
-          <PostDetailPage />
-          // </ProtectedRoute>
+          <ProtectedRoute>
+            <PostDetailPage />
+          </ProtectedRoute>
         }
       />
       <Route
         path='group'
         element={
-          // <ProtectedRoute>
-          <GroupPage />
-          // </ProtectedRoute>
+          <ProtectedRoute>
+            <GroupPage />
+          </ProtectedRoute>
         }
       />
       <Route
         path='user'
         element={
-          // <ProtectedRoute>
-          <UserPage />
-          // </ProtectedRoute>
+          <ProtectedRoute>
+            <UserPage />
+          </ProtectedRoute>
         }
       />
+
+      <Route
+        path='folder'
+        element={
+          <ProtectedRoute>
+            <FolderPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path='/*' element={<NotFoundPage />} />
     </Route>
   )
 );

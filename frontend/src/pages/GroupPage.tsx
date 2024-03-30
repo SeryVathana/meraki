@@ -1,22 +1,21 @@
 import PostsContainer from '@/components/PostsContainer';
 import CreateGroupPostDialog from '@/components/dialogs/CreateGroupPostDialog';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
+import GroupAddMembersDialog from '@/components/dialogs/GroupAddMembersDialog';
+import GroupJoinRequests from '@/components/dialogs/GroupJoinRequests';
+import GroupMembersDialog from '@/components/dialogs/GroupMembersDialog';
+import GroupPostRequests from '@/components/dialogs/GroupPostRequests';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Dot, Ellipsis, EllipsisVertical, Pen } from 'lucide-react';
-import { useState } from 'react';
-import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import GroupMembersDialog from '@/components/dialogs/GroupMembersDialog';
-import GroupPendingRequests from '@/components/dialogs/GroupPendingRequests';
-import GroupAddMembersDialog from '@/components/dialogs/GroupAddMembersDialog';
+import { Dot, Ellipsis, Pen } from 'lucide-react';
+import { useState } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 
 const GroupPage = () => {
   const [isPublicGroup, setIsPublicGroup] = useState<boolean>(true);
@@ -80,7 +79,10 @@ const GroupPage = () => {
                 <GroupMembersDialog group_id='1' type='dropdown' />
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <GroupPendingRequests group_id='1' type='dropdown' />
+                <GroupJoinRequests group_id='1' type='dropdown' />
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <GroupPostRequests group_id='1' type='dropdown' />
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <GroupAddMembersDialog group_id='1' type='dropdown' />

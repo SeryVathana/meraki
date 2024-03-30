@@ -24,6 +24,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import GroupsDialog from './dialogs/GroupsDialog';
 import SearchDialog from './dialogs/SearchDialog';
 import { Button } from './ui/button';
+import PendingGroupInviteDialog from './dialogs/PendingGroupInviteDialog';
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -172,8 +173,10 @@ export function Navbar() {
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
                   <GroupsDialog user_id='1' type='drop-down-link' />
                 </DropdownMenuItem>
-                <DropdownMenuItem>Create Groups</DropdownMenuItem>
-                <DropdownMenuItem>Pending Invites</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/create-group')}>Create Groups</DropdownMenuItem>
+                <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
+                  <PendingGroupInviteDialog user_id='1' type='drop-down-link' />
+                </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => handleLogOut()}>Log out</DropdownMenuItem>

@@ -1,9 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowDownAZ, ArrowUpAZ, Ban, Check, Delete, Dot, FilterX, Globe, Lock, Search, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
@@ -26,7 +23,7 @@ const pendingRequests = [
   },
 ];
 
-const GroupPendingRequests = ({ group_id, type }: { group_id: string; type: string }) => {
+const GroupJoinRequests = ({ group_id, type }: { group_id: string; type: string }) => {
   const [requests, setRequests] = useState(pendingRequests);
 
   const navigate = useNavigate();
@@ -35,10 +32,10 @@ const GroupPendingRequests = ({ group_id, type }: { group_id: string; type: stri
       <DialogTrigger asChild>
         {type == 'button' ? (
           <Button variant={'secondary'} className='rounded-full px-0'>
-            Pending Requests
+            Join Requests
           </Button>
         ) : (
-          <p className='text-sm w-full px-2 py-1.5 hover:bg-secondary rounded-sm'>Pending requests</p>
+          <p className='text-sm w-full px-2 py-1.5 hover:bg-secondary rounded-sm'>Join requests</p>
         )}
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px] lg:max-w-screen-sm'>
@@ -81,4 +78,4 @@ const GroupPendingRequests = ({ group_id, type }: { group_id: string; type: stri
   );
 };
 
-export default GroupPendingRequests;
+export default GroupJoinRequests;
