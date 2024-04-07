@@ -6,6 +6,7 @@ import mockData from '../db/mock-post.json';
 
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import SavePostDialog from './dialogs/SavePostDialog';
 
 const PostsContainer = () => {
   const navigate = useNavigate();
@@ -15,18 +16,10 @@ const PostsContainer = () => {
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
 
-  useEffect(() => {
-    // setData(shuffleArray(mockData));
-  }, [data]);
-
-  if (!data) {
-    return <h1>Loading</h1>;
-  }
-
-  const handleSavePost = (id: string) => {
-    if (savedPosts.includes(id)) {
+  const handleSavePost = (postId: string) => {
+    if (savedPosts.includes(postId)) {
       setSavedPosts((prev) => {
-        const indexToRemove = prev.indexOf(id);
+        const indexToRemove = prev.indexOf(postId);
         if (indexToRemove !== -1) {
           // Create a new array without the item to remove
           const updatedPosts = [...prev.slice(0, indexToRemove), ...prev.slice(indexToRemove + 1)];
@@ -36,9 +29,17 @@ const PostsContainer = () => {
         return prev;
       });
     } else {
-      setSavedPosts([...savedPosts, id]);
+      setSavedPosts([...savedPosts, postId]);
     }
   };
+
+  useEffect(() => {
+    // setData(shuffleArray(mockData));
+  }, [data]);
+
+  if (!data) {
+    return <h1>Loading</h1>;
+  }
 
   const handleLikePost = (id: string) => {
     if (likedPosts.includes(id)) {
@@ -62,19 +63,7 @@ const PostsContainer = () => {
       {data.map((post: any, index: number) => {
         return (
           <div className='group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer' key={index}>
-            <Button
-              variant={'secondary'}
-              size={'icon'}
-              className={cn(
-                'hidden absolute top-3 right-3 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary',
-                savedPosts.includes(String(post.id))
-                  ? 'bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500'
-                  : ''
-              )}
-              onClick={() => handleSavePost(String(post.id))}
-            >
-              {savedPosts.includes(String(post.id)) ? <PinOff className='w-5 h-5' /> : <Pin className='w-5 h-5' />}
-            </Button>
+            <SavePostDialog postId={post.id} savedPosts={savedPosts} handleSavePost={handleSavePost} />
             <Button
               variant={'secondary'}
               size={'icon'}
