@@ -1,12 +1,12 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button.js';
-import { Heart, HeartCrack, Pin, PinOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import mockData from '../db/mock-post.json';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button.js";
+import { Heart, HeartCrack, Pin, PinOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import mockData from "../db/mock-post.json";
 
-import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-import SavePostDialog from './dialogs/SavePostDialog';
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import SavePostDialog from "./dialogs/SavePostDialog";
 
 const PostsContainer = () => {
   const navigate = useNavigate();
@@ -59,43 +59,50 @@ const PostsContainer = () => {
   };
 
   return (
-    <div className='columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-5 space-y-5 mt-3'>
+    <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-5 space-y-5 mt-3">
       {data.map((post: any, index: number) => {
         return (
-          <div className='group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer' key={index}>
-            <SavePostDialog postId={post.id} savedPosts={savedPosts} handleSavePost={handleSavePost} />
+          <div className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer" key={index}>
+            {savedPosts.includes(post.id) ? (
+              <Button
+                variant={"secondary"}
+                size={"icon"}
+                className={cn(
+                  "hidden absolute top-3 right-3 z-10 group-hover:flex hover:border-primary bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500"
+                )}
+              >
+                <PinOff className="w-5 h-5" />
+              </Button>
+            ) : (
+              <SavePostDialog postId={post.id} handleSavePost={handleSavePost} />
+            )}
             <Button
-              variant={'secondary'}
-              size={'icon'}
+              variant={"secondary"}
+              size={"icon"}
               className={cn(
-                'hidden absolute bottom-3 right-3 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary',
-                likedPosts.includes(String(post.id))
-                  ? 'bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500'
-                  : ''
+                "hidden absolute bottom-3 right-3 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary",
+                likedPosts.includes(String(post.id)) ? "bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500" : ""
               )}
               onClick={() => handleLikePost(String(post.id))}
             >
-              {likedPosts.includes(String(post.id)) ? <Heart className='w-5 h-5' /> : <Heart className='w-5 h-5' />}
+              {likedPosts.includes(String(post.id)) ? <Heart className="w-5 h-5" /> : <Heart className="w-5 h-5" />}
             </Button>
 
-            <div
-              className='hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center'
-              onClick={() => navigate(`/user?id=${1}`)}
-            >
-              <Avatar className='w-6 h-6'>
-                <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
+            <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user?id=${1}`)}>
+              <Avatar className="w-6 h-6">
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
-              <div className='flex flex-col text-white '>
-                <h1 className='font-medium text-sm'>Sery Vathana</h1>
+              <div className="flex flex-col text-white ">
+                <h1 className="font-medium text-sm">Sery Vathana</h1>
               </div>
             </div>
 
             <div key={index} onClick={() => navigate(`/post?id=${post.id}`)}>
-              <img className='w-full bg-gray-300' src={post.img_url} alt='' />
-              <div className='hidden group-hover:flex'>
-                <div className='absolute top-0 left-0 w-full h-full opacity-50 bg-gray-900' />
+              <img className="w-full bg-gray-300" src={post.img_url} alt="" />
+              <div className="hidden group-hover:flex">
+                <div className="absolute top-0 left-0 w-full h-full opacity-50 bg-gray-900" />
               </div>
             </div>
           </div>

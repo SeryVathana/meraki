@@ -9,7 +9,7 @@ export interface CurrentUserContextType {
 const UserContext = createContext<CurrentUserContextType | null>(null);
 
 export const AuthContextProvider = ({ children }: { children: any }) => {
-  const [user, setUser] = useState({ email: "yooseryvathana@gmail.com" });
+  const [user, setUser] = useState<any | null>({ email: "yooseryvathana@gmail.com" });
 
   return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 };
