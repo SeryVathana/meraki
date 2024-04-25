@@ -4,10 +4,6 @@ import { Navigate, Outlet } from "react-router-dom";
 const EmptyLayout = () => {
   const auth = UserAuth();
 
-  console.log("hi");
-
-  console.log(window.location.pathname);
-
   if (!auth?.user && window.location.pathname != "/login" && window.location.pathname != "/register") {
     return <Navigate to={"/login"} />;
   }
