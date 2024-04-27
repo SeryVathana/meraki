@@ -17,6 +17,9 @@ import FolderPage from "./pages/FolderPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import EmptyLayout from "./layouts/EmptyLayout";
 
+import { store } from './redux/store'
+import { Provider } from 'react-redux'
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<EmptyLayout />}>
@@ -101,9 +104,9 @@ const router = createBrowserRouter(
 
 function App() {
   return (
-    <AuthContextProvider>
+    <Provider store={store}>
       <RouterProvider router={router} />
-    </AuthContextProvider>
+    </Provider>
   );
 }
 

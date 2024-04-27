@@ -3,14 +3,24 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UserAuth } from "@/contexts/AuthContext";
 import { Link, Navigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8, "Password must contain at least 8 character(s)").max(50),
+  password: z
+    .string()
+    .min(8, "Password must contain at least 8 character(s)")
+    .max(50),
 });
 
 const LoginPage = () => {
@@ -37,7 +47,10 @@ const LoginPage = () => {
       <h1 className="text-3xl">Login</h1>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-[400px]">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8 w-[400px]"
+        >
           <FormField
             control={form.control}
             name="email"
@@ -64,6 +77,14 @@ const LoginPage = () => {
               </FormItem>
             )}
           />
+
+          <span className="text-sm text-muted-foreground pl-auto">
+            forgot password?{" "}
+            <Link to="/register" className="text-primary">
+              create new account
+            </Link>
+          </span>
+
           <div className="w-full flex justify-center">
             <Button type="submit" className="float-right">
               Login

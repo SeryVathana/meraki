@@ -37,9 +37,6 @@ const GroupPage = () => {
           alt='Image'
           className='w-full h-full object-cover rounded-xl'
         />
-        <Button className=' relative group top-0 right-0 rounded-xl cursor-pointer'>
-          <input type='file' className='absolute inset-0 w-full h-full opacity-0' />
-        </Button>
         <div className='z-40  group absolute rounded-full bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3 border-4 border-white'>
           <input type='file' className='absolute inset-0 z-50 w-full h-full opacity-0 rounded-full  cursor-pointer' />
 

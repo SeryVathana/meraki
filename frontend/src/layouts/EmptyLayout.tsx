@@ -1,10 +1,12 @@
-import { UserAuth } from "@/contexts/AuthContext";
+import { RootState } from "@/redux/store";
+import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from "react-router-dom";
 
 const EmptyLayout = () => {
-  const auth = UserAuth();
 
-  if (!auth?.user && window.location.pathname != "/login" && window.location.pathname != "/register") {
+  const auth = useSelector((state: RootState) => state.auth)
+
+  if (!auth?.email && window.location.pathname != "/login" && window.location.pathname != "/register") {
     return <Navigate to={"/login"} />;
   }
 

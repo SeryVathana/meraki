@@ -1,4 +1,5 @@
 import PostsContainer from "@/components/PostsContainer";
+import { useEffect } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 
 const FolderPage = () => {
@@ -7,6 +8,10 @@ const FolderPage = () => {
   const folderParam = pageParams.get("id");
 
   if (!folderParam) return <Navigate to={"/profile?post=saved-posts"} />;
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  },[]) 
 
   return (
     <div className="mb-10 mt-5">

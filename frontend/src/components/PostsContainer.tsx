@@ -95,7 +95,7 @@ const PostsContainer = () => {
                 )}
                 onClick={() => handleSavePost(post.id)}
               >
-                <PinOff className="w-5 h-5" />
+                <Pin className="w-5 h-5" />
               </Button>
             ) : (
               <Dialog>
@@ -157,7 +157,7 @@ const PostsContainer = () => {
               )}
               onClick={() => handleLikePost(String(post.id))}
             >
-              {likedPosts.includes(String(post.id)) ? <Heart className="w-5 h-5" /> : <Heart className="w-5 h-5" />}
+              <Heart className="w-5 h-5" />
             </Button>
 
             <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user?id=${1}`)}>

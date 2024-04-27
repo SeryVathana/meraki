@@ -15,6 +15,7 @@ import { ChevronDown, ChevronRight, Heart, Pin, SendHorizonal, Users } from 'luc
 import mockData from '../db/mock-post.json';
 
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 const mock_comments = [
   {
@@ -132,6 +133,7 @@ const PostDetailPage = () => {
     window.scrollTo(0, 0);
   }, [idParam]);
 
+
   return (
     <div>
       <div className={cn(' h-[80vh] relative mb-10 max-w-screen-lg mx-auto grid grid-cols-2 gap-10 border-[1px] rounded-2xl')}>
@@ -229,8 +231,8 @@ const PostDetailPage = () => {
                           </Avatar>
 
                           <div>
-                            <p className='line-clamp-2 text-sm' onClick={() => navigate(`/user?id=${1}`)}>
-                              <span className='font-semibold'>Sery Vathana</span> {comment.comment}
+                            <p className='line-clamp-2 text-sm'>
+                              <span className='font-semibold mr-2 cursor-pointer hover:underline' onClick={() => navigate(`/user?id=${1}`)}>Sery Vathana</span> {comment.comment}
                             </p>
 
                             <div className='flex items-center gap-4 mb-3 mt-1 text-sm'>
@@ -279,20 +281,20 @@ const PostDetailPage = () => {
                             return (
                               <div key={reply.id}>
                                 <div className='ml-10 flex gap-3 items-start'>
-                                  <Avatar className='w-8 h-8 min-w-8 min-h-8' onClick={() => navigate(`/user?id=${1}`)}>
+                                  <Avatar className='w-7 h-7' onClick={() => navigate(`/user?id=${1}`)}>
                                     <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' className='w-8 rounded-full' />
                                     <AvatarFallback>CN</AvatarFallback>
                                   </Avatar>
 
                                   <div>
-                                    <p className='line-clamp-2 text-sm' onClick={() => navigate(`/user?id=${1}`)}>
-                                      <span className='font-semibold'>Sery Vathana</span> {reply.comment}
+                                    <p className='line-clamp-2 text-sm'>
+                                      <span className='font-semibold mr-2 cursor-pointer hover:underline'  onClick={() => navigate(`/user?id=${1}`)}>Sery Vathana</span> {reply.comment}
                                     </p>
 
-                                    <div className='flex items-center  gap-4 mb-3 mt-1 text-sm'>
-                                      <h1>2d</h1>
+                                    <div className='flex items-center gap-4 mb-3 mt-1 text-xs'>
+                                      <h1 className='text-muted-foreground'>2d</h1>
                                       <button
-                                        className='float-end text-sm hover:text-gray-400'
+                                        className='float-end hover:text-gray-400'
                                         onClick={() => handleMakeReply(reply.id)}
                                       >
                                         Reply
@@ -342,7 +344,7 @@ const PostDetailPage = () => {
           <div className='sticky bottom-0 flex w-full gap-2  pt-5 pb-5 pr-3 mt-auto border-t-[1px]'>
             <Textarea
               placeholder='Add comment here.'
-              className='border-2  max-h-[100px]'
+              className='border-2  max-h-[60px]'
               value={inputComment}
               onChange={(e) => setInputComment(e.target.value)}
             />

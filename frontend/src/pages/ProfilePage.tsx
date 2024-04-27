@@ -68,9 +68,9 @@ const ProfilePage = () => {
           <PostsContainer />
         </div>
       ) : (
-        <div className='grid grid-cols-6 gap-4 my-10'>
+        <div className='grid grid-cols-6 gap-6 my-10'>
           <CreateFolderDialog />
-          {data.slice(0, 9).map((folder, index) => {
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((folder, index) => {
             return (
               <div
                 key={index}
@@ -78,7 +78,7 @@ const ProfilePage = () => {
                 className='border-[1px] h-[300px] relative group cursor-pointer flex flex-col rounded-xl overflow-hidden'
               >
                 <div className='w-full h-1/2 border-r-[1px]'>
-                  <img src={data[6].img_url} alt='' className='w-full h-full object-cover' />
+                  <img src={data[9].img_url} alt='' className='w-full h-full object-cover' />
                 </div>
                 <div className='w-full h-1/2 flex border-t-[1px]'>
                   <div className='w-1/2 h-full border-r-[1px]'>
