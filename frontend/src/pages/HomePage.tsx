@@ -1,11 +1,11 @@
 import PostsContainer from "@/components/PostsContainer";
-import { UserAuth } from "@/contexts/AuthContext";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 const HomePage = () => {
-  const auth = UserAuth();
-  const user = auth?.user;
+  const auth = useSelector((state: RootState) => state.auth);
 
-  if (user?.email) {
+  if (auth?.email) {
     return <PostsContainer />;
   } else {
     return (

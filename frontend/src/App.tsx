@@ -1,4 +1,9 @@
-import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
@@ -6,7 +11,6 @@ import ProfilePage from "./pages/ProfilePage";
 import SettingPage from "./pages/SettingPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import LoginPage from "./pages/LoginPage";
-import { AuthContextProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import RegisterPage from "./pages/RegisterPage";
 import PostDetailPage from "./pages/PostDetailPage";
@@ -17,8 +21,9 @@ import FolderPage from "./pages/FolderPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import EmptyLayout from "./layouts/EmptyLayout";
 
-import { store } from './redux/store'
-import { Provider } from 'react-redux'
+import { store } from "./redux/store";
+import { Provider } from "react-redux";
+import DashboardPage from "./pages/DashboardPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -93,6 +98,15 @@ const router = createBrowserRouter(
           element={
             <ProtectedRoute>
               <FolderPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
