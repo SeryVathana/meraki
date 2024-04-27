@@ -1,28 +1,28 @@
+import { Provider } from "react-redux";
 import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
   RouterProvider,
 } from "react-router-dom";
-
-import MainLayout from "./layouts/MainLayout";
-import HomePage from "./pages/HomePage";
-import ProfilePage from "./pages/ProfilePage";
-import SettingPage from "./pages/SettingPage";
-import CreatePostPage from "./pages/CreatePostPage";
-import LoginPage from "./pages/LoginPage";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import RegisterPage from "./pages/RegisterPage";
-import PostDetailPage from "./pages/PostDetailPage";
-import GroupPage from "./pages/GroupPage";
-import UserPage from "./pages/UserPage";
-import CreateGroupPage from "./pages/CreateGroupPage";
-import FolderPage from "./pages/FolderPage";
-import NotFoundPage from "./pages/NotFoundPage";
+import DashboardLayout from "./layouts/DashboardLayout";
 import EmptyLayout from "./layouts/EmptyLayout";
-
+import MainLayout from "./layouts/MainLayout";
+import CreateGroupPage from "./pages/CreateGroupPage";
+import CreatePostPage from "./pages/CreatePostPage";
+import DashboardOverviewPage from "./pages/DashboardOverviewPage";
+import FolderPage from "./pages/FolderPage";
+import GroupPage from "./pages/GroupPage";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import PostDetailPage from "./pages/PostDetailPage";
+import ProfilePage from "./pages/ProfilePage";
+import RegisterPage from "./pages/RegisterPage";
+import SettingPage from "./pages/SettingPage";
+import UserPage from "./pages/UserPage";
 import { store } from "./redux/store";
-import { Provider } from "react-redux";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 
 const router = createBrowserRouter(
@@ -106,10 +106,13 @@ const router = createBrowserRouter(
           path="dashboard"
           element={
             <ProtectedRoute>
-              <DashboardPage />
+              <DashboardLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="overview" element={<DashboardOverviewPage />} />
+        </Route>
       </Route>
       <Route path="/*" element={<NotFoundPage />} />
     </Route>
