@@ -1,6 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button.js";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Dot, Heart, Pin, PinOff, Search } from "lucide-react";
@@ -44,7 +50,10 @@ const PostsContainer = () => {
         const indexToRemove = prev.indexOf(postId);
         if (indexToRemove !== -1) {
           // Create a new array without the item to remove
-          const updatedPosts = [...prev.slice(0, indexToRemove), ...prev.slice(indexToRemove + 1)];
+          const updatedPosts = [
+            ...prev.slice(0, indexToRemove),
+            ...prev.slice(indexToRemove + 1),
+          ];
           return updatedPosts;
         }
         // If the item is not found, return the original array
@@ -61,7 +70,10 @@ const PostsContainer = () => {
         const indexToRemove = prev.indexOf(id);
         if (indexToRemove !== -1) {
           // Create a new array without the item to remove
-          const updatedPosts = [...prev.slice(0, indexToRemove), ...prev.slice(indexToRemove + 1)];
+          const updatedPosts = [
+            ...prev.slice(0, indexToRemove),
+            ...prev.slice(indexToRemove + 1),
+          ];
           return updatedPosts;
         }
         // If the item is not found, return the original array
@@ -85,13 +97,16 @@ const PostsContainer = () => {
     <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-5 space-y-5 mt-3">
       {data.map((post: any, index: number) => {
         return (
-          <div className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer" key={index}>
+          <div
+            className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer"
+            key={index}
+          >
             {savedPosts.includes(post.id) ? (
               <Button
                 variant={"secondary"}
                 size={"icon"}
                 className={cn(
-                  "hidden absolute top-3 right-3 z-10 group-hover:flex hover:border-primary bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500"
+                  "hidden absolute top-3 right-3 z-10 group-hover:flex hover:border-primary bg-primary text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-primary"
                 )}
                 onClick={() => handleSavePost(post.id)}
               >
@@ -112,10 +127,15 @@ const PostsContainer = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px] lg:max-w-screen-sm">
                   <DialogHeader>
-                    <DialogTitle className="my-3 flex items-center">My Folder</DialogTitle>
+                    <DialogTitle className="my-3 flex items-center">
+                      My Folder
+                    </DialogTitle>
                     <div className="flex gap-2">
                       <div className="relative w-full mr-auto">
-                        <Input placeholder="Search groups..." className="pr-10 " />
+                        <Input
+                          placeholder="Search groups..."
+                          className="pr-10 "
+                        />
                         <Search className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 w-5" />
                       </div>
                     </div>
@@ -138,7 +158,9 @@ const PostsContainer = () => {
                             <div className="flex gap-2 items-center">
                               <h1 className="text-lg">{group.group_name}</h1>
                               <Dot className="text-gray-500" />
-                              <p className="text-gray-500">{group.isPublic ? "public" : "private"}</p>
+                              <p className="text-gray-500">
+                                {group.isPublic ? "public" : "private"}
+                              </p>
                             </div>
                           </Button>
                         </DialogTrigger>
@@ -153,16 +175,24 @@ const PostsContainer = () => {
               size={"icon"}
               className={cn(
                 "hidden absolute bottom-3 right-3 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary",
-                likedPosts.includes(String(post.id)) ? "bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500" : ""
+                likedPosts.includes(String(post.id))
+                  ? "bg-primary text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-primary"
+                  : ""
               )}
               onClick={() => handleLikePost(String(post.id))}
             >
               <Heart className="w-5 h-5" />
             </Button>
 
-            <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user?id=${1}`)}>
+            <div
+              className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center"
+              onClick={() => navigate(`/user?id=${1}`)}
+            >
               <Avatar className="w-6 h-6">
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn"
+                />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
