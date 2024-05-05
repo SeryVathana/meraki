@@ -13,7 +13,7 @@ const initialState: User = {
   fullname: "Sery Vathana",
   username: "seryvathana",
   email: "yooseryvathana@gmail.com",
-  role: "admin",
+  role: "user",
 };
 
 const authSlice = createSlice({
