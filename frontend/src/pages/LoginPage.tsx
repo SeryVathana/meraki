@@ -1,28 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { RootState } from "@/redux/store";
 import { Label } from "@/components/ui/label";
+import { GoogleLogin } from 'react-google-login'; // Import GoogleLogin component
+
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8, "Password must contain at least 8 character(s)").max(50),
+  password: z.string().min(8, "Password must contain at least 8 characters").max(50),
 });
 
 const LoginPage = () => {
   const auth = useSelector((state: RootState) => state.auth);
-
-  // if (auth?.email) {
-  //   return <Navigate to={"/"} />;
-  // }
-
-  const form = useForm<z.infer<typeof formSchema>>({
+  const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -30,7 +25,15 @@ const LoginPage = () => {
     },
   });
 
-  function onLogin(values: z.infer<typeof formSchema>) {}
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    // Handle form submission here
+  };
+
+  const responseGoogle = (response: any) => {
+    console.log(response); // You'll get user information here
+    // You can dispatch an action to your Redux store to handle user authentication
+  };
+  
 
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[100vh]">
@@ -40,10 +43,11 @@ const LoginPage = () => {
             <h1 className="text-3xl font-bold">Login</h1>
             <p className="text-balance text-muted-foreground">Enter your email below to login to your account</p>
           </div>
-          <div className="grid gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} required />
+              {errors.email && <p className="text-red-500">{errors.email.message}</p>}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -52,15 +56,23 @@ const LoginPage = () => {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" {...register("password")} required />
+              {errors.password && <p className="text-red-500">{errors.password.message}</p>}
             </div>
             <Button type="submit" className="w-full mt-5">
               Login
             </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
-          </div>
+            {/* Google login button */}
+            <GoogleLogin
+              clientId="584573966192-8vas8uq7o2p04la9pva2eo5pkla0km91.apps.googleusercontent.com"
+              buttonText="Login with Google"
+              onSuccess={responseGoogle}
+              onFailure={responseGoogle} // Handle failure case if needed
+              cookiePolicy={'single_host_origin'}
+              className="w-full mt-3"
+            />
+            
+          </form>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link to="/signup" className="underline">
@@ -79,63 +91,6 @@ const LoginPage = () => {
         />
       </div>
     </div>
-    // <div className="flex flex-col items-center justify-center gap-10 h-screen pb-32">
-    //   <h1 className="text-3xl">Login</h1>
-
-    //   <Form {...form}>
-    //     <form
-    //       onSubmit={form.handleSubmit(onLogin)}
-    //       className="space-y-8 w-[400px]"
-    //     >
-    //       <FormField
-    //         control={form.control}
-    //         name="email"
-    //         render={({ field }) => (
-    //           <FormItem>
-    //             <FormLabel>Email</FormLabel>
-    //             <FormControl>
-    //               <Input placeholder="joe@mail.com" type="email" {...field} />
-    //             </FormControl>
-    //             <FormMessage />
-    //           </FormItem>
-    //         )}
-    //       />
-    //       <FormField
-    //         control={form.control}
-    //         name="password"
-    //         render={({ field }) => (
-    //           <FormItem>
-    //             <FormLabel>Password</FormLabel>
-    //             <FormControl>
-    //               <Input placeholder="********" type="password" {...field} />
-    //             </FormControl>
-    //             <FormMessage />
-    //           </FormItem>
-    //         )}
-    //       />
-
-    //       <span className="text-sm text-muted-foreground pl-auto">
-    //         forgot password?{" "}
-    //         <Link to="/register" className="text-primary">
-    //           create new account
-    //         </Link>
-    //       </span>
-
-    //       <div className="w-full flex justify-center">
-    //         <Button type="submit" className="float-right">
-    //           Login
-    //         </Button>
-    //       </div>
-    //     </form>
-    //   </Form>
-    //   <span>
-    //     Don't have account?{" "}
-    //     <Link to="/register" className="text-primary">
-    //       register
-    //     </Link>{" "}
-    //     now.
-    //   </span>
-    // </div>
   );
 };
 
