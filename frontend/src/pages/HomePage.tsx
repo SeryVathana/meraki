@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 const HomePage = () => {
   const auth = useSelector((state: RootState) => state.auth);
 
-  if (auth?.email) {
+  if (auth?.userData.email) {
     return <PostsContainer />;
   } else {
     return (

@@ -1,43 +1,47 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { login, signOut } from "./authThunk";
 
-// Define user interface with optional properties
+// Define types for user data and login/fetch response
 interface User {
-  fullname: string | null;
-  username: string | null;
-  email: string | null;
-  role: string | null;
+  // Add specific properties based on your user data structure
+  [key: string]: any;
 }
 
-// Define initial state with empty user object
-const initialState: User = {
-  fullname: "Sery Vathana",
-  username: "seryvathana",
-  email: "yooseryvathana@gmail.com",
-  role: "user",
+// Define the initial state for the auth slice
+const initialState = {
+  token: null as string | null,
+  loading: false,
+  userData: {
+    email: "jingli130604@gmail.com",
+    role:'admin'
+  } as User,
 };
 
-const authSlice = createSlice({
+export const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
-    login(state, action) {
-      const { fullname, username, email, role }: User = action.payload;
-      // Update state with user information
-      state.email = fullname;
-      state.username = username;
-      state.email = email;
-      state.role = role;
-    },
-    logout(state) {
-      // Reset state to empty user object on logout
-      state.fullname = null;
-      state.username = null;
-      state.email = null;
-      state.role = null;
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(signOut.fulfilled, (state) => {
+        state.loading = false;
+        state.userData = {};
+        state.token = null;
+      })
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        const { token, user } = action.payload;
+        state.token = token;
+        state.userData = user;
+        state.loading = false;
+      })
+      .addCase(login.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 
-export const { login, logout } = authSlice.actions;
-
+// No need to destructure actions from authSlice in TypeScript
 export default authSlice.reducer;

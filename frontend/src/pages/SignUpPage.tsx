@@ -38,7 +38,7 @@ const SignUpPage = () => {
   };
 
   const responseGoogle = (response: any) => {
-    console.log(response); // You'll get user information here
+    console.log("ers:", response); // You'll get user information here
     // You can dispatch an action to your Redux store to handle user authentication
   };
    

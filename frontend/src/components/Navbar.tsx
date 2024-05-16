@@ -24,19 +24,20 @@ import GroupsDialog from "./dialogs/GroupsDialog";
 import PendingGroupInviteDialog from "./dialogs/PendingGroupInviteDialog";
 import SearchDialog from "./dialogs/SearchDialog";
 import { Button } from "./ui/button";
-import { logout } from "@/redux/slices/authSlice";
+import { signOut } from "@/redux/slices/authThunk";
+import { useAppDispatch } from "@/redux/hook";
 
 export function Navbar() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [openDropDown, setOpenDropDown] = React.useState<boolean>(false);
 
   const auth = useSelector((state: RootState) => state.auth);
-  const user = auth.email;
+  const user = auth?.userData.email;
 
   const handleUserLogout = () => {
-    dispatch(logout());
+    dispatch(signOut());
     navigate("/login");
   };
 
@@ -71,10 +72,10 @@ export function Navbar() {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 mr-10">
-              <DropdownMenuLabel>{auth.fullname}</DropdownMenuLabel>
+              <DropdownMenuLabel>{auth.userData.fullname}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                {auth.role == "admin" && (
+                {auth.userData.role == "admin" && (
                   <DropdownMenuItem asChild>
                     <NavLink to={"/dashboard"}>Admin Dashboard</NavLink>
                   </DropdownMenuItem>

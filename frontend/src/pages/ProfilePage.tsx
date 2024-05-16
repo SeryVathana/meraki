@@ -17,6 +17,8 @@ const ProfilePage = () => {
 
   const navigate = useNavigate();
 
+  const user = auth?.userData;
+
   const postParam = params.get("post");
 
   return (
@@ -37,9 +39,9 @@ const ProfilePage = () => {
           </label>
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight lg:text-3xl">{auth.fullname}</h1>
-        <h3 className="text-slate-500">@{auth.username}</h3>
-        <h3 className="text-slate-500">{auth.email}</h3>
+        <h1 className="text-4xl font-bold tracking-tight lg:text-3xl">{user?.fullname}</h1>
+        <h3 className="text-slate-500">@{user?.username}</h3>
+        <h3 className="text-slate-500">{user?.email}</h3>
 
         <div className="flex gap-5">
           <FollowDialog user_id="1" type="followers" />

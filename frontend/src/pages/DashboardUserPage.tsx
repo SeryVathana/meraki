@@ -10,10 +10,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ListFilterIcon, MoreHorizontalIcon, Search } from "lucide-react";
+import { useState } from "react";
+
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"; // Import your Dialog components
 
 const DashboardUserPage = () => {
+
+  const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
+  const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+
+  const handleRemoveUser = (userId: string) => {
+    setOpenRemoveAlert(false);
+    // Add your logic to handle user removal here
+  };
+
+  const handleEditUser = (userId: string) => {
+    setOpenEditDialog(true);
+    // Add your logic to handle user editing here
+  };
+
+  const userInfo = () => ({
+    username: "Laser Lemonade Machine",
+    email:"yooseryvathana@gmail.com",
+    img_url:"http://example.png"
+    
+  });
+
+  // Call the food function to get the object
+  const userObject = userInfo();
+  
   return (
     <main className="grid flex-1 items-start gap-4 p-2">
       <div className="flex items-center justify-between">
@@ -85,9 +113,67 @@ const DashboardUserPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                          {/* <DropdownMenuLabel>Actions</DropdownMenuLabel> */}
+                          <DropdownMenuItem asChild>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button className="text-sm w-full text-left justify-start p-2" variant="ghost" size="sm">
+                                  Edit
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[625px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit user details</DialogTitle>
+                                  <DialogDescription>Enter new information about user to change it.</DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="img_url">Image URL</Label>
+                                    <Input id="img_url" defaultValue={userObject.img_url} className="col-span-3" />
+                                  </div>
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="title">Username</Label>
+                                    <Input id="username" defaultValue={userObject.username} className="col-span-3" />
+                                  </div>
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="description">Email</Label>
+                                    <Input id="description" defaultValue={userObject.email} className="col-span-3" />
+                                  </div>
+                                </div>
+                                <DialogFooter>
+                                  <Button type="submit">Save Changes</Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Dialog open={openRemoveAlert} onOpenChange={setOpenRemoveAlert}>
+                              <DialogTrigger asChild>
+                                <Button className="text-sm w-full text-left justify-start p-2" variant="ghost" size="sm">
+                                  Delete
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[525px]">
+                                <DialogHeader>
+                                  <DialogTitle>Confirm</DialogTitle>
+                                  <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
+                                  {/* <div className="space-y-2">
+                                    <p className="text-sm">
+                                      Name: <span className="font-semibold">food name</span>
+                                    </p>
+                                  </div> */}
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button type="submit" variant="secondary" onClick={() => setOpenRemoveAlert(false)}>
+                                    Cancel
+                                  </Button>
+                                  <Button variant="destructive" onClick={() => handleRemoveUser}>
+                                    Confirm
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
