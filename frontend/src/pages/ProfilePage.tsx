@@ -17,16 +17,15 @@ const ProfilePage = () => {
 
   const navigate = useNavigate();
 
+  const user = auth?.userData;
+
   const postParam = params.get("post");
 
   return (
     <div className="min-h-[100vh]">
       <div className="flex flex-col gap-2 items-center my-10">
         <div className="w-32 h-32 rounded-full relative group">
-          <input
-            type="file"
-            className="absolute inset-0 w-full h-full opacity-0 z-50 rounded-full cursor-pointer"
-          />
+          <input type="file" className="absolute inset-0 w-full h-full opacity-0 z-50 rounded-full cursor-pointer" />
 
           <label htmlFor="file-upload" className="relative ">
             <Avatar className="w-32 h-32  group-hover:border-2 border-gray-200">
@@ -40,11 +39,9 @@ const ProfilePage = () => {
           </label>
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight lg:text-3xl">
-          {auth.fullname}
-        </h1>
-        <h3 className="text-slate-500">@{auth.username}</h3>
-        <h3 className="text-slate-500">{auth.email}</h3>
+        <h1 className="text-4xl font-bold tracking-tight lg:text-3xl">{user?.fullname}</h1>
+        <h3 className="text-slate-500">@{user?.username}</h3>
+        <h3 className="text-slate-500">{user?.email}</h3>
 
         <div className="flex gap-5">
           <FollowDialog user_id="1" type="followers" />
@@ -53,31 +50,16 @@ const ProfilePage = () => {
 
         <div className="flex gap-5 mt-5">
           <GroupsDialog user_id="1" type="button" />
-          <Button
-            className="rounded-full"
-            onClick={() => navigate("/profile/setting")}
-          >
+          <Button className="rounded-full" onClick={() => navigate("/profile/setting")}>
             Edit Profile
           </Button>
         </div>
 
         <div className="flex gap-10 mt-10">
-          <NavLink
-            to={"/profile?post=my-posts"}
-            className={cn(
-              postParam === "my-posts" || !postParam
-                ? "underline text-primary"
-                : ""
-            )}
-          >
+          <NavLink to={"/profile?post=my-posts"} className={cn(postParam === "my-posts" || !postParam ? "underline text-primary" : "")}>
             Created
           </NavLink>
-          <NavLink
-            to={"/profile?post=saved-posts"}
-            className={cn(
-              postParam === "saved-posts" ? "underline  text-primary" : ""
-            )}
-          >
+          <NavLink to={"/profile?post=saved-posts"} className={cn(postParam === "saved-posts" ? "underline  text-primary" : "")}>
             Saved
           </NavLink>
         </div>
@@ -97,26 +79,14 @@ const ProfilePage = () => {
                 className="border-[1px] h-[300px] relative group cursor-pointer flex flex-col rounded-xl overflow-hidden"
               >
                 <div className="w-full h-1/2 border-r-[1px]">
-                  <img
-                    src={data[9].img_url}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={data[9].img_url} alt="" className="w-full h-full object-cover" />
                 </div>
                 <div className="w-full h-1/2 flex border-t-[1px]">
                   <div className="w-1/2 h-full border-r-[1px]">
-                    <img
-                      src={data[1].img_url}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={data[1].img_url} alt="" className="w-full h-full object-cover" />
                   </div>
                   <div className="w-1/2 h-full ">
-                    <img
-                      src={data[2].img_url}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={data[2].img_url} alt="" className="w-full h-full object-cover" />
                   </div>
                 </div>
               </div>

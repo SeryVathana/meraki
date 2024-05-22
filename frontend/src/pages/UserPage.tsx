@@ -1,17 +1,14 @@
-import PostsContainer from '@/components/PostsContainer';
-import FollowDialog from '@/components/dialogs/FollowDialog';
-import GroupsDialog from '@/components/dialogs/GroupsDialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { Pen } from 'lucide-react';
-import { useState } from 'react';
-
-import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
+import PostsContainer from "@/components/PostsContainer";
+import FollowDialog from "@/components/dialogs/FollowDialog";
+import GroupsDialog from "@/components/dialogs/GroupsDialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const UserPage = () => {
-  const [postParams] = useSearchParams('');
-  const idParam = postParams.get('id') || '';
+  const [postParams] = useSearchParams("");
+  const idParam = postParams.get("id") || "";
 
   const [followedUsers, setFollowedUsers] = useState<string[]>([]);
 
@@ -35,30 +32,26 @@ const UserPage = () => {
   };
 
   return (
-    <div className=''>
-      <div className='flex flex-col gap-2 items-center my-10'>
-        <Avatar className='w-32 h-32'>
-          <AvatarImage src='https://github.com/shadcn.png' />
+    <div className="">
+      <div className="flex flex-col gap-2 items-center my-10">
+        <Avatar className="w-32 h-32">
+          <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 
-        <h1 className='text-4xl font-bold tracking-tight lg:text-3xl'>Sery Vathana</h1>
-        <h3 className='text-slate-500'>@znaazmz</h3>
-        <h3 className='text-slate-500'>yooseryvathana@gmail.com</h3>
+        <h1 className="text-4xl font-bold tracking-tight lg:text-3xl">Sery Vathana</h1>
+        <h3 className="text-slate-500">@znaazmz</h3>
+        <h3 className="text-slate-500">yooseryvathana@gmail.com</h3>
 
-        <div className='flex gap-5'>
-          <FollowDialog type='followers' user_id={idParam} />
-          <FollowDialog type='followings' user_id={idParam} />
+        <div className="flex gap-5">
+          <FollowDialog type="followers" user_id={idParam} />
+          <FollowDialog type="followings" user_id={idParam} />
         </div>
 
-        <div className='flex gap-5'>
-          <GroupsDialog user_id={idParam} type='button' />
-          <Button
-            className='rounded-full'
-            variant={followedUsers.includes(idParam) ? 'default' : 'secondary'}
-            onClick={() => handleFollow(idParam)}
-          >
-            {followedUsers.includes(idParam) ? 'Follow' : 'Followed'}
+        <div className="flex gap-5">
+          <GroupsDialog user_id={idParam} type="button" />
+          <Button className="rounded-full" variant={followedUsers.includes(idParam) ? "default" : "secondary"} onClick={() => handleFollow(idParam)}>
+            {followedUsers.includes(idParam) ? "Follow" : "Followed"}
           </Button>
         </div>
       </div>
