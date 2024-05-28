@@ -1,13 +1,27 @@
+import { useAppDispatch } from "@/redux/hook";
+import { fetchUserData } from "@/redux/slices/authThunk";
 import { RootState } from "@/redux/store";
+import { getToken } from "@/utils/HelperFunctions";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
 const EmptyLayout = () => {
   const auth = useSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  // if (!auth?.userData.email && window.location.pathname != "/login" && window.location.pathname != "/register") {
-  //   return <Navigate to={"/login"} />;
-  // }
+  const getUserData = async () => {
+    try {
+      await dispatch(fetchUserData());
+    } catch (e) {
+      navigate("/login");
+    }
+  };
+
+  useEffect(() => {
+    getUserData();
+  }, [auth.token]);
 
   return (
     <div className="px-5 md:px-10">

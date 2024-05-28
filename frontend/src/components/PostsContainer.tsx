@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import mockData from "../db/mock-post.json";
 
 import { useEffect, useState } from "react";
+import { capitalizeFirstLetter } from "@/utils/HelperFunctions";
 
 const myFolders = [
   {
@@ -30,13 +31,12 @@ const myFolders = [
   },
 ];
 
-const PostsContainer = () => {
+const PostsContainer = ({ posts }) => {
   const navigate = useNavigate();
 
-  const [data, setData]: any[] = useState<any[]>(mockData);
+  const [data, setData]: any[] = useState<any[]>(posts);
 
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
-  const [likedPosts, setLikedPosts] = useState<string[]>([]);
 
   const handleSavePost = (postId: string) => {
     if (savedPosts.includes(postId)) {
@@ -55,22 +55,9 @@ const PostsContainer = () => {
     }
   };
 
-  const handleLikePost = (id: string) => {
-    if (likedPosts.includes(id)) {
-      setLikedPosts((prev) => {
-        const indexToRemove = prev.indexOf(id);
-        if (indexToRemove !== -1) {
-          // Create a new array without the item to remove
-          const updatedPosts = [...prev.slice(0, indexToRemove), ...prev.slice(indexToRemove + 1)];
-          return updatedPosts;
-        }
-        // If the item is not found, return the original array
-        return prev;
-      });
-    } else {
-      setLikedPosts([...savedPosts, id]);
-    }
-  };
+  useEffect(() => {
+    setData(posts);
+  }, [posts]);
 
   if (!data) {
     return <h1>Loading</h1>;
@@ -78,7 +65,7 @@ const PostsContainer = () => {
 
   return (
     <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-5 space-y-5 mt-3">
-      {data.map((post: any, index: number) => {
+      {data?.map((post: any, index: number) => {
         return (
           <div className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer" key={index}>
             {savedPosts.includes(post.id) ? (
@@ -143,30 +130,19 @@ const PostsContainer = () => {
                 </DialogContent>
               </Dialog>
             )}
-            <Button
-              variant={"secondary"}
-              size={"icon"}
-              className={cn(
-                "hidden absolute bottom-3 right-3 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary",
-                likedPosts.includes(String(post.id)) ? "bg-primary text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-primary" : ""
-              )}
-              onClick={() => handleLikePost(String(post.id))}
-            >
-              <Heart className="w-5 h-5" />
-            </Button>
 
             <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user?id=${1}`)}>
               <Avatar className="w-6 h-6">
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage src={post.user_pf_img_url} alt="@shadcn" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col text-white ">
-                <h1 className="font-medium text-sm">Sery Vathana</h1>
+                <h1 className="font-medium text-sm">{capitalizeFirstLetter(post.user_name)}</h1>
               </div>
             </div>
 
-            <div key={index} onClick={() => navigate(`/post?id=${post.id}`)}>
+            <div key={index} onClick={() => navigate(`/post/${post.id}`)}>
               <img className="w-full bg-gray-300" src={post.img_url} alt="" />
               <div className="hidden group-hover:flex">
                 <div className="absolute top-0 left-0 w-full h-full opacity-50 bg-gray-900" />

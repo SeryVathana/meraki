@@ -9,9 +9,9 @@ const DashboardLayout = () => {
 
   const auth = useSelector((state: RootState) => state.auth);
 
-  // if (auth?.userData.role != "admin") {
-  //   return <Navigate to={"/"} />;
-  // }
+  if (auth?.userData.role != "admin") {
+    return <Navigate to={"/"} />;
+  }
 
   useEffect(() => {
     switch (window.location.pathname) {

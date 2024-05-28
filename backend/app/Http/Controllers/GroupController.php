@@ -18,7 +18,26 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $group = Group::get();
+        $group = Group::where("status", "public")->get();
+        $data = [
+            'status' => 200,
+            'group' => $group
+        ];
+
+        return response()->json($data, 200);
+    }
+
+    public function getUserGroups($id)
+    {
+        $group = Group::where('owner_id', $id)->get();
+
+        // loop each group to get the members count
+        foreach ($group as $g) {
+            $members = GroupMember::where("group_id", $g->id)->get();
+            $membersCount = $members->count();
+            $g->members = $membersCount;
+        }
+
         $data = [
             'status' => 200,
             'group' => $group
@@ -45,6 +64,7 @@ class GroupController extends Controller
 
         $validator = Validator::make($request->all(), [
             'title' => 'required',
+            "img_url" => "nullable|url",
             'status' => 'required',
         ]);
 
@@ -65,6 +85,7 @@ class GroupController extends Controller
             $group->owner_id = $userId;
             $group->title = $request->title;
             $group->status = $request->status;
+            $group->img_url = $request->img_url;
 
             $group->save();
 
@@ -90,6 +111,7 @@ class GroupController extends Controller
      */
     public function show($id)
     {
+        $user = Auth::user();
         $group = Group::find($id);
 
         if (!$group) {
@@ -101,19 +123,45 @@ class GroupController extends Controller
             return response()->json($data, 404);
         }
 
+        $isMember = false;
+        if ($group->owner_id == $user->id) {
+            $isMember = true;
+        } else {
+            $member = GroupMember::where("group_id", $id)->where("user_id", $user->id)->first();
+            if ($member) {
+                $isMember = true;
+            }
+        }
+
+        $isAdmin = false;
+        if ($group->owner_id == $user->id) {
+            $isAdmin = true;
+        } else {
+            $member = GroupMember::where("group_id", $id)->where("user_id", $user->id)->first();
+            if ($member) {
+                if ($member->role == "admin") {
+                    $isAdmin = true;
+                }
+            }
+        }
+
         $members = GroupMember::where("group_id", $id)->get();
         $membersCount = $members->count();
 
         $post = Post::where("group_id", $id)->get();
-        $postCount = $members->count();
+
+
 
         $res = [
             "id" => $group->id,
             "title" => $group->title,
             "owner_id" => $group->owner_id,
+            "img_url" => $group->img_url,
+            "is_member" => $isMember,
+            "is_admin" => $isAdmin,
             "status" => $group->status,
             "members" => $membersCount,
-            "posts" => $postCount,
+            "posts" => count($post),
             "created_at" => $group->created_at,
             "updated_at" => $group->updated_at,
         ];
@@ -168,6 +216,7 @@ class GroupController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'status' => 'required',
+            "img_url" => "nullable|url"
         ]);
 
         if ($validator->fails()) {
@@ -182,6 +231,9 @@ class GroupController extends Controller
 
         $group->title = $request->title;
         $group->status = $request->status;
+        if ($request->img_url != "") {
+            $group->img_url = $request->img_url;
+        }
 
         $group->save();
 

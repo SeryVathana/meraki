@@ -107,7 +107,7 @@ class UserController extends Controller
             if (!Auth::attempt($request->only(['email', 'password']))) {
                 return response()->json([
                     'status' => 401,
-                    'message' => 'Email & Password does not match with our record.',
+                    'message' => 'Incorrect Email or Password',
                 ], 401);
             }
 
@@ -116,7 +116,11 @@ class UserController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'User Logged In Successfully',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
+                'data' => [
+                    'token' => $user->createToken("API TOKEN")->plainTextToken,
+                    "user" => $user
+                ]
+
             ], 200);
 
         } catch (\Throwable $th) {
@@ -125,6 +129,125 @@ class UserController extends Controller
                 'message' => $th->getMessage()
             ], 500);
         }
+    }
+
+    public function getUserData(Request $request)
+    {
+        $user = Auth::user();
+
+        print_r($user->id);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Data',
+            'data' => $user
+        ], 200);
+    }
+
+    public function getUserDataById(Request $request, $id)
+    {
+
+        $loggedInUser = Auth::user();
+
+        $user = User::find($id);
+
+        //get followers length and followings length
+        $followers = json_decode($user->followers);
+        $follings = json_decode($user->followings);
+
+        $user->followers = count($followers);
+        $user->followings = count($follings);
+
+        $isFollowing = false;
+        $key = array_search($loggedInUser->id, $followers);
+        if ($key !== false) {
+            $isFollowing = true;
+        }
+
+        $data = [
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'username' => $user->username,
+            'is_following' => $isFollowing,
+            'email' => $user->email,
+            'role' => $user->role,
+            'pf_img_url' => $user->pf_img_url,
+            'followers' => $user->followers,
+            'followings' => $user->followings,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at
+        ];
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Data',
+            'user' => $data
+        ], 200);
+    }
+
+    public function followUser($id)
+    {
+        $loggedInUser = Auth::user();
+
+        if ($loggedInUser->id == $id) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'You can not follow yourself'
+            ], 401);
+        }
+
+
+        $user = User::find($id);
+        $followers = json_decode($user->followers);
+
+        if (!array_key_exists($loggedInUser->id, $followers)) {
+            array_push($followers, $loggedInUser->id);
+        }
+
+
+        $uArr = array_unique($followers);
+
+
+        $user->followers = json_encode($uArr);
+
+        $user->save();
+
+
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Followed Successfully',
+        ], 200);
+    }
+
+    public function unfollowUser($id)
+    {
+        $loggedInUser = Auth::user();
+
+        if ($loggedInUser->id == $id) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'You can not unfollow yourself'
+            ], 401);
+        }
+
+        $user = User::find($id);
+        $followers = json_decode($user->followers);
+
+
+
+        $key = array_search($loggedInUser->id, $followers);
+        if ($key !== false) {
+            unset($followers[$key]);
+        }
+
+        $user->followers = json_encode($followers);
+        $user->save();
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Unfollowed Successfully'
+        ], 200);
     }
 
 }

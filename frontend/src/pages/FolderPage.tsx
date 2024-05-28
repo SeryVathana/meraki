@@ -10,8 +10,8 @@ const FolderPage = () => {
   if (!folderParam) return <Navigate to={"/profile?post=saved-posts"} />;
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  },[]) 
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="mb-10 mt-5">
@@ -23,7 +23,7 @@ const FolderPage = () => {
           repudiandae temporibus quam, cupiditate alias ipsum non, quis consectetur aperiam impedit! Distinctio, optio vitae!
         </p>
       </div>
-      <PostsContainer />
+      {/* <PostsContainer /> */}
     </div>
   );
 };

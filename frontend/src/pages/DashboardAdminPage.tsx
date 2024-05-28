@@ -1,41 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MoreHorizontalIcon, PlusCircleIcon, Search } from "lucide-react";
-import { useState } from "react";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"; // Import your Dialog components
-
 
 const DashboardAdminPage = () => {
-
-  const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
-  const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
-  const [openAddAlert, setOpenAddAlert] = useState<boolean>(false);
-
-  const handleRemoveUser = (userId: string) => {
-    setOpenRemoveAlert(false);
-    // Add your logic to handle user removal here
-  };
-
-  const handleEditUser = (userId: string) => {
-    setOpenEditDialog(true);
-    // Add your logic to handle user editing here
-  };
-
-  const userInfo = () => ({
-    username: "Laser Lemonade Machine",
-    email:"yooseryvathana@gmail.com",
-    img_url:"http://example.png"
-    
-  });
-
-  // Call the food function to get the object
-  const userObject = userInfo();
-
   return (
     <main className="grid flex-1 items-start gap-4 p-2">
       <div className="flex items-center justify-between">
@@ -46,41 +17,10 @@ const DashboardAdminPage = () => {
             Search
           </Button>
         </div>
-        <Dialog open={openAddAlert} onOpenChange={setOpenAddAlert}>
-                              <DialogTrigger asChild>
-                              <Button className="gap-1">
+        <Button className="gap-1">
           <PlusCircleIcon className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Add Admin</span>
         </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[625px]">
-                                <DialogHeader>
-                                  <DialogTitle>Add New Admin</DialogTitle>
-                                  <DialogDescription>Enter new admin information</DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="img_url">Image URL</Label>
-                                    <Input id="img_url" defaultValue="image" className="col-span-3" />
-                                  </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="title">Username</Label>
-                                    <Input id="username" defaultValue="username" className="col-span-3" />
-                                  </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="description">Email</Label>
-                                    <Input id="description" defaultValue="example@gmail.com" className="col-span-3" />
-                                  </div>
-                                </div>
-                                <DialogFooter>
-                                <Button type="submit" variant="secondary" onClick={() => setOpenAddAlert(false)}>
-                                    Cancel
-                                  </Button>
-                                  <Button type="submit">Add</Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-        
       </div>
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="py-4">
@@ -94,7 +34,9 @@ const DashboardAdminPage = () => {
                   <span className="sr-only">Image</span>
                 </TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="hidden md:table-cell">Price</TableHead>
+                <TableHead className="hidden md:table-cell">Total Sales</TableHead>
                 <TableHead className="hidden md:table-cell">Created at</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
@@ -109,7 +51,11 @@ const DashboardAdminPage = () => {
                       <img alt="Product image" className="aspect-square rounded-full object-cover" height="48" src="/placeholder.svg" width="48" />
                     </TableCell>
                     <TableCell className="font-medium">Laser Lemonade Machine</TableCell>
-                    <TableCell className="font-medium">yooseryvathana@gmail.com</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Draft</Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">$499.99</TableCell>
+                    <TableCell className="hidden md:table-cell">25</TableCell>
                     <TableCell className="hidden md:table-cell">2023-07-12 10:42 AM</TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -120,67 +66,9 @@ const DashboardAdminPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          {/* <DropdownMenuLabel>Actions</DropdownMenuLabel> */}
-                          <DropdownMenuItem asChild>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button className="text-sm w-full text-left justify-start p-2" variant="ghost" size="sm">
-                                  Edit
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[625px]">
-                                <DialogHeader>
-                                  <DialogTitle>Edit admin details</DialogTitle>
-                                  <DialogDescription>Enter new information about admin to change it.</DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="img_url">Image URL</Label>
-                                    <Input id="img_url" defaultValue={userObject.img_url} className="col-span-3" />
-                                  </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="title">Username</Label>
-                                    <Input id="username" defaultValue={userObject.username} className="col-span-3" />
-                                  </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="description">Email</Label>
-                                    <Input id="description" defaultValue={userObject.email} className="col-span-3" />
-                                  </div>
-                                </div>
-                                <DialogFooter>
-                                  <Button type="submit">Save Changes</Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Dialog open={openRemoveAlert} onOpenChange={setOpenRemoveAlert}>
-                              <DialogTrigger asChild>
-                                <Button className="text-sm w-full text-left justify-start p-2" variant="ghost" size="sm">
-                                  Delete
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[525px]">
-                                <DialogHeader>
-                                  <DialogTitle>Confirm</DialogTitle>
-                                  <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
-                                  {/* <div className="space-y-2">
-                                    <p className="text-sm">
-                                      Name: <span className="font-semibold">food name</span>
-                                    </p>
-                                  </div> */}
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button type="submit" variant="secondary" onClick={() => setOpenRemoveAlert(false)}>
-                                    Cancel
-                                  </Button>
-                                  <Button variant="destructive" onClick={() => handleRemoveUser}>
-                                    Confirm
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          </DropdownMenuItem>
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

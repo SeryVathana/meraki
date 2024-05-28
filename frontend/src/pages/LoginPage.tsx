@@ -4,11 +4,14 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RootState } from "@/redux/store";
 import { Label } from "@/components/ui/label";
-import { GoogleLogin } from 'react-google-login'; // Import GoogleLogin component
-
+import { GoogleLogin } from "react-google-login"; // Import GoogleLogin component
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "@/redux/hook";
+import { login } from "@/redux/slices/authThunk";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -17,7 +20,18 @@ const formSchema = z.object({
 
 const LoginPage = () => {
   const auth = useSelector((state: RootState) => state.auth);
-  const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  // States
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -25,19 +39,35 @@ const LoginPage = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    // Handle form submission here
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsError(false);
+    setErrorMessage("");
+
+    // You can dispatch an action to your Redux store to handle user authentication
+    const res = await dispatch(login(data));
+
+    if (res?.payload === undefined) {
+      setIsError(true);
+      setErrorMessage("Incorrect email or password");
+    } else {
+      navigate("/");
+    }
   };
 
-  const responseGoogle = (response: any) => {
-    console.log(response); // You'll get user information here
-    // You can dispatch an action to your Redux store to handle user authentication
-  };
-  
+  // const responseGoogle = (response: any) => {
+  //   console.log(response); // You'll get user information here
+  //   // You can dispatch an action to your Redux store to handle user authentication
+  // };
+
+  useEffect(() => {
+    if (auth.token) {
+      navigate("/");
+    }
+  });
 
   return (
-    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[100vh]">
-      <div className="flex items-center justify-center py-12">
+    <div className="w-full lg:grid lg:grid-cols-2 min-h-[100vh]">
+      <div className="flex items-center justify-center py-12 min-h-[100vh] md:min-h-auto">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold">Login</h1>
@@ -59,26 +89,32 @@ const LoginPage = () => {
               <Input id="password" type="password" {...register("password")} required />
               {errors.password && <p className="text-red-500">{errors.password.message}</p>}
             </div>
-            <Button type="submit" className="w-full mt-5">
+
+            {isError && (
+              <div className="flex justify-center items-center my-5">
+                <p className="text-destructive">{errorMessage}</p>
+              </div>
+            )}
+
+            <Button type="submit" className={cn("w-full", !isError ? "mt-5" : "")}>
               Login
             </Button>
             {/* Google login button */}
-            <GoogleLogin
-              clientId="584573966192-8vas8uq7o2p04la9pva2eo5pkla0km91.apps.googleusercontent.com"
-              buttonText="Login with Google"
-              onSuccess={responseGoogle}
-              onFailure={responseGoogle} // Handle failure case if needed
-              cookiePolicy={'single_host_origin'}
-              className="w-full mt-3"
-            />
-            
           </form>
-          <div className="mt-4 text-center text-sm">
+          <div className="text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link to="/signup" className="underline">
               Sign up
             </Link>
           </div>
+          {/* <GoogleLogin
+            clientId="584573966192-8vas8uq7o2p04la9pva2eo5pkla0km91.apps.googleusercontent.com"
+            buttonText="Login with Google"
+            onSuccess={responseGoogle}
+            onFailure={responseGoogle} // Handle failure case if needed
+            cookiePolicy={"single_host_origin"}
+            className="w-full mt-3"
+          /> */}
         </div>
       </div>
       <div className="hidden bg-muted lg:block">

@@ -19,3 +19,8 @@ export const removeUser = () => {
 export const setUser = (val) => {
   localStorage.setItem("user", val);
 };
+
+export const capitalizeFirstLetter = (string: string) => {
+  if (string === null || string === undefined) return string;
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};

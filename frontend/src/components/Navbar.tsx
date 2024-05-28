@@ -26,6 +26,7 @@ import SearchDialog from "./dialogs/SearchDialog";
 import { Button } from "./ui/button";
 import { signOut } from "@/redux/slices/authThunk";
 import { useAppDispatch } from "@/redux/hook";
+import { capitalizeFirstLetter } from "@/utils/HelperFunctions";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -36,14 +37,22 @@ export function Navbar() {
   const auth = useSelector((state: RootState) => state.auth);
   const user = auth?.userData.email;
 
-  const handleUserLogout = () => {
+  const handleUserLogout = async () => {
     dispatch(signOut());
     navigate("/login");
   };
 
+  const getFullName = () => {
+    if (auth?.userData.first_name && auth?.userData.last_name) {
+      return `${capitalizeFirstLetter(auth?.userData.first_name)} ${capitalizeFirstLetter(auth?.userData.last_name)}`;
+    } else {
+      return auth?.userData.email;
+    }
+  };
+
   return (
     <div className="w-full flex items-center gap-10">
-      <NavLink to={"/"}>
+      <NavLink to="/">
         <h1 className="scroll-m-20 text-lg text-primary font-extrabold tracking-tight lg:text-xl ">Meraki</h1>
       </NavLink>
       <NavigationMenu>
@@ -62,17 +71,17 @@ export function Navbar() {
         <div className="flex gap-5 ml-auto">
           <SearchDialog />
 
-          <GroupsDialog user_id="1" type="icon" />
+          <GroupsDialog userId={auth.userData.id} type="icon" />
 
           <DropdownMenu open={openDropDown} onOpenChange={() => setOpenDropDown(!openDropDown)}>
             <DropdownMenuTrigger asChild className=" cursor-pointer">
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <Avatar className="border rounded-full">
+                <AvatarImage src={auth.userData.pf_img_url} alt="@shadcn" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 mr-10">
-              <DropdownMenuLabel>{auth.userData.fullname}</DropdownMenuLabel>
+              <DropdownMenuLabel>{getFullName()}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 {auth.userData.role == "admin" && (
@@ -102,7 +111,7 @@ export function Navbar() {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
-                  <GroupsDialog user_id="1" type="drop-down-link" />
+                  <GroupsDialog userId={auth.userData.id} type="drop-down-link" />
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/create-group")}>Create Groups</DropdownMenuItem>
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>

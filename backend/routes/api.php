@@ -12,18 +12,27 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ReportController;
 use App\Http\Middleware\AdminRoleMiddleware;
+use App\Http\Middleware\Cors;
 use App\Models\Comment;
 
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return response()->json([
+        'status' => 200,
+        'message' => 'User Data',
+        'data' => $request->user()
+    ], 200);
 })->middleware('auth:sanctum');
 
 Route::post('auth/register', [UserController::class, 'createUser']);
 Route::post('auth/login', [UserController::class, 'loginUser']);
 
 Route::group([
-    'middleware' => 'auth:sanctum'
+    'middleware' => ['auth:sanctum']
 ], function () {
+    Route::get('user/{id}', [UserController::class, 'getUserDataById']);
+    Route::put('user/follow/{id}', [UserController::class, 'followUser']);
+    Route::put('user/unfollow/{id}', [UserController::class, 'unfollowUser']);
+
     Route::get('post', [PostController::class, "index"]);
     Route::get('post/mypost', [PostController::class, "getMyPosts"]);
     Route::get('post/user/{id}', [PostController::class, "getUserPosts"]); // $id = user id
@@ -35,8 +44,10 @@ Route::group([
     Route::delete('post/{id}', [PostController::class, "destroy"]);
     Route::get('post/highlighted', [PostController::class, 'getHighlightedPosts']);
     Route::get('post/latest', [PostController::class, 'getLatestPosts']);
+    Route::PUT('post/like/{id}', [PostController::class, 'likePost']);
 
     Route::get('group', [GroupController::class, "index"]);
+    Route::get("group/user/{id}", [GroupController::class, "getUserGroups"]);
     Route::get('group/{id}', [GroupController::class, "show"]);
     Route::post('group', [GroupController::class, "store"]);
     Route::put('group/{id}', [GroupController::class, "update"]);
@@ -65,9 +76,9 @@ Route::group([
     Route::delete('folder/{id}', [FolderController::class, "destroy"]);
 
     //Comment with multi level
-    Route::get('/comment', [CommentController::class, 'index']);
-    Route::post('/comment',  [CommentController::class,  'store']);
-    Route::post('/comment/{id}/reply',  [CommentController::class,  'reply']);
+    Route::get('/comment/{id}', [CommentController::class, 'index']);
+    Route::post('/comment', [CommentController::class, 'store']);
+    Route::post('/comment/{id}/reply', [CommentController::class, 'reply']);
 
     //Report 
     Route::post('report', [ReportController::class, 'store']);
@@ -75,34 +86,34 @@ Route::group([
 
     //Tag
     Route::get('tag', [TagController::class, "index"]);
-    Route::get('tag/{id}', [TagController::class, "show"]); 
-    Route::post('tag', [TagController::class, "store"]);
-    Route::delete('tag/{id}', [TagController::class, "destroy"]); 
-    Route::put('tag/{id}', [TagController::class, "update"]);
+    Route::get('tag/{id}', [TagController::class, "show"]);
 
 
 
     Route::group([
         'middleware' => AdminRoleMiddleware::class
-    ], function() {
-    //Group
-    Route::get('admin/group', [GroupController::class, 'index']);
+    ], function () {
+        //Group
+        Route::post('tag', [TagController::class, "store"]);
+        Route::put('tag/{id}', [TagController::class, "update"]);
+        Route::delete('tag/{id}', [TagController::class, "destroy"]);
+        Route::get('admin/group', [GroupController::class, 'index']);
 
 
-    //comment
-    Route::get('admin/comment', [CommentController::class, 'adminIndex']);
-    Route::get('admin/comment/{id}', [CommentController::class, 'adminShow']);
-    Route::delete('admin/comment/{id}', [CommentController::class, 'adminDestroy']);
+        //comment
+        Route::get('admin/comment', [CommentController::class, 'adminIndex']);
+        Route::get('admin/comment/{id}', [CommentController::class, 'adminShow']);
+        Route::delete('admin/comment/{id}', [CommentController::class, 'adminDestroy']);
 
-     //post
-     Route::get('admin/post', [PostController::class, 'adminIndex']);
-     Route::get('admin/post/{id}', [PostController::class, 'adminShow']);
-     Route::delete('admin/post/{id}', [PostController::class, 'adminDestroy']);
+        //post
+        Route::get('admin/post', [PostController::class, 'adminIndex']);
+        Route::get('admin/post/{id}', [PostController::class, 'adminShow']);
+        Route::delete('admin/post/{id}', [PostController::class, 'adminDestroy']);
 
-     //report 
-     Route::get('admin/report', [ReportController::class, 'adminIndex']);
-     Route::get('admin/postId/{id}', [ReportController::class, 'adminShow']);
-     Route::delete('admin/report/{id}', [ReportController::class, 'adminDestroy']);
-    
+        //report 
+        Route::get('admin/report', [ReportController::class, 'adminIndex']);
+        Route::get('admin/postId/{id}', [ReportController::class, 'adminShow']);
+        Route::delete('admin/report/{id}', [ReportController::class, 'adminDestroy']);
+
     });
 });

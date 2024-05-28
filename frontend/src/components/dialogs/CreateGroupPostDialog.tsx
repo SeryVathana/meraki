@@ -1,42 +1,79 @@
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Upload, X } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Book, Boxes, CookingPot, Hammer, Heart, PawPrint, PiggyBank, Plane, Shirt, Tent, Upload, X } from "lucide-react";
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Label } from "../ui/label";
+import { useToast } from "../ui/use-toast";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "@/lib/firebase";
+import { getToken } from "@/utils/HelperFunctions";
+import TagDropDown from "../TagDropDown";
 
-const formSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-});
-
-const CreateGroupPostDialog = () => {
+const CreateGroupPostDialog = ({ group, handleFetchGroupPosts }: { group: any; handleFetchGroupPosts: Function }) => {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [tempImgURL, setTempImgURL] = useState<string>('');
+  const [tempImgURL, setTempImgURL] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [selectedTag, setSelectedTag] = useState<any[]>([]);
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-    },
-  });
+  async function onSubmit() {
+    if (!uploadFile) return;
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+    const tags = selectedTag.map((tag) => tag.id);
+
+    const fileName = `user-uploaded/${uploadFile} - ${new Date().getTime()}`;
+    const imgs = ref(storage, fileName);
+    const uploadDisplay = await uploadBytes(imgs, uploadFile);
+    const imgDownloadURL = await getDownloadURL(uploadDisplay.ref);
     const reqBody = {
-      title: values.title,
-      description: values.description,
-      img_url: tempImgURL,
+      group_id: group.id,
+      title: title,
+      description: description,
+      status: group.status,
+      tag: JSON.stringify(tags),
+      img_url: imgDownloadURL,
     };
 
-    console.log(reqBody);
+    setIsLoading(true);
+
+    await fetch("http://127.0.0.1:8000/api/post", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(reqBody),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setIsLoading(false);
+        toast({
+          title: "Successfully published post.",
+          variant: "success",
+          description: "Your post is now live.",
+        });
+        handleFetchGroupPosts();
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsLoading(false);
+        toast({
+          title: "Failed to publish post.",
+          variant: "destructive",
+          description: "Please try again later.",
+        });
+      });
 
     setUploadFile(null);
-    setTempImgURL('');
+    setTempImgURL("");
   }
 
   function handleTempFileUpload(e: any) {
@@ -47,45 +84,41 @@ const CreateGroupPostDialog = () => {
 
   function handleRemoveTempImg() {
     setUploadFile(null);
-    setTempImgURL('');
+    setTempImgURL("");
   }
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={() => setOpen(!open)}>
       <DialogTrigger asChild>
-        <Button variant='default' className=''>
+        <Button variant="default" className="">
           Create Post
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[425px] lg:max-w-screen-sm'>
+      <DialogContent className="sm:max-w-[425px] lg:max-w-screen-sm">
         <DialogHeader>
           <DialogTitle>Create Post</DialogTitle>
         </DialogHeader>
 
-        <div className=' flex justify-center'>
+        <div className=" flex justify-center">
           {tempImgURL ? (
-            <div className='w-full h-[300px] rounded-2xl overflow-hidden relative border-[1px] bg-gray-200'>
-              <img src={tempImgURL} alt={tempImgURL} className='h-full object-contain mx-auto' />
+            <div className="w-full h-[300px] rounded-2xl overflow-hidden relative border-[1px] bg-gray-200">
+              <img src={tempImgURL} alt={tempImgURL} className="h-full object-contain mx-auto" />
               <Button
-                size='icon'
-                variant='destructive'
-                className='absolute top-3 right-3 rounded-lg hover:bg-red-400 hover:border-[1px]'
+                size="icon"
+                variant="destructive"
+                className="absolute top-3 right-3 rounded-lg hover:bg-red-400 hover:border-[1px]"
                 onClick={() => handleRemoveTempImg()}
               >
-                <X className='w-5' />
+                <X className="w-5" />
               </Button>
             </div>
           ) : (
-            <div className='w-full h-[300px] relative bg-gray-100 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200'>
-              <input
-                type='file'
-                className='absolute inset-0 w-full h-full opacity-0 z-50 cursor-pointer'
-                onChange={(e) => handleTempFileUpload(e)}
-              />
-              <Upload className='my-5' />
-              <h3 className='font-medium text-xl'>
-                <label htmlFor='file-upload' className='relative cursor-pointer '>
+            <div className="w-full h-[300px] relative bg-gray-100 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
+              <input type="file" className="absolute inset-0 w-full h-full opacity-0 z-50 cursor-pointer" onChange={(e) => handleTempFileUpload(e)} />
+              <Upload className="my-5" />
+              <h3 className="font-medium text-xl">
+                <label htmlFor="file-upload" className="relative cursor-pointer ">
                   <span>Drag and drop</span>
-                  <span className='text-indigo-600'> or browse </span>
+                  <span className="text-indigo-600"> or browse </span>
                   <span>to upload</span>
                 </label>
               </h3>
@@ -93,44 +126,24 @@ const CreateGroupPostDialog = () => {
           )}
         </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4 '>
-            <FormField
-              control={form.control}
-              name='title'
-              render={({ field }) => (
-                <FormItem className=''>
-                  <FormLabel>Title (optional)</FormLabel>
+        <div className="space-y-4 ">
+          <div className="space-y-2">
+            <Label>Post Title</Label>
+            <Input placeholder="Hi" />
+          </div>
+          <div className="space-y-2">
+            <Label>Post Description</Label>
+            <Textarea placeholder="Description" />
+          </div>
 
-                  <FormControl>
-                    <Input placeholder='Add title here' type='text' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
+          <TagDropDown selectedTags={selectedTag} setSelectedTags={setSelectedTag} />
 
-                  <FormControl>
-                    <Textarea placeholder='Add description here' className='max-h-[200px]' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogTrigger asChild>
-              <Button type='submit' className='float-end'>
-                Submit Post
-              </Button>
-            </DialogTrigger>
-          </form>
-        </Form>
+          <DialogTrigger asChild>
+            <Button className="float-end" disabled={isLoading || !tempImgURL} onClick={() => onSubmit()}>
+              Submit Post
+            </Button>
+          </DialogTrigger>
+        </div>
       </DialogContent>
     </Dialog>
   );
