@@ -19,28 +19,32 @@ import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import GroupsDialog from "./dialogs/GroupsDialog";
 import PendingGroupInviteDialog from "./dialogs/PendingGroupInviteDialog";
 import SearchDialog from "./dialogs/SearchDialog";
 import { Button } from "./ui/button";
 import { signOut } from "@/redux/slices/authThunk";
 import { useAppDispatch } from "@/redux/hook";
-import { capitalizeFirstLetter } from "@/utils/HelperFunctions";
+import { capitalizeFirstLetter, getToken } from "@/utils/HelperFunctions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function Navbar() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
+  const [tags, setTags] = React.useState([]);
   const [openDropDown, setOpenDropDown] = React.useState<boolean>(false);
 
   const auth = useSelector((state: RootState) => state.auth);
   const user = auth?.userData.email;
+  const [selectedTag, setSelectedTag] = React.useState<string>("all");
 
   const handleUserLogout = async () => {
     dispatch(signOut());
     navigate("/login");
   };
+
+  const tag = useParams().tag;
 
   const getFullName = () => {
     if (auth?.userData.first_name && auth?.userData.last_name) {
@@ -50,18 +54,60 @@ export function Navbar() {
     }
   };
 
+  React.useEffect(() => {
+    if (window.location.href.includes("tag") || window.location.href == "/") {
+      navigate(`/tag/${selectedTag}`);
+    }
+  }, [selectedTag]);
+
+  React.useEffect(() => {
+    fetch("http://localhost:8000/api/tag", { headers: { Authorization: `Bearer ${getToken()}` } })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setTags(data.tags);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    if (tag) {
+      setSelectedTag(tag);
+    }
+  }, [tag]);
   return (
     <div className="w-full flex items-center gap-10">
       <NavLink to="/">
         <h1 className="scroll-m-20 text-lg text-primary font-extrabold tracking-tight lg:text-xl ">Meraki</h1>
       </NavLink>
-      <NavigationMenu>
+      <NavigationMenu className="flex gap-2">
+        {(window.location.href.includes("tag") || window.location.href == "/") && (
+          <NavigationMenuList>
+            <Select
+              value={selectedTag}
+              onValueChange={(val) => {
+                setSelectedTag(val);
+              }}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Tags" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                {tags.map((tag, i) => (
+                  <SelectItem key={tag.id} value={String(tag.name).toLowerCase()}>
+                    {tag.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </NavigationMenuList>
+        )}
         <NavigationMenuList>
           {user && (
             <NavigationMenuItem asChild>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                <Link to="/create-post">Create Post</Link>
-              </NavigationMenuLink>
+              <Link to="/create-post">
+                <Button>Create Post</Button>
+              </Link>
             </NavigationMenuItem>
           )}
         </NavigationMenuList>
@@ -126,10 +172,10 @@ export function Navbar() {
       ) : (
         <div className="flex gap-5 ml-auto">
           <Button variant={"secondary"} asChild>
-            <Link to={"/login"}>Login</Link>
+            <Link to={"/login"}>Log in</Link>
           </Button>
           <Button variant={"default"} asChild>
-            <Link to={"/register"}>Register</Link>
+            <Link to={"/signup"}>Sign up</Link>
           </Button>
         </div>
       )}

@@ -79,6 +79,80 @@ class UserController extends Controller
             ], 500);
         }
     }
+    public function createUserMobile(Request $request)
+    {
+        try {
+            //Validated
+            $validateUser = Validator::make(
+                $request->all(),
+                [
+                    'username' => 'required|unique:users',
+                    'email' => 'required|email|unique:users,email',
+                    'password' => 'required',
+                ]
+            );
+
+            if ($validateUser->fails()) {
+                print_r('Error' . $validateUser->errors()->first());
+
+                if ($validateUser->errors()->first() == "The username has already been taken.") {
+                    return response()->json([
+                        "status" => 400,
+                        "message" => "Username already taken"
+                    ], 403);
+                }
+
+                if ($validateUser->errors()->first() == "The email has already been taken.") {
+                    return response()->json([
+                        "status" => 400,
+                        "message" => "Email already taken"
+                    ], 404);
+                }
+                return response()->json([
+                    'status' => 401,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+
+            if (!$request->pf_img_url) {
+                $pfImgUrl = "https://i.pinimg.com/736x/e7/fd/e7/e7fde7197f89cac7846e66ad629287cc.jpg";
+            } else {
+                $pfImgUrl = $request->pf_img_url;
+            }
+
+            if (!$request->social_login_info) {
+                $socialLoginInfo = "{}";
+            } else {
+                $socialLoginInfo = $request->social_login_info;
+            }
+
+            $user = User::create([
+                'first_name' => "First Name",
+                'last_name' => "Last Name",
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => "user",
+                'pf_img_url' => $pfImgUrl,
+                'social_login_info' => $socialLoginInfo,
+                'followers' => "[]",
+                'followings' => "[]",
+            ]);
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'User Created Successfully',
+                'token' => $user->createToken("API TOKEN")->plainTextToken
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
 
     /**
      * Login The User
@@ -142,6 +216,12 @@ class UserController extends Controller
             'message' => 'User Data',
             'data' => $user
         ], 200);
+    }
+    public function getUserDataMobile(Request $request)
+    {
+        $user = Auth::user();
+
+        return response()->json($user, 200);
     }
 
     public function getUserDataById(Request $request, $id)
@@ -247,6 +327,54 @@ class UserController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'User Unfollowed Successfully'
+        ], 200);
+    }
+
+    public function editProfile(Request $request)
+    {
+        //only username
+        $loggedUser = Auth::user();
+
+        if ($request->username == $loggedUser->username) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'No changes made'
+            ], 200);
+        }
+
+        //Validated
+        $validateUser = Validator::make(
+            $request->all(),
+            [
+                'username' => 'required|unique:users',
+            ]
+        );
+
+        if ($validateUser->fails()) {
+            print_r('Error' . $validateUser->errors()->first());
+
+            if ($validateUser->errors()->first() == "The username has already been taken.") {
+                return response()->json([
+                    "status" => 400,
+                    "message" => "Username already taken"
+                ], 403);
+            }
+            return response()->json([
+                'status' => 401,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+
+        $user = User::find($loggedUser->id);
+
+        $user->username = $request->username;
+
+        $user->save();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Profile Updated Successfully',
+            'data' => $user
         ], 200);
     }
 

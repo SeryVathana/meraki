@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { login } from "@/redux/slices/authThunk";
 import { cn } from "@/lib/utils";
+import { getToken } from "@/utils/HelperFunctions";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -60,7 +61,8 @@ const LoginPage = () => {
   // };
 
   useEffect(() => {
-    if (auth.token) {
+    const token = getToken();
+    if (token) {
       navigate("/");
     }
   });
@@ -73,7 +75,7 @@ const LoginPage = () => {
             <h1 className="text-3xl font-bold">Login</h1>
             <p className="text-balance text-muted-foreground">Enter your email below to login to your account</p>
           </div>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="m@example.com" {...register("email")} required />
@@ -82,9 +84,9 @@ const LoginPage = () => {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <Link to="/forgot-password" className="ml-auto inline-block text-sm underline">
+                {/* <Link to="/forgot-password" className="ml-auto inline-block text-sm underline">
                   Forgot your password?
-                </Link>
+                </Link> */}
               </div>
               <Input id="password" type="password" {...register("password")} required />
               {errors.password && <p className="text-red-500">{errors.password.message}</p>}
@@ -119,7 +121,7 @@ const LoginPage = () => {
       </div>
       <div className="hidden bg-muted lg:block">
         <img
-          src="/placeholder.svg"
+          src="https://images.pexels.com/photos/23105933/pexels-photo-23105933/free-photo-of-a-rock-in-the-ocean-with-waves-crashing-on-it.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           alt="Image"
           width="1920"
           height="1080"

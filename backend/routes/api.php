@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FolderController;
+use App\Http\Controllers\SavedPostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
@@ -14,6 +15,11 @@ use App\Http\Controllers\ReportController;
 use App\Http\Middleware\AdminRoleMiddleware;
 use App\Http\Middleware\Cors;
 use App\Models\Comment;
+
+Route::get('post/getall', [PostController::class, "getAllPosts"]);
+Route::get("post/search", [PostController::class, "searchPostByTitle"]);
+Route::post('post/create', [PostController::class, "createMobilePost"]);
+Route::post("auth/register-mobile", [UserController::class, "createUserMobile"]);
 
 Route::get('/user', function (Request $request) {
     return response()->json([
@@ -29,12 +35,15 @@ Route::post('auth/login', [UserController::class, 'loginUser']);
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
+    Route::get('user/mobile', [UserController::class, 'getUserDataMobile']);
+    Route::put('user/edit', [UserController::class, 'editProfile']);
     Route::get('user/{id}', [UserController::class, 'getUserDataById']);
     Route::put('user/follow/{id}', [UserController::class, 'followUser']);
     Route::put('user/unfollow/{id}', [UserController::class, 'unfollowUser']);
 
     Route::get('post', [PostController::class, "index"]);
     Route::get('post/mypost', [PostController::class, "getMyPosts"]);
+    Route::get('post/mypost/mobile', [PostController::class, "getMyPostsMobile"]);
     Route::get('post/user/{id}', [PostController::class, "getUserPosts"]); // $id = user id
     Route::get('post/group/{id}', [PostController::class, "getGroupPosts"]); // $id = group id
     Route::get('post/{id}', [PostController::class, "show"]);
@@ -71,14 +80,20 @@ Route::group([
 
     //Folder
     Route::get('folder', [FolderController::class, "index"]);
+    Route::get("folder/{id}", [FolderController::class, "show"]);
     Route::post('folder', [FolderController::class, "store"]);
     Route::put('folder/{id}', [FolderController::class, "update"]);
     Route::delete('folder/{id}', [FolderController::class, "destroy"]);
+    Route::get("folder/post/{id}", [FolderController::class, "getFoldersByPostId"]);
 
     //Comment with multi level
     Route::get('/comment/{id}', [CommentController::class, 'index']);
     Route::post('/comment', [CommentController::class, 'store']);
     Route::post('/comment/{id}/reply', [CommentController::class, 'reply']);
+
+    //Saved Post
+    Route::post('post/savepost', [SavedPostController::class, 'store']);
+    Route::get('post/savedPosts/{id}', [SavedPostController::class, 'getSavedPosts']);
 
     //Report 
     Route::post('report', [ReportController::class, 'store']);

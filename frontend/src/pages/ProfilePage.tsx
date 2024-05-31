@@ -10,6 +10,7 @@ import data from "@/db/mock-post.json";
 import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import { capitalizeFirstLetter, getToken } from "@/utils/HelperFunctions";
+import { set } from "date-fns";
 import { Pen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -19,6 +20,7 @@ const ProfilePage = () => {
   const auth = useSelector((state: RootState) => state.auth);
   const [params] = useSearchParams("my-posts");
   const [posts, setPosts] = useState<any[]>([]);
+  const [folders, setFolders] = useState<any[]>([]);
 
   const navigate = useNavigate();
 
@@ -40,22 +42,25 @@ const ProfilePage = () => {
       .then((data) => setPosts(data.posts));
   }, [auth.token]);
 
+  useEffect(() => {
+    // fetch my folders
+    if (postParam === "saved-posts") {
+      fetch("http://localhost:8000/api/folder", { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+        .then((res) => res.json())
+        .then((data) => {
+          setFolders(data.folders);
+        });
+    }
+  }, [postParam]);
+
   return (
     <div className="min-h-[100vh]">
       <div className="flex flex-col items-center my-10 space-y-2">
         <div className="w-32 h-32 rounded-full relative group">
-          <input type="file" className="absolute inset-0 w-full h-full opacity-0 z-50 rounded-full cursor-pointer" />
-
-          <label htmlFor="file-upload" className="relative ">
-            <Avatar className="w-32 h-32 border group-hover:border-4 border-gray-200">
-              <AvatarImage src={user.pf_img_url ? user.pf_img_url : ""} />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-
-            <div className="w-full h-full absolute top-0 left-0 rounded-full  opacity-0 group-hover:opacity-80 bg-gray-800 flex justify-center items-center">
-              <Pen className="text-white " />
-            </div>
-          </label>
+          <Avatar className="w-32 h-32 border group-hover:border-4 border-gray-200">
+            <AvatarImage src={user.pf_img_url ? user.pf_img_url : ""} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
         </div>
 
         <h1 className="text-4xl font-bold tracking-tight lg:text-3xl">{getFullName()}</h1>
@@ -88,24 +93,29 @@ const ProfilePage = () => {
         postParam === "my-posts" || !postParam ? (
           posts && posts.length > 0 && <PostsContainer posts={posts} />
         ) : (
-          <div className="grid grid-cols-6 gap-6 my-10">
-            <CreateFolderDialog />
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((folder, index) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+            <div className="min-h-[300px]">
+              <CreateFolderDialog />
+            </div>
+            {folders.map((folder, index) => {
               return (
                 <div
                   key={index}
-                  onClick={() => navigate("/folder?id=1")}
-                  className="border-[1px] h-[300px] relative group cursor-pointer flex flex-col rounded-xl overflow-hidden"
+                  onClick={() => navigate(`/folder/${folder.id}`)}
+                  className="group border-[1px] min-h-[250px] xl:min-h-[300px] max-h-[300px] relative group cursor-pointer flex flex-col rounded-xl overflow-hidden"
                 >
+                  <div className="hidden group-hover:flex group-hover:border justify-center items-center absolute w-full h-full bg-slate-100 bg-opacity-80 transition-opacity hover:opacity-100 opacity-0 duration-200">
+                    <h1 className="max-w-[100px] max-h-[100px] truncate text-wrap text-center font-semibold">{folder.title}</h1>
+                  </div>
                   <div className="w-full h-1/2 border-r-[1px]">
-                    <img src={data[9].img_url} alt="" className="w-full h-full object-cover" />
+                    <img src={folder.saved_posts[0]?.img_url || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
                   </div>
                   <div className="w-full h-1/2 flex border-t-[1px]">
                     <div className="w-1/2 h-full border-r-[1px]">
-                      <img src={data[1].img_url} alt="" className="w-full h-full object-cover" />
+                      <img src={folder?.saved_posts[1]?.img_url || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
                     </div>
                     <div className="w-1/2 h-full ">
-                      <img src={data[2].img_url} alt="" className="w-full h-full object-cover" />
+                      <img src={folder?.saved_posts[2]?.img_url || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>

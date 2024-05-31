@@ -79,18 +79,29 @@ const GroupsDialog = ({ userId, type }: { userId: number; type: string }) => {
 const GroupDialogContent = ({ userId }: { userId: number }) => {
   const [groups, setGroups] = useState<any[]>([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     fetch(`http://localhost:8000/api/group/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => setGroups(data.group))
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
   }, [userId]);
 
-  if (groups.length == 0) {
+  if (isLoading) {
     return (
       <div className="h-[20vh] w-full flex justify-center items-center">
         <h1>Loading...</h1>
+      </div>
+    );
+  }
+
+  if (!isLoading && groups.length == 0) {
+    return (
+      <div className="h-[20vh] w-full flex justify-center items-center">
+        <h1>No group found.</h1>
       </div>
     );
   }

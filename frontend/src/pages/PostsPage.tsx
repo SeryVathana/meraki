@@ -1,0 +1,64 @@
+import PostsContainer from "@/components/PostsContainer";
+import { RootState } from "@/redux/store";
+import { getToken } from "@/utils/HelperFunctions";
+import { useEffect, useState } from "react";
+import { set } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { redirect, useNavigate, useParams } from "react-router-dom";
+
+const PostsPage = () => {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const tag = useParams().tag;
+
+  const handleFetchPosts = () => {
+    console.log("Fetching posts...");
+    setIsLoading(true);
+    // Fetch posts
+    fetch(`http://127.0.0.1:8000/api/post?tag=${tag}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setPosts(data.posts);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    if (window.location.href.includes(tag)) {
+      setPosts([]);
+      handleFetchPosts();
+    }
+  }, [tag]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center">
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
+
+  if (!isLoading && posts.length === 0) {
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center">
+        <h1>No posts found. :(</h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[100vh]">
+      <PostsContainer posts={posts} />
+    </div>
+  );
+};
+
+export default PostsPage;

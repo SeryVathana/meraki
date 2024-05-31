@@ -23,6 +23,7 @@ import UserPage from "./pages/UserPage";
 import { store } from "./redux/store";
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "./layouts/ProtectedLayout";
+import PostsPage from "./pages/PostsPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,6 +34,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<ProtectedRoute />}>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="tag/:tag" element={<PostsPage />} />
           <Route path="profile">
             <Route index element={<ProfilePage />} />
             <Route path="setting" element={<SettingPage />} />
@@ -44,12 +46,12 @@ const router = createBrowserRouter(
           <Route path="group/:groupId" element={<GroupPage />} />
           <Route path="user/:userId" element={<UserPage />} />
 
-          <Route path="folder" element={<FolderPage />} />
+          <Route path="/folder/:id" element={<FolderPage />} />
 
           <Route path="dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="overview" element={<DashboardOverviewPage />} />
-            <Route path="user" element={<DashboardUserPage />} />
+            <Route path="users" element={<DashboardUserPage />} />
             <Route path="group" element={<DashboardGroupPage />} />
             <Route path="admin" element={<DashboardAdminPage />} />
           </Route>

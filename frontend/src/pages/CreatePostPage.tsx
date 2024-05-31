@@ -96,6 +96,7 @@ const CreatePostPage = () => {
 
     setUploadFile(null);
     setTempImgURL("");
+    setSelectedTag([]);
 
     form.clearErrors();
     form.reset();
