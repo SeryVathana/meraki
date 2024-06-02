@@ -7,7 +7,7 @@ import { User } from "@/redux/slices/authSlice";
 import { getToken } from "@/utils/HelperFunctions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { Globe, Lock, Upload, X } from "lucide-react";
+import { Globe, LoaderCircle, Lock, Upload, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -16,9 +16,13 @@ import { Button } from "../ui/button";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { set } from "date-fns";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { useToast } from "../ui/use-toast";
 
 const EditGroupDialog = ({ group, handleFetchGroupInfo, type }: { group: any; handleFetchGroupInfo: any; type: string }) => {
   const [open, setOpen] = useState(false);
+
+  if (!group) return null;
+
   return (
     <Dialog open={open} onOpenChange={() => setOpen(!open)}>
       <DialogTrigger asChild>
@@ -27,7 +31,7 @@ const EditGroupDialog = ({ group, handleFetchGroupInfo, type }: { group: any; ha
             Edit Group
           </Button>
         ) : (
-          <p className="text-sm w-full px-2 py-1.5 hover:bg-secondary rounded-sm">Edit Group</p>
+          <p className="text-sm w-full px-2 py-1.5 hover:bg-secondary rounded-sm cursor-pointer ">Edit Group</p>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] lg:max-w-screen-sm max-h-[80vh] overflow-auto">
@@ -204,6 +208,7 @@ const DeleteGroupContent = ({ group }: { group: any }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const { toast } = useToast();
 
   function handleDeleteGroup() {
     setIsLoading(true);
@@ -215,7 +220,16 @@ const DeleteGroupContent = ({ group }: { group: any }) => {
       .then((data) => {
         setIsLoading(false);
 
-        navigate("/");
+        if (data.status == 200) {
+          navigate("/tag/all");
+          toast({ title: "Success.", description: "Group deleted successfully.", variant: "success" });
+        } else {
+          setOpenDialog(false);
+          toast({ title: "Something went wrong.", description: "Failed to delete group. Please try again.", variant: "destructive" });
+        }
+      })
+      .catch((err) => {
+        toast({ title: "Something went wrong.", description: "Failed to delete group. Please try again.", variant: "destructive" });
       });
   }
 
@@ -225,12 +239,15 @@ const DeleteGroupContent = ({ group }: { group: any }) => {
         <div className="">
           <DialogHeader className="mb-5 mt-16">
             <DialogTitle>Delete group</DialogTitle>
-            <DialogDescription>Think twice bro, there's no way back fr fr.</DialogDescription>
+            <DialogDescription>Are you sure you want to delete this group? This action cannot be undone.</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-3 gap-5">
             {isLoading ? (
-              <Button className="w-full" disabled>
-                Deleting
+              <Button className="w-full" disabled variant="destructive">
+                <div className="flex gap-2 items-center">
+                  <LoaderCircle className="animate-spin" />
+                  <span>Deleting</span>
+                </div>
               </Button>
             ) : (
               <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>

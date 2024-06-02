@@ -9,20 +9,23 @@ import { getToken } from "@/utils/HelperFunctions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { Globe, Lock, Upload, X } from "lucide-react";
+import { Globe, LoaderCircle, Lock, Upload, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import errorMap from "zod/locales/en.js";
 
 const formSchema = z.object({
-  title: z.string({ required_error: "Name is required" }).min(3, "Group name must 3 characters long.").max(50),
+  title: z.string({ required_error: "Name is required" }).trim().min(3, "Group name must 3 characters long.").max(50),
 });
 
 const CreateGroupPage = () => {
+  const navigate = useNavigate();
   const [uploadProfileFile, setUploadProfileFile] = useState<File | null>(null);
   const [tempProfileImgURL, setTempProfileImgURL] = useState<string>("");
   const [status, setStatus] = useState<string>("public");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -33,6 +36,9 @@ const CreateGroupPage = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (isLoading) return;
+
+    setIsLoading(true);
     const fileName = `user-uploaded/${uploadProfileFile} - ${new Date().getTime()}`;
     const imgs = ref(storage, fileName);
     const uploadDisplay = await uploadBytes(imgs, uploadProfileFile);
@@ -59,6 +65,10 @@ const CreateGroupPage = () => {
             variant: "success",
             description: "Your group is now live.",
           });
+
+          setTimeout(() => {
+            navigate(`/group/${data.id}`);
+          }, 1000);
         } else {
           toast({
             title: "Failed to created group.",
@@ -66,6 +76,9 @@ const CreateGroupPage = () => {
             description: "Please try again.",
           });
         }
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
 
     setUploadProfileFile(null);
@@ -157,8 +170,15 @@ const CreateGroupPage = () => {
                   </div>
                 </div>
                 <div className="flex">
-                  <Button type="submit" className="w-full">
-                    Create group
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <div className="flex gap-2 items-center">
+                        <LoaderCircle className="animate-spin" />
+                        <span>Creating...</span>
+                      </div>
+                    ) : (
+                      "Create group"
+                    )}
                   </Button>
                 </div>
               </form>

@@ -7,8 +7,8 @@ import { RootState } from "@/redux/store";
 import { PostType } from "@/types/types";
 import { getToken } from "@/utils/HelperFunctions";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { format, formatDistance } from "date-fns";
-import { ChevronDown, ChevronRight, Heart, MessageCircle, Pin, SendHorizonal, Users } from "lucide-react";
+import { format, formatDistance, set } from "date-fns";
+import { ChevronDown, ChevronRight, Heart, LoaderCircle, MessageCircle, Pin, SearchX, SendHorizonal, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -26,6 +26,7 @@ const PostDetailPage = () => {
   const [replyToId, setReplyToId] = useState<string>("");
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isPinned, setIsPinned] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -83,7 +84,7 @@ const PostDetailPage = () => {
   };
 
   const handleLikePost = (postId: number) => {
-    setIsLiked(!isLiked);
+    setIsLiked((prev) => !prev);
     fetch(`http://localhost:8000/api/post/like/${postId}`, {
       method: "PUT",
       headers: {
@@ -94,13 +95,7 @@ const PostDetailPage = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.status == 200) {
-          setPost((prev) => {
-            if (isLiked) {
-              return { ...prev, like_count: prev.like_count - 1, likes: prev.likes.filter((id) => id != auth.userData.id) };
-            } else {
-              return { ...prev, like_count: prev.like_count + 1, likes: [...prev.likes, auth.userData.id] };
-            }
-          });
+          handleFetchPost();
         }
       });
   };
@@ -113,10 +108,16 @@ const PostDetailPage = () => {
       });
   };
 
-  useEffect(() => {
+  const handleFetchPost = () => {
     fetch(`http://localhost:8000/api/post/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
-      .then((data) => setPost(data.post));
+      .then((data) => setPost(data.post))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    setIsLoading(true);
+    handleFetchPost();
 
     window.scrollTo(0, 0);
   }, [postId]);
@@ -126,7 +127,7 @@ const PostDetailPage = () => {
   }, [postId]);
 
   useEffect(() => {
-    setIsLiked(post?.likes.includes(auth.userData.id));
+    setIsLiked(post?.is_liked);
   }, [post]);
 
   useEffect(() => {
@@ -138,8 +139,22 @@ const PostDetailPage = () => {
     setTotalComments(totalComments);
   }, [comments]);
 
-  if (!post) {
-    return <div>Loading...</div>;
+  if (isLoading && !post) {
+    return (
+      <div className="w-full h-[80vh] flex flex-col justify-center items-center gap-2">
+        <LoaderCircle className="w-10 h-10 text-gray-400 animate-spin" />
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isLoading && !post) {
+    return (
+      <div className="w-full h-[80vh] flex flex-col justify-center items-center gap-2">
+        <SearchX className="w-10 h-10 text-gray-400" />
+        <h1>Post not found. Something went wrong.</h1>
+      </div>
+    );
   }
 
   return (
@@ -151,7 +166,7 @@ const PostDetailPage = () => {
         <div className={cn("relative flex flex-col pt-5 max-h-[80vh]")}>
           <div className={cn("flex flex-col pr-5  overflow-auto")}>
             <div className="flex gap-4 items-center">
-              <Avatar className="cursor-pointer border rounded-full overflow-hidden" onClick={() => navigate(`/user?id=${1}`)}>
+              <Avatar className="cursor-pointer border rounded-full overflow-hidden" onClick={() => navigate(`/user/${1}`)}>
                 <AvatarImage src={post.user_pf_img_url} alt="@shadcn" className="w-12 " />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
@@ -183,6 +198,16 @@ const PostDetailPage = () => {
 
             <div className="my-3">
               <p className={cn("text-md  text-muted-foreground")}>{post.description}</p>
+            </div>
+
+            <div className="flex gap-2">
+              {post.tags.map((tag) => {
+                return (
+                  <Link to={`/tag/${String(tag.name).toLowerCase()}`} key={tag.id} className="text-blue-600 text-sm">
+                    #{tag.name}
+                  </Link>
+                );
+              })}
             </div>
 
             <div className="flex gap-5 items-center my-2">
@@ -217,14 +242,14 @@ const PostDetailPage = () => {
                     <div key={comment.id}>
                       <div className="relative">
                         <div className="flex gap-3 items-start">
-                          <Avatar className="w-8 h-8 min-w-8 min-h-8 rounded-full border overflow-hidden" onClick={() => navigate(`/user?id=${1}`)}>
+                          <Avatar className="w-8 h-8 min-w-8 min-h-8 rounded-full border overflow-hidden" onClick={() => navigate(`/user/${1}`)}>
                             <AvatarImage src={comment.user_pf_img_url} alt="@shadcn" className="w-8" />
                             <AvatarFallback>CN</AvatarFallback>
                           </Avatar>
 
                           <div>
                             <p className="text-sm max-w-full ">
-                              <span className="font-semibold mr-2 cursor-pointer hover:underline" onClick={() => navigate(`/user?id=${1}`)}>
+                              <span className="font-semibold mr-2 cursor-pointer hover:underline" onClick={() => navigate(`/user/${1}`)}>
                                 {comment.user_name}
                               </span>{" "}
                               <span className="break-words break-all">{comment.comment}</span>
@@ -265,7 +290,7 @@ const PostDetailPage = () => {
                                   <div className="flex gap-3 items-start">
                                     <Avatar
                                       className="w-8 h-8 min-w-8 min-h-8 rounded-full border overflow-hidden"
-                                      onClick={() => navigate(`/user?id=${1}`)}
+                                      onClick={() => navigate(`/user/${1}`)}
                                     >
                                       <AvatarImage src={reply.user_pf_img_url} alt="@shadcn" className="w-8" />
                                       <AvatarFallback>CN</AvatarFallback>
@@ -273,7 +298,7 @@ const PostDetailPage = () => {
 
                                     <div>
                                       <p className="line-clamp-2 text-sm">
-                                        <span className="font-semibold mr-2 cursor-pointer hover:underline" onClick={() => navigate(`/user?id=${1}`)}>
+                                        <span className="font-semibold mr-2 cursor-pointer hover:underline" onClick={() => navigate(`/user/${1}`)}>
                                           {reply.user_name}
                                         </span>{" "}
                                         {reply.comment}

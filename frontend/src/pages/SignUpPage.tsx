@@ -19,7 +19,13 @@ const formSchema = z
     lastName: z.string().min(2, "Last name must be at least 2 characters").max(50),
     userName: z.string().min(2, "Username must be at least 2 characters").max(16, "Username must be at most 16 characters"),
     email: z.string().email(),
-    password: z.string().min(8, "Password must contain at least 8 characters").max(50),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters in length")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Password must contain at least one digit")
+      .regex(/[@$!%*#?&]/, "Password must contain at least one special character"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -47,8 +53,6 @@ const SignUpPage = () => {
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     // Handle form submission here
-    console.log(data);
-
     const reqBody = {
       first_name: data.firstName,
       last_name: data.lastName,
@@ -66,7 +70,6 @@ const SignUpPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         if (data.status == 200) {
           toast({
             title: "Successfully registered account.",
@@ -84,12 +87,9 @@ const SignUpPage = () => {
               form.setError("userName", { message: "Username already exists" });
             }
           }
-          // Redirect to login page
         }
       })
       .catch((err) => console.error(err));
-
-    // form.setError("email", { message: "Email already exists" });
   };
 
   useEffect(() => {
@@ -137,15 +137,27 @@ const SignUpPage = () => {
               <Input id="email" type="email" placeholder="m@example.com" {...form.register("email")} required />
               {errors.email && <p className="text-red-500">{errors.email.message}</p>}
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...form.register("password")} required />
+              <Input id="password" type="password" placeholder="***********" {...form.register("password")} required />
               {errors.password && <p className="text-red-500">{errors.password.message}</p>}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input id="confirmPassword" type="password" {...form.register("confirmPassword")} required />
+              <Input id="confirmPassword" type="password" placeholder="***********" {...form.register("confirmPassword")} required />
               {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
+            </div>
+
+            <div className="">
+              <p className="font-semibold">Password must meet the following criteria:</p>
+              <ul className="text-slate-500 ml-2 space-y-1 my-2 text-sm">
+                <li>1. Must be at least 8 characters in length</li>
+                <li>2. Must contain at least one lowercase letter</li>
+                <li>3. Must contain at least one uppercase letter</li>
+                <li>4. Must contain at least one digit</li>
+                <li>5. Must contain at least one special character (@, $, !, %, *, #, ?, &)</li>
+              </ul>
             </div>
 
             <Button type="submit" className="w-full mt-5">

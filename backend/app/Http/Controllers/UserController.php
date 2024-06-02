@@ -27,7 +27,14 @@ class UserController extends Controller
                     'last_name' => 'required',
                     'username' => 'required|unique:users',
                     'email' => 'required|email|unique:users,email',
-                    'password' => 'required',
+                    'password' => [
+                        'required',
+                        'min:8',
+                        'regex:/[a-z]/',      // must contain at least one lowercase letter
+                        'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                        'regex:/[0-9]/',      // must contain at least one digit
+                        'regex:/[@$!%*#?&]/', // must contain a special character
+                    ],
                     'pf_img_url' => 'nullable',
                     'social_login_info' => 'nullable',
                 ]
@@ -286,13 +293,22 @@ class UserController extends Controller
         }
 
 
+        $self = User::find($loggedInUser->id);
+        $myFollowing = json_decode($self->followings);
+
+        if (!array_key_exists($user->id, $myFollowing)) {
+            array_push($myFollowing, $user->id);
+        }
+
         $uArr = array_unique($followers);
+        $selfArr = array_unique($myFollowing);
 
-
+        $self->followings = json_encode($selfArr);
         $user->followers = json_encode($uArr);
 
-        $user->save();
 
+        $user->save();
+        $self->save();
 
 
         return response()->json([
@@ -330,7 +346,7 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function editProfile(Request $request)
+    public function editProfileMobile(Request $request)
     {
         //only username
         $loggedUser = Auth::user();
@@ -377,5 +393,240 @@ class UserController extends Controller
             'data' => $user
         ], 200);
     }
+    public function editProfile(Request $request)
+    {
+        //only username
+        $loggedUser = Auth::user();
 
+        if ($request->username == $loggedUser->username && $request->first_name == $loggedUser->first_name && $request->last_name == $loggedUser->last_name) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'No changes made'
+            ], 200);
+        }
+
+        //Validated
+        if ($request->username != $loggedUser->username) {
+            $validateUser = Validator::make(
+                $request->all(),
+                [
+                    'first_name' => 'required',
+                    'last_name' => 'required',
+                    'username' => 'required|unique:users',
+                ]
+            );
+        } else {
+            $validateUser = Validator::make(
+                $request->all(),
+                [
+                    'first_name' => 'required',
+                    'last_name' => 'required',
+                ]
+            );
+        }
+
+        if ($validateUser->fails()) {
+            print_r('Error' . $validateUser->errors()->first());
+
+            if ($validateUser->errors()->first() == "The username has already been taken.") {
+                return response()->json([
+                    "status" => 400,
+                    "message" => "Username already taken"
+                ], 403);
+            }
+            return response()->json([
+                'status' => 401,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+
+        $user = User::find($loggedUser->id);
+
+        $user->username = $request->username;
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+
+        $user->save();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Profile Updated Successfully',
+        ], 200);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Logged Out Successfully'
+        ], 200);
+    }
+
+    public function logoutAll(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Logged Out From All Devices Successfully'
+        ], 200);
+    }
+
+    public function updateUserPassword(Request $request)
+    {
+        $loggedUser = Auth::user();
+
+
+        $validateUser = Validator::make(
+            $request->all(),
+            [
+                'old_password' => 'required',
+                'new_password' => [
+                    'required',
+                    'min:8',
+                    'regex:/[a-z]/',      // must contain at least one lowercase letter
+                    'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                    'regex:/[0-9]/',      // must contain at least one digit
+                    'regex:/[@$!%*#?&]/', // must contain a special character
+                ]
+            ]
+        );
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+
+        if (!Hash::check($request->old_password, $loggedUser->password)) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Incorrect Old Password',
+            ], 401);
+        }
+
+        //check if new password is same as old password
+        if (Hash::check($request->new_password, $loggedUser->password)) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'New Password can not be same as Old Password',
+            ], 401);
+        }
+
+        $loggedUser->password = Hash::make($request->new_password);
+        $loggedUser->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Password Updated Successfully',
+        ], 200);
+    }
+
+
+    public function updateUserPfImg(Request $request)
+    {
+        $loggedUser = Auth::user();
+
+        $validateUser = Validator::make(
+            $request->all(),
+            [
+                'pf_img_url' => 'required',
+            ]
+        );
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+
+        $loggedUser->pf_img_url = $request->pf_img_url;
+        $loggedUser->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Profile Image Updated Successfully',
+        ], 200);
+    }
+
+    public function getUserFollowers($id)
+    {
+        $loggedInUser = Auth::user();
+        $user = User::find($id);
+
+        $followers = json_decode($user->followers);
+
+        $data = [];
+
+
+        foreach ($followers as $follower) {
+            $f = User::find($follower);
+            $isFollowing = false;
+
+            $followers = json_decode($f->followers);
+            if (in_array($loggedInUser->id, $followers)) {
+                $isFollowing = true;
+            }
+
+
+            $userData = [
+                'id' => $f->id,
+                'first_name' => $f->first_name,
+                'last_name' => $f->last_name,
+                'email' => $f->email,
+                'pf_img_url' => $f->pf_img_url,
+                'is_following' => $isFollowing,
+            ];
+            array_push($data, $userData);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Followers',
+            'data' => $data
+        ], 200);
+    }
+
+
+    public function getUserFollowings($id)
+    {
+        $loggedInUser = Auth::user();
+        $user = User::find($id);
+
+        $followings = json_decode($user->followings);
+
+        $data = [];
+
+
+        foreach ($followings as $following) {
+            $f = User::find($following);
+            $isFollowing = false;
+
+            $followers = json_decode($f->followers);
+            if (in_array($loggedInUser->id, $followers)) {
+                $isFollowing = true;
+            }
+
+
+            $userData = [
+                'id' => $f->id,
+                'first_name' => $f->first_name,
+                'last_name' => $f->last_name,
+                'email' => $f->email,
+                'pf_img_url' => $f->pf_img_url,
+                'is_following' => $isFollowing,
+            ];
+            array_push($data, $userData);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Followings',
+            'data' => $data
+        ], 200);
+    }
 }

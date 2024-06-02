@@ -29,7 +29,7 @@ class PostController extends Controller
 
         $posts = [];
         $tag = Tag::where('name', $qTag)->first();
-        $allPosts = Post::where("status", "public")->get();
+        $allPosts = Post::where("status", "public")->orderByDesc("created_at")->get();
 
         $posts = [];
         if ($tag) {
@@ -504,9 +504,6 @@ class PostController extends Controller
             $post->group_title = $group->title;
         }
 
-
-
-
         $tags = json_decode($post->tag);
 
         $tagDetails = [];
@@ -523,6 +520,7 @@ class PostController extends Controller
             "id" => $post->id,
             "user_id" => $post->user_id,
             "group_id" => $post->group_id,
+            "group_title" => "",
             "tags" => $tagDetails,
             "title" => $post->title,
             "description" => $post->description,
@@ -536,6 +534,13 @@ class PostController extends Controller
             "created_at" => $post->created_at,
             "updated_at" => $post->updated_at
         ];
+
+        if ($post->group_id != null) {
+            $group = Group::find($post->group_id);
+            $postData["group_title"] = $group->title;
+        }
+
+
 
         $data = [
             "status" => 200,

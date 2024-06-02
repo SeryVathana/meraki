@@ -64,7 +64,6 @@ export function Navbar() {
     fetch("http://localhost:8000/api/tag", { headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setTags(data.tags);
       });
   }, []);
@@ -132,26 +131,38 @@ export function Navbar() {
               <DropdownMenuGroup>
                 {auth.userData.role == "admin" && (
                   <DropdownMenuItem asChild>
-                    <NavLink to={"/dashboard"}>Admin Dashboard</NavLink>
+                    <NavLink to={"/dashboard"} className="cursor-pointer">
+                      Admin Dashboard
+                    </NavLink>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile"}>Profile</NavLink>
+                  <NavLink to={"/profile"} className="cursor-pointer">
+                    Profile
+                  </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile/setting"}>Setting</NavLink>
+                  <NavLink to={"/profile/setting"} className="cursor-pointer">
+                    Setting
+                  </NavLink>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile?post=my-posts"}>My Posts</NavLink>
+                  <NavLink to={"/profile?post=my-posts"} className="cursor-pointer">
+                    My Posts
+                  </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/create-post"}>Create Posts</NavLink>
+                  <NavLink to={"/create-post"} className="cursor-pointer">
+                    Create Posts
+                  </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile?post=saved-posts"}>Saved Posts</NavLink>
+                  <NavLink to={"/profile?post=saved-posts"} className="cursor-pointer">
+                    Saved Posts
+                  </NavLink>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
@@ -159,13 +170,17 @@ export function Navbar() {
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
                   <GroupsDialog userId={auth.userData.id} type="drop-down-link" />
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/create-group")}>Create Groups</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/create-group")} className="cursor-pointer">
+                  Create Groups
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
-                  <PendingGroupInviteDialog user_id="1" type="drop-down-link" />
+                  <PendingGroupInviteDialog type="drop-down-link" />
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleUserLogout()}>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleUserLogout()} className="cursor-pointer">
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

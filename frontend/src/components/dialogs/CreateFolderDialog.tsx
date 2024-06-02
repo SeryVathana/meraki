@@ -15,7 +15,7 @@ const formSchema = z.object({
   description: z.string().max(500, "Description must be equal or less than 24 characters.").optional(),
 });
 
-const CreateFolderDialog = () => {
+const CreateFolderDialog = ({ handleFetchFolders }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,6 +46,7 @@ const CreateFolderDialog = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
+        handleFetchFolders();
       })
       .catch((err) => console.log(err));
 

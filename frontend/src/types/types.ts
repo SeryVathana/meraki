@@ -9,11 +9,16 @@ export type PostType = {
   description: string;
   img_url: string;
   status: "public" | "private";
-  tag: string;
+  tags: TagsType[];
   likes: number[];
   like_count: number;
   is_liked: boolean;
   created_at: string;
   updated_at: string;
   is_highlighted: number;
+};
+
+type TagsType = {
+  id: number;
+  name: string;
 };

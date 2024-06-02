@@ -25,4 +25,10 @@ export const login = createAsyncThunk("auth/login", async (payload: any) => {
 
 export const signOut = createAsyncThunk("auth/signOut", async () => {
   removeToken();
+
+  await axios.put("http://localhost:8000/api/auth/logout", null, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
 });

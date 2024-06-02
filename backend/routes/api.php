@@ -35,11 +35,18 @@ Route::post('auth/login', [UserController::class, 'loginUser']);
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
+    Route::put('auth/logout', [UserController::class, 'logout']);
+    Route::get('auth/logoutAll', [UserController::class, 'logoutAll']);
+    Route::put('user/password', [UserController::class, 'updateUserPassword']);
     Route::get('user/mobile', [UserController::class, 'getUserDataMobile']);
     Route::put('user/edit', [UserController::class, 'editProfile']);
+    Route::put('user/editMobile', [UserController::class, 'editProfileMobile']);
     Route::get('user/{id}', [UserController::class, 'getUserDataById']);
     Route::put('user/follow/{id}', [UserController::class, 'followUser']);
     Route::put('user/unfollow/{id}', [UserController::class, 'unfollowUser']);
+    Route::put('user/updatepf', [UserController::class, 'updateUserPfImg']);
+    Route::get('user/follower/{id}', [UserController::class, 'getUserFollowers']);
+    Route::get('user/following/{id}', [UserController::class, 'getUserFollowings']);
 
     Route::get('post', [PostController::class, "index"]);
     Route::get('post/mypost', [PostController::class, "getMyPosts"]);
@@ -57,26 +64,34 @@ Route::group([
 
     Route::get('group', [GroupController::class, "index"]);
     Route::get("group/user/{id}", [GroupController::class, "getUserGroups"]);
+    Route::get("group/mygroups", [GroupController::class, "getMyGroups"]);
     Route::get('group/{id}', [GroupController::class, "show"]);
     Route::post('group', [GroupController::class, "store"]);
     Route::put('group/{id}', [GroupController::class, "update"]);
     Route::delete('group/{id}', [GroupController::class, "destroy"]);
 
     // Group member
+    Route::put("group/public/join/{id}", [GroupController::class, "joinPublicGroup"]); // $id = group id
+    Route::put("group/leave/{id}", [GroupController::class, "leaveGroup"]); // $id = group id
+
+    Route::get("group/notmember/{id}", [GroupMemberController::class, "getNotMembers"]); // $id = group id
     Route::get('group/member/{id}', [GroupMemberController::class, "show"]); // $id = group id
     Route::put('group/member/{id}', [GroupMemberController::class, "update"]); // $id = group id
     Route::delete('group/member/{id}', [GroupMemberController::class, "destroy"]); // $id = group id
+    Route::put("group/promote/{id}", [GroupController::class, "promoteToAdmin"]); // $id = group id
+
 
     // Group invite
     Route::get('group/invite/{id}', [GroupInviteController::class, "index"]); //$id = group id
     Route::post('group/invite/{id}', [GroupInviteController::class, "store"]); //$id = group id
     Route::delete('group/invite/{id}', [GroupInviteController::class, "destroy"]); //$id = invite id
     Route::put('group/invite/accept/{id}', [GroupInviteController::class, "update"]); //$id = invite id
-
+    Route::get("group/pending/invite", [GroupInviteController::class, "getPendingInvites"]);
     //Group request
     Route::post('group/request/{id}', [GroupRequestController::class, "store"]); //$id = group id
     Route::put('group/request/accept/{id}', [GroupRequestController::class, "update"]); //$id = group id
     Route::delete('group/request/{id}', [GroupRequestController::class, "destroy"]); //$id = group id
+    Route::get("group/request/pending/{id}", [GroupRequestController::class, "getPendingRequests"]); //$id = group id
 
     //Folder
     Route::get('folder', [FolderController::class, "index"]);

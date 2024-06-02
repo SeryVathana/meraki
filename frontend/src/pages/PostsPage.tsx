@@ -1,6 +1,7 @@
 import PostsContainer from "@/components/PostsContainer";
 import { RootState } from "@/redux/store";
 import { getToken } from "@/utils/HelperFunctions";
+import { LoaderCircle, SearchX } from "lucide-react";
 import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
 import { useSelector } from "react-redux";
@@ -27,7 +28,9 @@ const PostsPage = () => {
       .then((data) => {
         setPosts(data.posts);
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err);
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -40,16 +43,18 @@ const PostsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full h-[80vh] flex justify-center items-center">
-        <h1>Loading...</h1>
+      <div className="w-full h-[80vh] flex flex-col justify-center items-center gap-2">
+        <LoaderCircle className="w-10 h-10 text-gray-400 animate-spin" />
+        <p>Loading...</p>
       </div>
     );
   }
 
   if (!isLoading && posts.length === 0) {
     return (
-      <div className="w-full h-[80vh] flex justify-center items-center">
-        <h1>No posts found. :(</h1>
+      <div className="w-full h-[80vh] flex flex-col justify-center items-center gap-2">
+        <SearchX className="w-10 h-10 text-gray-400" />
+        <h1>No posts found.</h1>
       </div>
     );
   }

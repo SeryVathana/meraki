@@ -86,6 +86,15 @@ const CreateGroupPostDialog = ({ group, handleFetchGroupPosts }: { group: any; h
     setUploadFile(null);
     setTempImgURL("");
   }
+
+  if (!group) {
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center">
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={() => setOpen(!open)}>
       <DialogTrigger asChild>

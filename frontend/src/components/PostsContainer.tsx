@@ -1,44 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button.js";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { Dot, Heart, Pin, PinOff, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import mockData from "../db/mock-post.json";
-
 import { useEffect, useState } from "react";
-import { capitalizeFirstLetter } from "@/utils/HelperFunctions";
+import { useNavigate } from "react-router-dom";
 import SavePostDialog from "./dialogs/SavePostDialog";
 
-const myFolders = [
-  {
-    id: "1",
-    img_url: "https://github.com/shadcn.png",
-    group_name: "Kab Jak",
-    isPublic: true,
-  },
-  {
-    id: "2",
-    img_url: "https://github.com/shadcn.png",
-    group_name: "Informationo Technology and Engineering",
-    isPublic: false,
-  },
-  {
-    id: "3",
-    img_url: "https://github.com/shadcn.png",
-    group_name: "Royal University of Phnom Penh",
-    isPublic: true,
-  },
-];
-
-const PostsContainer = ({ posts, handleFetchSavedPosts }: { posts: any[]; handleFetchSavedPosts?: Function }) => {
+const PostsContainer = ({ posts }: { posts: any[] }) => {
   const navigate = useNavigate();
-
   const [data, setData]: any[] = useState<any[]>(posts);
-
-  const [savedPosts, setSavedPosts] = useState<string[]>([]);
-
   useEffect(() => {
     setData(posts);
   }, [posts]);
@@ -60,8 +27,8 @@ const PostsContainer = ({ posts, handleFetchSavedPosts }: { posts: any[]; handle
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
-              <div className="flex flex-col text-white ">
-                <h1 className="font-medium text-sm">{capitalizeFirstLetter(post.user_name)}</h1>
+              <div className="flex flex-col text-white">
+                <h1 className="font-medium text-sm line-clamp-1 truncate">{post.user_name}</h1>
               </div>
             </div>
 

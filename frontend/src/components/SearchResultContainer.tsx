@@ -1,11 +1,11 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button.js';
-import { Heart, HeartCrack, Pin, PinOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import mockData from '../db/mock-post.json';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button.js";
+import { Heart, HeartCrack, Pin, PinOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import mockData from "../db/mock-post.json";
 
-import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 const SearchResultContainer = ({ handleSearchDialog }: { handleSearchDialog: Function }) => {
   const navigate = useNavigate();
@@ -54,51 +54,47 @@ const SearchResultContainer = ({ handleSearchDialog }: { handleSearchDialog: Fun
   };
 
   return (
-    <div className='columns-2 sm:columns-3 md:columns-3 lg:columns-5 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto px-0 sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-2 md:gap-5 space-y-2 md:space-y-5 mt-3'>
+    <div className="columns-2 sm:columns-3 md:columns-3 lg:columns-5 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto px-0 sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-2 md:gap-5 space-y-2 md:space-y-5 mt-3">
       {data.map((post: any, index: number) => {
         return (
-          <div className='group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer' key={index}>
+          <div className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer" key={index}>
             <Button
-              variant={'secondary'}
-              size={'icon'}
+              variant={"secondary"}
+              size={"icon"}
               className={cn(
-                'hidden absolute top-2 right-2 w-8 h-8 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary',
-                savedPosts.includes(String(post.id))
-                  ? 'bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500'
-                  : ''
+                "hidden absolute top-2 right-2 w-8 h-8 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary",
+                savedPosts.includes(String(post.id)) ? "bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500" : ""
               )}
               onClick={() => handleSavePost(String(post.id))}
             >
-              {savedPosts.includes(String(post.id)) ? <PinOff className='w-4 h-4' /> : <Pin className='w-4 h-4' />}
+              {savedPosts.includes(String(post.id)) ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
             </Button>
             <Button
-              variant={'secondary'}
-              size={'icon'}
+              variant={"secondary"}
+              size={"icon"}
               className={cn(
-                'hidden absolute bottom-2 right-2 w-8 h-8 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary',
-                likedPosts.includes(String(post.id))
-                  ? 'bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500'
-                  : ''
+                "hidden absolute bottom-2 right-2 w-8 h-8 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary",
+                likedPosts.includes(String(post.id)) ? "bg-red-500 text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-red-500" : ""
               )}
               onClick={() => handleLikePost(String(post.id))}
             >
-              {likedPosts.includes(String(post.id)) ? <Heart className='w-4 h-4' /> : <Heart className='w-4 h-4' />}
+              {likedPosts.includes(String(post.id)) ? <Heart className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
             </Button>
 
             <div
-              className='hidden group-hover:flex absolute bottom-2 left-2 gap-1 z-10 items-center'
+              className="hidden group-hover:flex absolute bottom-2 left-2 gap-1 z-10 items-center"
               onClick={() => {
                 handleSearchDialog();
-                navigate(`/user?id=${1}`);
+                navigate(`/user/${1}`);
               }}
             >
-              <Avatar className='w-6 h-6'>
-                <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
+              <Avatar className="w-6 h-6">
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
-              <div className='flex flex-col text-white '>
-                <h1 className='text-xs'>Sery Vathana</h1>
+              <div className="flex flex-col text-white ">
+                <h1 className="text-xs">Sery Vathana</h1>
               </div>
             </div>
 
@@ -109,9 +105,9 @@ const SearchResultContainer = ({ handleSearchDialog }: { handleSearchDialog: Fun
                 navigate(`/post?id=${post.id}`);
               }}
             >
-              <img className='w-full bg-gray-300' src={post.img_url} alt='' />
-              <div className='hidden group-hover:flex'>
-                <div className='absolute top-0 left-0 w-full h-full opacity-50 bg-gray-900' />
+              <img className="w-full bg-gray-300" src={post.img_url} alt="" />
+              <div className="hidden group-hover:flex">
+                <div className="absolute top-0 left-0 w-full h-full opacity-50 bg-gray-900" />
               </div>
             </div>
           </div>

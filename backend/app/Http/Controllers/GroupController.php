@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\GroupMember;
+use App\Models\GroupRequest;
 use App\Models\Post;
 use App\Http\Requests\StoreGroupRequest;
 use App\Http\Requests\UpdateGroupRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Validator;
@@ -18,10 +20,100 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $group = Group::where("status", "public")->get();
+        $group = Group::get();
+
+
         $data = [
             'status' => 200,
-            'group' => $group
+            'groups' => $group
+        ];
+
+        return response()->json($data, 200);
+    }
+    public function getMyGroups(Request $request)
+    {
+        $user = Auth::user();
+
+        $status = $request->query('status');
+
+        $type = $request->query("type");
+        $groups = [];
+
+        if ($status != "public" && $status != "private") {
+            if ($type == "my-group") {
+                $groups = Group::where("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->get();
+            } else {
+                if ($type == "joined-group") {
+
+                    $joinedGroupIds = GroupMember::where("user_id", $user->id)->get();
+
+                    $joinedGroups = [];
+
+                    foreach ($joinedGroupIds as $joinedGroup) {
+                        $group = Group::where("id", $joinedGroup->group_id)->whereNot("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->first();
+
+                        if ($group) {
+                            array_push($joinedGroups, $group);
+                        }
+                    }
+
+                    $groups = $joinedGroups;
+                } else {
+                    $joinedGroupIds = GroupMember::where("user_id", $user->id)->get();
+
+                    $joinedGroups = [];
+
+                    foreach ($joinedGroupIds as $joinedGroup) {
+                        $group = Group::where("id", $joinedGroup->group_id)->where("title", "like", "%" . $request->query("search") . "%")->first();
+
+                        if ($group) {
+                            array_push($joinedGroups, $group);
+                        }
+                    }
+                    $groups = $joinedGroups;
+                }
+            }
+        } else {
+
+            if ($type == "my-group") {
+                $groups = Group::where("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->where("status", $status)->get();
+            } else {
+                if ($type == "joined-group") {
+
+                    $joinedGroupIds = GroupMember::where("user_id", $user->id)->get();
+
+                    $joinedGroups = [];
+
+                    foreach ($joinedGroupIds as $joinedGroup) {
+                        $group = Group::where("id", $joinedGroup->group_id)->whereNot("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->where("status", $status)->first();
+
+                        if ($group) {
+                            array_push($joinedGroups, $group);
+                        }
+                    }
+
+                    $groups = $joinedGroups;
+                } else {
+                    $joinedGroupIds = GroupMember::where("user_id", $user->id)->get();
+
+                    $joinedGroups = [];
+
+                    foreach ($joinedGroupIds as $joinedGroup) {
+                        $group = Group::where("id", $joinedGroup->group_id)->where("title", "like", "%" . $request->query("search") . "%")->where("status", $status)->first();
+
+                        if ($group) {
+                            array_push($joinedGroups, $group);
+                        }
+                    }
+                    $groups = $joinedGroups;
+                }
+            }
+
+        }
+
+        $data = [
+            'status' => 200,
+            'groups' => $groups
         ];
 
         return response()->json($data, 200);
@@ -99,7 +191,8 @@ class GroupController extends Controller
 
             $data = [
                 "status" => 200,
-                "message" => "Group created successfully"
+                "message" => "Group created successfully",
+                "id" => $group->id,
             ];
 
             return response()->json($data, 200);
@@ -165,6 +258,16 @@ class GroupController extends Controller
             "created_at" => $group->created_at,
             "updated_at" => $group->updated_at,
         ];
+
+        if ($group->status == "private") {
+            $req = GroupRequest::where("group_id", $id)->where("user_id", $user->id)->first();
+
+            if ($req) {
+                $res["is_requesting"] = true;
+            } else {
+                $res["is_requesting"] = false;
+            }
+        }
 
         $data = [
             "status" => 200,
@@ -242,11 +345,44 @@ class GroupController extends Controller
         $data = [
             "status" => 200,
             "message" => "Group updated successfully"
+
         ];
 
         return response()->json($data, 200);
 
 
+    }
+
+    public function promoteToAdmin($id)
+    {
+        $auth = Auth::user();
+
+        $member = GroupMember::find($id);
+        if (!$member) {
+            return response()->json([
+                "status" => 404,
+                "message" => "Member not found"
+            ], 404);
+        }
+
+        $group = Group::find($member->group_id);
+
+        $isOwner = Group::where("id", $group->id)->where("owner_id", $auth->id)->first();
+        if (!$isOwner) {
+            return response()->json([
+                "status" => 401,
+                "message" => "Unauthorized"
+            ], 401);
+        }
+        //change group member role with id to admin
+        $member->role = "admin";
+        $member->save();
+
+        $data = [
+            "status" => 200,
+            "message" => "Member promoted to admin successfully"
+        ];
+        return response()->json($data, 200);
     }
 
     /**
@@ -277,6 +413,10 @@ class GroupController extends Controller
 
         $group->delete();
 
+        GroupMember::where("group_id", "=", $group->id)->delete();
+
+        Post::where("group_id", "=", $group->id)->delete();
+
         $data = [
             "status" => 200,
             "message" => "Group deleted successfully",
@@ -284,5 +424,86 @@ class GroupController extends Controller
 
         return response()->json($data, 200);
 
+    }
+
+
+    public function joinPublicGroup($id)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $group = Group::find($id);
+
+        if (!$group) {
+            $data = [
+                "status" => 404,
+                "message" => "Group not found",
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $member = GroupMember::where("group_id", $id)->where("user_id", $userId)->first();
+
+        if ($member) {
+            $data = [
+                "status" => 400,
+                "message" => "You are already a member of this group"
+            ];
+
+            return response()->json($data, 400);
+        }
+
+        $member = new GroupMember;
+
+        $member->group_id = $id;
+        $member->user_id = $userId;
+        $member->role = "member";
+
+        $member->save();
+
+        $data = [
+            "status" => 200,
+            "message" => "You have joined the group successfully"
+        ];
+
+        return response()->json($data, 200);
+    }
+
+    public function leaveGroup($id)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $group = Group::find($id);
+
+        if (!$group) {
+            $data = [
+                "status" => 404,
+                "message" => "Group not found",
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $member = GroupMember::where("group_id", $id)->where("user_id", $userId)->first();
+
+        if (!$member) {
+            $data = [
+                "status" => 400,
+                "message" => "You are not a member of this group"
+            ];
+
+            return response()->json($data, 400);
+        }
+
+        $member->delete();
+
+        $data = [
+            "status" => 200,
+            "message" => "You have left the group successfully"
+        ];
+
+        return response()->json($data, 200);
     }
 }

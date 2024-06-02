@@ -16,7 +16,7 @@ import { getToken } from "@/utils/HelperFunctions";
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8, "Password must contain at least 8 characters").max(50),
+  password: z.string(),
 });
 
 const LoginPage = () => {
@@ -69,7 +69,7 @@ const LoginPage = () => {
 
   return (
     <div className="w-full lg:grid lg:grid-cols-2 min-h-[100vh]">
-      <div className="flex items-center justify-center py-12 min-h-[100vh] md:min-h-auto">
+      <div className="flex items-center justify-center py-12 min-h-[100vh]">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold">Login</h1>
@@ -88,7 +88,7 @@ const LoginPage = () => {
                   Forgot your password?
                 </Link> */}
               </div>
-              <Input id="password" type="password" {...register("password")} required />
+              <Input id="password" type="password" placeholder="***********" {...register("password")} required />
               {errors.password && <p className="text-red-500">{errors.password.message}</p>}
             </div>
 
@@ -119,7 +119,7 @@ const LoginPage = () => {
           /> */}
         </div>
       </div>
-      <div className="hidden bg-muted lg:block">
+      <div className="hidden bg-muted lg:block h-[100vh]">
         <img
           src="https://images.pexels.com/photos/23105933/pexels-photo-23105933/free-photo-of-a-rock-in-the-ocean-with-waves-crashing-on-it.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           alt="Image"

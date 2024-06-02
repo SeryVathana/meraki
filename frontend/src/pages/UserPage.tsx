@@ -22,9 +22,9 @@ const UserPage = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [followedUsers, setFollowedUsers] = useState<string[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
+  const navigate = useNavigate();
 
   const handleFetchUserPosts = () => {
-    const navigate = useNavigate();
     // fetch user posts
     fetch(`http://localhost:8000/api/post/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
@@ -35,21 +35,31 @@ const UserPage = () => {
   };
 
   const handleFollow = () => {
+    setIsFollowing((prev) => !prev);
     if (isFollowing) {
       fetch(`http://localhost:8000/api/user/unfollow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
         .then((data) => {
           console.log(data);
-          setIsFollowing(false);
         });
     } else {
       fetch(`http://localhost:8000/api/user/follow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
         .then((data) => {
           console.log(data);
-          setIsFollowing(true);
         });
     }
+
+    handleFetchUserInfo();
+  };
+
+  const handleFetchUserInfo = () => {
+    fetch(`http://localhost:8000/api/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setUser(data.user);
+      });
   };
 
   useEffect(() => {
@@ -59,17 +69,12 @@ const UserPage = () => {
       return;
     }
 
-    fetch(`http://localhost:8000/api/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setUser(data.user);
-      });
+    handleFetchUserInfo();
   }, [userId]);
 
   useEffect(() => {
     handleFetchUserPosts();
-  }, [userId]);
+  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -78,13 +83,18 @@ const UserPage = () => {
   }, [user]);
 
   useEffect(() => {
+    console.log(auth.userData.id, userId);
     if (auth.userData.id == Number(userId)) {
       naigate("/profile");
     }
-  }, [auth.token]);
+  }, [userId]);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center">
+        <h1>Loading...</h1>
+      </div>
+    );
   }
 
   return (
