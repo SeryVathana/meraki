@@ -36,7 +36,6 @@ const FolderPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setFolder(data.folder);
       })
       .catch((err) => {

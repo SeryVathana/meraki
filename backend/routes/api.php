@@ -21,20 +21,13 @@ Route::get("post/search", [PostController::class, "searchPostByTitle"]);
 Route::post('post/create', [PostController::class, "createMobilePost"]);
 Route::post("auth/register-mobile", [UserController::class, "createUserMobile"]);
 
-Route::get('/user', function (Request $request) {
-    return response()->json([
-        'status' => 200,
-        'message' => 'User Data',
-        'data' => $request->user()
-    ], 200);
-})->middleware('auth:sanctum');
-
 Route::post('auth/register', [UserController::class, 'createUser']);
 Route::post('auth/login', [UserController::class, 'loginUser']);
 
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
+    Route::get("user", [UserController::class, "getUserData"]);
     Route::put('auth/logout', [UserController::class, 'logout']);
     Route::get('auth/logoutAll', [UserController::class, 'logoutAll']);
     Route::put('user/password', [UserController::class, 'updateUserPassword']);

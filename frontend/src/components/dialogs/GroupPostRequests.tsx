@@ -48,7 +48,7 @@ const GroupPostRequests = ({ group_id, type }: { group_id: string; type: string 
               <div key={index} className="flex w-full justify-between px-2 py-2 rounded-md border-[1px]">
                 <div className="flex w-full gap-5">
                   <Avatar className="hover:border-2 cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
-                    <AvatarImage src={user.img_url} />
+                    <AvatarImage src={user.img_url} className="object-cover w-full h-full" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
 

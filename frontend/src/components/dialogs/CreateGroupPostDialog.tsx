@@ -1,17 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Book, Boxes, CookingPot, Hammer, Heart, PawPrint, PiggyBank, Plane, Shirt, Tent, Upload, X } from "lucide-react";
-import { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Label } from "../ui/label";
-import { useToast } from "../ui/use-toast";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { getToken } from "@/utils/HelperFunctions";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { Upload, X } from "lucide-react";
+import { useState } from "react";
 import TagDropDown from "../TagDropDown";
+import { Label } from "../ui/label";
+import { useToast } from "../ui/use-toast";
 
 const CreateGroupPostDialog = ({ group, handleFetchGroupPosts }: { group: any; handleFetchGroupPosts: Function }) => {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -53,7 +51,6 @@ const CreateGroupPostDialog = ({ group, handleFetchGroupPosts }: { group: any; h
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsLoading(false);
         toast({
           title: "Successfully published post.",

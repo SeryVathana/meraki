@@ -23,7 +23,7 @@ const PostsContainer = ({ posts }: { posts: any[] }) => {
 
             <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user/${1}`)}>
               <Avatar className="w-6 h-6">
-                <AvatarImage src={post.user_pf_img_url} alt="@shadcn" />
+                <AvatarImage src={post.user_pf_img_url} alt="@shadcn" className="object-cover w-full h-full" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 

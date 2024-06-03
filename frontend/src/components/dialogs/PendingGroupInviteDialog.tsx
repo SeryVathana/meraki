@@ -1,34 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  ArrowDownAZ,
-  ArrowUpAZ,
-  Ban,
-  Check,
-  Dot,
-  Ellipsis,
-  FilterX,
-  Globe,
-  Hand,
-  Loader,
-  LoaderCircle,
-  Lock,
-  Search,
-  SearchX,
-  TriangleAlert,
-  Users,
-  X,
-} from "lucide-react";
-import { Button } from "../ui/button";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { useEffect, useState } from "react";
 import { format } from "date-fns";
+import { Check, Dot, LoaderCircle, SearchX, TriangleAlert, Users, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../ui/button";
 
 const PendingGroupInviteDialog = ({ type }: { type: string }) => {
+  const auth = useSelector((state: RootState) => state.auth);
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={() => setOpen(!open)}>
@@ -42,7 +23,14 @@ const PendingGroupInviteDialog = ({ type }: { type: string }) => {
             Pending Invites
           </Button>
         ) : type == "drop-down-link" ? (
-          <p className="text-sm w-full px-2 py-1 hover:bg-slate-100 rounded-sm cursor-pointer">Pending Invites</p>
+          <div className="text-sm relative w-full px-2 py-2 hover:bg-slate-100 rounded-sm cursor-pointer">
+            <p>Pending Invites</p>
+            {auth.userData.invites > 0 && (
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 px-[5px] py-[0px] text-xs rounded-full bg-destructive text-white">
+                {auth.userData.invites}
+              </div>
+            )}
+          </div>
         ) : (
           ""
         )}
@@ -71,7 +59,6 @@ const GroupInvitesContent = () => {
     fetch(`http://localhost:8000/api/group/pending/invite`, { method: "GET", headers: { Authorization: `Bearer ${auth.token}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setGroups(data.invites);
       })
       .finally(() => {
@@ -90,7 +77,6 @@ const GroupInvitesContent = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         handleFetchGroups();
       })
       .catch((err) => {
@@ -106,7 +92,6 @@ const GroupInvitesContent = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         handleFetchGroups();
       })
       .catch((err) => {
@@ -143,7 +128,7 @@ const GroupInvitesContent = () => {
         <div className="flex justify-between items-center">
           <DialogTrigger className="flex w-fit justify-start gap-5 py-2 cursor-pointer" onClick={() => navigate(`/group?id=${group.id}`)}>
             <Avatar className="border">
-              <AvatarImage src={group.img_url} className="object-cover" />
+              <AvatarImage src={group.img_url} className="object-cover w-full h-full" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
 

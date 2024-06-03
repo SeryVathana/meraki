@@ -55,9 +55,9 @@ const router = createBrowserRouter(
             <Route path="group" element={<DashboardGroupPage />} />
             <Route path="admin" element={<DashboardAdminPage />} />
           </Route>
+          <Route path="/*" element={<NotFoundPage />} />
         </Route>
       </Route>
-      <Route path="/*" element={<NotFoundPage />} />
     </Route>
   )
 );

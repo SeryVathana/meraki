@@ -89,7 +89,7 @@ const SearchResultContainer = ({ handleSearchDialog }: { handleSearchDialog: Fun
               }}
             >
               <Avatar className="w-6 h-6">
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" className="object-cover w-full h-full" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 

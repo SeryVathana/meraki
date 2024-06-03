@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { v4 } from "uuid";
+import NotFoundPage from "./NotFoundPage";
 
 const PostDetailPage = () => {
   const auth = useSelector((state: RootState) => state.auth);
@@ -149,12 +150,7 @@ const PostDetailPage = () => {
   }
 
   if (!isLoading && !post) {
-    return (
-      <div className="w-full h-[80vh] flex flex-col justify-center items-center gap-2">
-        <SearchX className="w-10 h-10 text-gray-400" />
-        <h1>Post not found. Something went wrong.</h1>
-      </div>
-    );
+    return <NotFoundPage />;
   }
 
   return (

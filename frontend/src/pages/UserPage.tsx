@@ -29,7 +29,6 @@ const UserPage = () => {
     fetch(`http://localhost:8000/api/post/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setPosts(data.posts);
       });
   };
@@ -39,15 +38,11 @@ const UserPage = () => {
     if (isFollowing) {
       fetch(`http://localhost:8000/api/user/unfollow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-        });
+        .then((data) => {});
     } else {
       fetch(`http://localhost:8000/api/user/follow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-        });
+        .then((data) => {});
     }
 
     handleFetchUserInfo();
@@ -57,7 +52,6 @@ const UserPage = () => {
     fetch(`http://localhost:8000/api/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setUser(data.user);
       });
   };
@@ -101,7 +95,7 @@ const UserPage = () => {
     <div className="">
       <div className="flex flex-col gap-2 items-center my-10">
         <Avatar className="w-32 h-32 border">
-          <AvatarImage src={user.pf_img_url} />
+          <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 

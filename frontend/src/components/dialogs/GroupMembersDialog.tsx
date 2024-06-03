@@ -64,7 +64,6 @@ const GroupMemberContent = ({ group, searchQuery }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setMembers(data.members);
       })
       .finally(() => setIsLoading(false));
@@ -74,6 +73,18 @@ const GroupMemberContent = ({ group, searchQuery }) => {
     if (searchQuery && searchQuery.length < 2) return;
     handleFetchGroupMembers();
   }, [group, searchQuery]);
+
+  useEffect(() => {
+    // Store the interval id in a const, so you can cleanup later
+    const intervalId = setInterval(() => {
+      handleFetchGroupMembers();
+    }, 5000);
+
+    return () => {
+      // Since useEffect dependency array is empty, this will be called only on unmount
+      clearInterval(intervalId);
+    };
+  }, []);
 
   if (members.length == 0 && !isLoading) {
     return (
@@ -100,7 +111,7 @@ const GroupMemberContent = ({ group, searchQuery }) => {
           <div key={index} className="flex w-full justify-between px-2 py-2 rounded-md border-[1px]">
             <div className="flex w-full gap-5">
               <Avatar className="hover:border-2 cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
-                <AvatarImage src={user.pf_img_url} />
+                <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
@@ -164,7 +175,6 @@ const PromotionDialog = ({ user, handleFetchGroupMembers }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsOpen(false);
         handleFetchGroupMembers();
       })
@@ -190,7 +200,7 @@ const PromotionDialog = ({ user, handleFetchGroupMembers }) => {
         </DialogHeader>
         <div className="flex gap-2 items-center">
           <Avatar className="border">
-            <AvatarImage src={user.pf_img_url} />
+            <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
@@ -230,7 +240,6 @@ const RemoveUserDialog = ({ user, group, handleFetchGroupMembers }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsOpen(false);
         handleFetchGroupMembers();
       })
@@ -254,7 +263,7 @@ const RemoveUserDialog = ({ user, group, handleFetchGroupMembers }) => {
         <h1>Are you sure you want to remove user from group?</h1>
         <div className="flex gap-2 items-center">
           <Avatar className="border">
-            <AvatarImage src={user.pf_img_url} />
+            <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>

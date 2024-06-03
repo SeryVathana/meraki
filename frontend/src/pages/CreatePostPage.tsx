@@ -76,7 +76,6 @@ const CreatePostPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsLoading(false);
         toast({
           title: "Successfully published post.",

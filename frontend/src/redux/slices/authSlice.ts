@@ -17,6 +17,9 @@ export type User = {
   followings: number[];
   created_at: string;
   updated_at: string;
+  invites: number;
+  group_req: number;
+  total_noti: number;
 };
 
 // Define the initial state for the auth slice

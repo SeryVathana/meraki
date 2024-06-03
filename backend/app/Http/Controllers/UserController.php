@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GroupInvite;
+use App\Models\GroupMember;
+use App\Models\GroupRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -216,12 +219,39 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        print_r($user->id);
+        $invites = GroupInvite::where('user_id', $user->id)->get();
+
+        $myGroupsAsAdmin = GroupMember::where('user_id', $user->id)
+            ->where('role', 'admin')
+            ->get();
+
+        // Check if any group_id matches in GroupRequest
+        $groupIds = $myGroupsAsAdmin->pluck('group_id');
+        $joinRequests = GroupRequest::whereIn('group_id', $groupIds)->get();
+
+        $data = [
+            "id" => $user->id,
+            "first_name" => $user->first_name,
+            "last_name" => $user->last_name,
+            "username" => $user->username,
+            "email" => $user->email,
+            "role" => $user->role,
+            "pf_img_url" => $user->pf_img_url,
+            "social_login_info" => $user->social_login_info,
+            "followers" => $user->followers,
+            "followings" => $user->followings,
+            "created_at" => $user->created_at,
+            "updated_at" => $user->updated_at,
+            "invites" => count($invites),
+            "group_req" => count($joinRequests),
+            "total_noti" => count($invites) + count($joinRequests),
+        ];
 
         return response()->json([
             'status' => 200,
             'message' => 'User Data',
-            'data' => $user
+            // 'data' => $data
+            'data' => $data
         ], 200);
     }
     public function getUserDataMobile(Request $request)
@@ -553,8 +583,9 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUserFollowers($id)
+    public function getUserFollowers(Request $request, $id)
     {
+        $searchQuery = $request->query('q');
         $loggedInUser = Auth::user();
         $user = User::find($id);
 
@@ -562,9 +593,22 @@ class UserController extends Controller
 
         $data = [];
 
-
         foreach ($followers as $follower) {
-            $f = User::find($follower);
+            $f = "";
+            if ($searchQuery != "") {
+                $f = User::find($follower)->where("id", $follower)->where(function ($query) use ($searchQuery) {
+                    $query->where('first_name', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('email', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('username', 'like', '%' . $searchQuery . '%');
+                })->first();
+            } else {
+                $f = User::find($follower);
+            }
+            if (!$f) {
+                continue;
+            }
+
             $isFollowing = false;
 
             $followers = json_decode($f->followers);
@@ -592,8 +636,9 @@ class UserController extends Controller
     }
 
 
-    public function getUserFollowings($id)
+    public function getUserFollowings(Request $request, $id)
     {
+        $searchQuery = $request->query('q');
         $loggedInUser = Auth::user();
         $user = User::find($id);
 
@@ -603,7 +648,20 @@ class UserController extends Controller
 
 
         foreach ($followings as $following) {
-            $f = User::find($following);
+            $f = "";
+            if ($searchQuery != "") {
+                $f = User::find($following)->where("id", $following)->where(function ($query) use ($searchQuery) {
+                    $query->where('first_name', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('email', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('username', 'like', '%' . $searchQuery . '%');
+                })->first();
+            } else {
+                $f = User::find($following);
+            }
+            if (!$f) {
+                continue;
+            }
             $isFollowing = false;
 
             $followers = json_decode($f->followers);

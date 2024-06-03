@@ -11,6 +11,7 @@ import { User } from "@/redux/slices/authSlice";
 import { capitalizeFirstLetter, getToken } from "@/utils/HelperFunctions";
 
 const FollowerDialog = ({ user }: { user: User }) => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -21,73 +22,46 @@ const FollowerDialog = ({ user }: { user: User }) => {
       <DialogContent className="sm:max-w-[425px] lg:max-w-screen-sm">
         <DialogHeader>
           <DialogTitle className="mb-3 flex items-center">{capitalizeFirstLetter(user.first_name)}'s followers </DialogTitle>
-          <div className="flex gap-2">
-            <div className="relative w-full mr-auto">
-              <Input placeholder="Search groups..." className="pr-10 " />
-              <Search className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 w-5" />
-            </div>
-            <Select defaultValue="none">
-              <SelectTrigger className="w-fit">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="w-fit">
-                <SelectItem value="none">
-                  <Ban className="h-4 text-gray-600" />
-                </SelectItem>
-                <SelectItem value="global">
-                  <Globe className="h-4 text-gray-600" />
-                </SelectItem>
-                <SelectItem value="private">
-                  <Lock className="h-4 text-gray-600" />
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <Select defaultValue="none">
-              <SelectTrigger className="w-fit">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  <FilterX className="h-4 text-gray-600" />
-                </SelectItem>
-                <SelectItem value="private">
-                  <ArrowUpAZ className="h-4 text-gray-600" />
-                </SelectItem>
-                <SelectItem value="global">
-                  <ArrowDownAZ className="h-4 text-gray-600" />
-                </SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="relative w-full mr-auto">
+            <Input placeholder="Search groups..." className="pr-10 " value={searchQuery} onChange={(e) => setSearchQuery(e.target.value.trim())} />
+            <Search className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 w-5" />
           </div>
         </DialogHeader>
         <div className="min-h-[400px] max-h-[400px] overflow-auto pr-2 ">
-          <FollowerContent user={user} />
+          <FollowerContent user={user} searchQuery={searchQuery} />
         </div>
       </DialogContent>
     </Dialog>
   );
 };
 
-const FollowerContent = ({ user }) => {
+const FollowerContent = ({ user, searchQuery }) => {
   const navigate = useNavigate();
   const [followers, setFollowers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFetchFollowers = () => {
-    setIsLoading(true);
+    console.log(searchQuery);
     // fetch user followers
-    fetch(`http://localhost:8000/api/user/follower/${user.id}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`http://localhost:8000/api/user/follower/${user.id}?` + new URLSearchParams({ q: searchQuery }), {
+      method: "GET",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setFollowers(data.data);
       })
       .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
+    if (searchQuery && searchQuery.length < 2) {
+      return;
+    }
+
+    setIsLoading(true);
     handleFetchFollowers();
-  }, []);
+  }, [searchQuery]);
 
   if (followers.length == 0 && !isLoading) {
     return (
@@ -115,12 +89,15 @@ const FollowerContent = ({ user }) => {
             <DialogTrigger asChild key={index}>
               <Button key={user.id} className="flex w-full justify-start gap-5 py-7" variant={"outline"} onClick={() => navigate(`/user/${user.id}`)}>
                 <Avatar className="">
-                  <AvatarImage src={user.pf_img_url} />
+                  <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
 
                 <div className="flex gap-2 items-center">
-                  <h1 className="text-lg">{user.first_name + " " + user.last_name}</h1>
+                  <div className="flex flex-col justify-start items-start">
+                    <h1 className="text-md font-semibold">{user.first_name + " " + user.last_name}</h1>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
                   {user.is_following ? (
                     <div className="flex items-center text-gray-400">
                       <Dot />

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\GroupInvite;
 use App\Models\GroupMember;
 use App\Models\GroupRequest;
 use App\Models\Post;
@@ -109,6 +110,17 @@ class GroupController extends Controller
                 }
             }
 
+        }
+
+        foreach ($groups as $group) {
+
+            $groupAdmin = GroupMember::where("group_id", $group->id)->where("user_id", $user->id)->where("role", "admin")->first();
+            if (!$groupAdmin) {
+                continue;
+            }
+
+            $reqs = GroupRequest::where("group_id", $group->id)->get();
+            $group["req_count"] = count($reqs);
         }
 
         $data = [
@@ -267,6 +279,14 @@ class GroupController extends Controller
             } else {
                 $res["is_requesting"] = false;
             }
+        }
+
+        $isInviting = GroupInvite::where("group_id", $id)->where("user_id", $user->id)->first();
+        if ($isInviting) {
+            $res["is_inviting"] = true;
+            $res["invite_id"] = $isInviting->id;
+        } else {
+            $res["is_inviting"] = false;
         }
 
         $data = [

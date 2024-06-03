@@ -7,8 +7,11 @@ import { ArrowDownAZ, ArrowUpAZ, Ban, Dot, FilterX, Globe, LoaderCircle, Lock, S
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../ui/button";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 const GroupsDialog = ({ userId, type }: { userId: number; type: string }) => {
+  const auth = useSelector((state: RootState) => state.auth);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchStatus, setSearchStatus] = useState<string>("none");
   const [searchType, setSearchType] = useState<string>("none");
@@ -17,15 +20,29 @@ const GroupsDialog = ({ userId, type }: { userId: number; type: string }) => {
     <Dialog>
       <DialogTrigger asChild>
         {type == "icon" ? (
-          <Button variant={"outline"} size={"icon"}>
-            <Users className="w-5 h-5" />
-          </Button>
+          <div className="relative">
+            <Button variant={"outline"} size={"icon"}>
+              <Users className="w-5 h-5" />
+            </Button>
+            {auth.userData.group_req > 0 && (
+              <div className="absolute -right-1 -top-1 px-[5px] py-[0px] text-xs rounded-full bg-destructive text-white">
+                {auth.userData.group_req}
+              </div>
+            )}
+          </div>
         ) : type == "button" ? (
           <Button variant={"secondary"} className="rounded-full">
             Groups
           </Button>
         ) : type == "drop-down-link" ? (
-          <p className="text-sm w-full px-2 py-1 hover:bg-slate-100 rounded-sm cursor-pointer">My Groups</p>
+          <div className="text-sm relative w-full px-2 py-2 hover:bg-slate-100 rounded-sm cursor-pointer">
+            <p>My Groups</p>
+            {auth.userData.group_req > 0 && (
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 px-[5px] py-[0px] text-xs rounded-full bg-destructive text-white">
+                {auth.userData.group_req}
+              </div>
+            )}
+          </div>
         ) : (
           ""
         )}
@@ -71,6 +88,7 @@ const GroupsDialog = ({ userId, type }: { userId: number; type: string }) => {
 };
 
 const GroupDialogContent = ({ userId, searchQuery, searchStatus, searchType }) => {
+  const auth = useSelector((state: RootState) => state.auth);
   const [groups, setGroups] = useState<any[]>([]);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +131,7 @@ const GroupDialogContent = ({ userId, searchQuery, searchStatus, searchType }) =
             <DialogTrigger asChild key={index}>
               <Button
                 key={group.id}
-                className="flex w-full justify-start gap-5 py-7"
+                className="flex relative w-full justify-start gap-5 py-7"
                 variant={"outline"}
                 onClick={() => navigate(`/group/${group.id}`)}
               >
@@ -127,6 +145,11 @@ const GroupDialogContent = ({ userId, searchQuery, searchStatus, searchType }) =
                   <Dot className="text-gray-500" />
                   <p className="text-gray-500">{group.status == "public" ? "public" : "private"}</p>
                 </div>
+                {group.req_count > 0 && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 px-[5px] py-[0px] text-xs rounded-full bg-destructive text-white">
+                    {auth.userData.group_req}
+                  </div>
+                )}
               </Button>
             </DialogTrigger>
           )

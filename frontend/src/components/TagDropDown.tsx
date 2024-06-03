@@ -17,7 +17,6 @@ function TagDropDown({ selectedTags, setSelectedTags }: { selectedTags: any[]; s
     fetch("http://localhost:8000/api/tag", { headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setTags(data.tags);
       });
   }, []);

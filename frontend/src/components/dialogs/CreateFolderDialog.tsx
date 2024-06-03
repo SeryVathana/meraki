@@ -45,7 +45,6 @@ const CreateFolderDialog = ({ handleFetchFolders }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         handleFetchFolders();
       })
       .catch((err) => console.log(err));

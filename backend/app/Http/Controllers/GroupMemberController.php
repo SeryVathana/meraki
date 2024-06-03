@@ -131,7 +131,7 @@ class GroupMemberController extends Controller
                     ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
                     ->orWhere('email', 'like', '%' . $searchQuery . '%')
                     ->orWhere('username', 'like', '%' . $searchQuery . '%');
-            })->limit(50)->first();
+            })->first();
 
             if (!$user) {
                 continue;

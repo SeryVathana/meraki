@@ -1,21 +1,12 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { storage } from "@/lib/firebase";
-import { User } from "@/redux/slices/authSlice";
 import { getToken } from "@/utils/HelperFunctions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { Globe, Lock, Upload, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Button } from "../ui/button";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { set } from "date-fns";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { Textarea } from "../ui/textarea";
 
 const EditFolderDialog = ({ folder, handleFetchFolderInfo }: { folder: any; handleFetchFolderInfo: any }) => {
@@ -54,7 +45,6 @@ const EditFolderDialog = ({ folder, handleFetchFolderInfo }: { folder: any; hand
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsLoading(false);
         handleFetchFolderInfo();
         setOpen(false);

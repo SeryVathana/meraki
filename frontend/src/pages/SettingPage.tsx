@@ -75,8 +75,6 @@ const SettingPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         if (data.message == "New Password can not be same as Old Password") {
           setErrMsg("New password can not be same as old password");
         }
@@ -116,7 +114,6 @@ const SettingPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setUser(data.user);
       });
   };
@@ -302,7 +299,6 @@ const EditUserPfDialog = ({ user, handleFetchUserInfo }: { user: User; handleFet
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setOpen(false);
         handleFetchUserInfo();
         dispatch(fetchUserData());

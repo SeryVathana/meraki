@@ -1,13 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { getToken } from "@/utils/HelperFunctions";
 import { Dot, LoaderCircle, Search, SearchX } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
-import { getToken } from "@/utils/HelperFunctions";
-import { cn } from "@/lib/utils";
-import { set } from "date-fns";
 
 const GroupAddMembersDialog = ({ group, type }: { group: any; type: string }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -74,7 +73,6 @@ const UserContent = ({ group, searchQuery }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         handleFetchUsers();
       })
       .catch((err) => console.log(err))
@@ -95,7 +93,6 @@ const UserContent = ({ group, searchQuery }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         handleFetchUsers();
       })
       .catch((err) => console.log(err))
@@ -136,7 +133,7 @@ const UserContent = ({ group, searchQuery }) => {
       <div key={index} className="flex w-full justify-between px-2 py-2 rounded-md border-[1px]">
         <div className="flex w-full gap-5">
           <Avatar className="hover:border-2 cursor-pointer border" onClick={() => navigate(`/user/${user.id}`)}>
-            <AvatarImage src={user.pf_img_url} />
+            <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
 

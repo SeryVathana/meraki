@@ -120,10 +120,17 @@ export function Navbar() {
 
           <DropdownMenu open={openDropDown} onOpenChange={() => setOpenDropDown(!openDropDown)}>
             <DropdownMenuTrigger asChild className=" cursor-pointer">
-              <Avatar className="border rounded-full">
-                <AvatarImage src={auth.userData.pf_img_url} alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="border rounded-full">
+                  <AvatarImage src={auth.userData.pf_img_url} alt="@shadcn" className="object-cover w-full h-full" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                {auth.userData.total_noti > 0 && (
+                  <div className="absolute -right-1 -top-1 px-[5px] py-[0px] text-xs border rounded-full bg-destructive text-white">
+                    {auth.userData.total_noti}
+                  </div>
+                )}
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 mr-10">
               <DropdownMenuLabel>{getFullName()}</DropdownMenuLabel>

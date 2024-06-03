@@ -1,10 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { getToken } from "@/utils/HelperFunctions";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
 import { Button } from "../ui/button";
 
 const DeleteFolderDialog = ({ folder }: { folder: any }) => {
@@ -23,7 +20,6 @@ const DeleteFolderDialog = ({ folder }: { folder: any }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsLoading(false);
         setOpen(false);
         navigate("/profile?post=saved-posts");

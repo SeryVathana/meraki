@@ -13,10 +13,11 @@ import { RootState } from "@/redux/store";
 import { capitalizeFirstLetter, getToken } from "@/utils/HelperFunctions";
 import { Dialog } from "@radix-ui/react-dialog";
 import { set } from "date-fns";
-import { Dot, Ellipsis, Pen } from "lucide-react";
+import { Dot, Ellipsis, LoaderCircle, Pen, SearchX } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import NotFoundPage from "./NotFoundPage";
 
 const GroupPage = () => {
   const [isPublicGroup, setIsPublicGroup] = useState<boolean>(true);
@@ -36,16 +37,9 @@ const GroupPage = () => {
     fetch(`http://localhost:8000/api/group/${groupId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
-        if (data.status === 404) {
-          navigate("/tag/all");
-          return;
-        }
-        console.log(data);
         setGroup(data.group);
       })
-      .catch((err) => {
-        navigate("/tag/all");
-      });
+      .finally(() => setIsLoading(false));
   };
 
   const handleFetchGroupPosts = () => {
@@ -60,7 +54,6 @@ const GroupPage = () => {
     fetch(`http://localhost:8000/api/group/public/join/${groupId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsMember(true);
         handleFetchGroupInfo();
       });
@@ -72,8 +65,6 @@ const GroupPage = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.status == 200) {
-          console.log(data);
-          console.log(data);
           handleFetchGroupInfo();
         } else {
           setIsRequesting((prev) => !prev);
@@ -88,7 +79,6 @@ const GroupPage = () => {
     fetch(`http://localhost:8000/api/group/leave/${groupId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setIsMember(false);
         handleFetchGroupInfo();
       })
@@ -97,8 +87,23 @@ const GroupPage = () => {
       });
   };
 
+  const handleAcceptInvite = () => {
+    fetch(`http://localhost:8000/api/group/invite/accept/${group.invite_id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${auth.token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        handleFetchGroupInfo();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     // fetch group data
+    setIsLoading(true);
     handleFetchGroupInfo();
   }, [groupId]);
 
@@ -140,12 +145,17 @@ const GroupPage = () => {
     }
   }, [group, auth]);
 
-  if (!group) {
+  if (!group && isLoading) {
     return (
-      <div className="w-full h-[80vh] flex justify-center items-center">
+      <div className="w-full h-[80vh] flex flex-col gap-2 justify-center items-center">
+        <LoaderCircle className="w-10 h-10 text-gray-400 animate-spin" />
         <h1>Loading...</h1>
       </div>
     );
+  }
+
+  if (!group && !isLoading) {
+    return <NotFoundPage />;
   }
 
   return (
@@ -174,14 +184,18 @@ const GroupPage = () => {
         </div>
 
         <div className="w-full flex justify-center gap-5">
-          {isMember ? (
+          {group.is_inviting ? (
+            <Button variant="default" className="rounded-full" onClick={() => handleAcceptInvite()}>
+              Accept Invite
+            </Button>
+          ) : isMember ? (
             <CreateGroupPostDialog group={group} handleFetchGroupPosts={handleFetchGroupPosts} />
           ) : group?.status === "public" ? (
             <Button className="rounded-full" onClick={() => handleJoinPublicGroup()}>
               Join Group
             </Button>
           ) : group.is_requesting ? (
-            <Button className="rounded-full" variant="destructive" onClick={() => handleRequestJoinPrivateGroup()}>
+            <Button className="rounded-full" variant="secondary" onClick={() => handleRequestJoinPrivateGroup()}>
               Cancel Request
             </Button>
           ) : (
@@ -193,13 +207,23 @@ const GroupPage = () => {
           {isMember && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="" size={"icon"} variant={"secondary"}>
-                  <Ellipsis className="w-5" />
-                </Button>
+                <div className="relative">
+                  <Button className="" size={"icon"} variant={"secondary"}>
+                    <Ellipsis className="w-5" />
+                  </Button>
+                  {auth.userData.group_req > 0 && (
+                    <div className="absolute -right-1 -top-1 px-[5px] py-[0px] text-xs rounded-full bg-destructive text-white">
+                      {auth.userData.group_req}
+                    </div>
+                  )}
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <GroupMembersDialog group={group} type="dropdown" />
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <GroupJoinRequestsDailog group={group} type="dropdown" />
                 </DropdownMenuItem>
                 {isOwner && (
                   <>
