@@ -268,7 +268,14 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        //get followers length and followings length
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'User Not Found'
+            ], 404);
+        }
+
+        // get followers length and followings length
         $followers = json_decode($user->followers);
         $follings = json_decode($user->followings);
 

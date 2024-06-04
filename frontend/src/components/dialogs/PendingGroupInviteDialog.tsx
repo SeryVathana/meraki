@@ -59,6 +59,7 @@ const GroupInvitesContent = () => {
     fetch(`http://localhost:8000/api/group/pending/invite`, { method: "GET", headers: { Authorization: `Bearer ${auth.token}` } })
       .then((res) => res.json())
       .then((data) => {
+        console.log(data.invites);
         setGroups(data.invites);
       })
       .finally(() => {
@@ -126,7 +127,7 @@ const GroupInvitesContent = () => {
     return (
       <div key={index} className="border rounded-md px-2 group hover:bg-gray-50">
         <div className="flex justify-between items-center">
-          <DialogTrigger className="flex w-fit justify-start gap-5 py-2 cursor-pointer" onClick={() => navigate(`/group?id=${group.id}`)}>
+          <DialogTrigger className="flex w-fit justify-start gap-5 py-2 cursor-pointer" onClick={() => navigate(`/group/${group.group_id}`)}>
             <Avatar className="border">
               <AvatarImage src={group.img_url} className="object-cover w-full h-full" />
               <AvatarFallback>CN</AvatarFallback>

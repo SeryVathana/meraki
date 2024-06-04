@@ -42,7 +42,7 @@ class GroupController extends Controller
 
         if ($status != "public" && $status != "private") {
             if ($type == "my-group") {
-                $groups = Group::where("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->get();
+                $groups = Group::where("owner_id", $user->id)->where("title", "ilike", "%" . $request->query("search") . "%")->get();
             } else {
                 if ($type == "joined-group") {
 
@@ -51,7 +51,7 @@ class GroupController extends Controller
                     $joinedGroups = [];
 
                     foreach ($joinedGroupIds as $joinedGroup) {
-                        $group = Group::where("id", $joinedGroup->group_id)->whereNot("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->first();
+                        $group = Group::where("id", $joinedGroup->group_id)->whereNot("owner_id", $user->id)->where("title", "ilike", "%" . $request->query("search") . "%")->first();
 
                         if ($group) {
                             array_push($joinedGroups, $group);
@@ -65,7 +65,7 @@ class GroupController extends Controller
                     $joinedGroups = [];
 
                     foreach ($joinedGroupIds as $joinedGroup) {
-                        $group = Group::where("id", $joinedGroup->group_id)->where("title", "like", "%" . $request->query("search") . "%")->first();
+                        $group = Group::where("id", $joinedGroup->group_id)->where("title", "ilike", "%" . $request->query("search") . "%")->first();
 
                         if ($group) {
                             array_push($joinedGroups, $group);
@@ -77,7 +77,7 @@ class GroupController extends Controller
         } else {
 
             if ($type == "my-group") {
-                $groups = Group::where("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->where("status", $status)->get();
+                $groups = Group::where("owner_id", $user->id)->where("title", "ilike", "%" . $request->query("search") . "%")->where("status", $status)->get();
             } else {
                 if ($type == "joined-group") {
 
@@ -86,7 +86,7 @@ class GroupController extends Controller
                     $joinedGroups = [];
 
                     foreach ($joinedGroupIds as $joinedGroup) {
-                        $group = Group::where("id", $joinedGroup->group_id)->whereNot("owner_id", $user->id)->where("title", "like", "%" . $request->query("search") . "%")->where("status", $status)->first();
+                        $group = Group::where("id", $joinedGroup->group_id)->whereNot("owner_id", $user->id)->where("title", "ilike", "%" . $request->query("search") . "%")->where("status", $status)->first();
 
                         if ($group) {
                             array_push($joinedGroups, $group);
@@ -100,7 +100,7 @@ class GroupController extends Controller
                     $joinedGroups = [];
 
                     foreach ($joinedGroupIds as $joinedGroup) {
-                        $group = Group::where("id", $joinedGroup->group_id)->where("title", "like", "%" . $request->query("search") . "%")->where("status", $status)->first();
+                        $group = Group::where("id", $joinedGroup->group_id)->where("title", "ilike", "%" . $request->query("search") . "%")->where("status", $status)->first();
 
                         if ($group) {
                             array_push($joinedGroups, $group);

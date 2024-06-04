@@ -25,10 +25,9 @@ const GroupPage = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [isMember, setIsMember] = useState<boolean>(false);
-  const navigate = useNavigate();
   const auth = useSelector((state: RootState) => state.auth);
   const [openAlert, setOpenAlert] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRequesting, setIsRequesting] = useState(false);
 
   const { groupId } = useParams();

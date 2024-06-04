@@ -25,7 +25,8 @@ class CommentController extends Controller
             $comment->user_name = $user->first_name . ' ' . $user->last_name;
             $comment->user_pf_img_url = $user->pf_img_url;
 
-            $arrCmt = Comment::where('reply_cmt_id', $comment->id)->get();
+            $arrCmt = Comment::where('reply_cmt_id', "=", $comment->id)->get();
+
             $comment->replies = $arrCmt;
 
             $comment->replies->map(function ($reply) {

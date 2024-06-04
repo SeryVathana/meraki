@@ -13,6 +13,7 @@ export type PostType = {
   likes: number[];
   like_count: number;
   is_liked: boolean;
+  is_saved: boolean;
   created_at: string;
   updated_at: string;
   is_highlighted: number;

@@ -6,6 +6,7 @@ use Validator;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 class ReportController extends Controller
 {
     //For User 
@@ -30,14 +31,7 @@ class ReportController extends Controller
 
         }
 
-        if ($request->status != "public" && $request->status != "private") {
-            $data = [
-                "status" => 400,
-                "message" => "Invalid input"
-            ];
 
-            return response()->json($data, 400);
-        }
         $report = new Report;
         $report->user_id = $userId;
         $report->post_id = $request->post_id;
@@ -46,10 +40,10 @@ class ReportController extends Controller
 
         $data = [
             "status" => 200,
-            "message" => "Folder created successfully",
+            "message" => "Report created successfully",
         ];
 
-        return response()->json($data, 200);   
+        return response()->json($data, 200);
     }
 
     //For CRUD Admin
@@ -81,5 +75,5 @@ class ReportController extends Controller
         $report->delete();
         return response()->json(['message' => 'report deleted successfully']);
     }
-    
+
 }

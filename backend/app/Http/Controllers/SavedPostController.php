@@ -103,13 +103,14 @@ class SavedPostController extends Controller
             return response()->json($data, 400);
         }
 
-        $post = Post::where("user_id", $userId)->where("id", $request->post_id)->first();
+
+        $post = Post::where("id", $request->post_id)->first();
         if (!$post) {
             $data = [
-                "status" => 400,
+                "status" => 404,
                 "message" => "Post not found"
             ];
-            return response()->json($data, 400);
+            return response()->json($data, 404);
         }
 
 
