@@ -11,6 +11,8 @@ import { capitalizeFirstLetter, getToken } from "@/utils/HelperFunctions";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import NotFoundPage from "./NotFoundPage";
+import { LoaderCircle } from "lucide-react";
 
 const UserPage = () => {
   const { userId } = useParams();
@@ -20,9 +22,8 @@ const UserPage = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
-  const [followedUsers, setFollowedUsers] = useState<string[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleFetchUserPosts = () => {
     // fetch user posts
@@ -38,14 +39,24 @@ const UserPage = () => {
     if (isFollowing) {
       fetch(`http://localhost:8000/api/user/unfollow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
-        .then((data) => {});
+        .then((data) => {
+          if (data.status == 200) {
+            // setIsFollowing(false);
+            // change follower count
+            // setUser((prev) => ({ ...prev, followers: prev.followers - 1 }));
+          }
+        });
     } else {
       fetch(`http://localhost:8000/api/user/follow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
-        .then((data) => {});
+        .then((data) => {
+          if (data.status == 200) {
+            setIsFollowing(true);
+          }
+        });
     }
 
-    handleFetchUserInfo();
+    // handleFetchUserInfo();
   };
 
   const handleFetchUserInfo = () => {
@@ -53,7 +64,8 @@ const UserPage = () => {
       .then((res) => res.json())
       .then((data) => {
         setUser(data.user);
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
@@ -62,6 +74,8 @@ const UserPage = () => {
       console.log("User ID must be a number");
       return;
     }
+
+    setIsLoading(true);
 
     handleFetchUserInfo();
   }, [userId]);
@@ -83,12 +97,17 @@ const UserPage = () => {
     }
   }, [userId]);
 
-  if (!user) {
+  if (!user && isLoading) {
     return (
-      <div className="w-full h-[80vh] flex justify-center items-center">
+      <div className="w-full h-[80vh] flex flex-col gap-2 justify-center items-center">
+        <LoaderCircle className="w-10 h-10 text-gray-400 animate-spin" />
         <h1>Loading...</h1>
       </div>
     );
+  }
+
+  if (!user && !isLoading) {
+    return <NotFoundPage />;
   }
 
   return (

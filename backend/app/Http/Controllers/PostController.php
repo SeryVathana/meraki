@@ -28,8 +28,9 @@ class PostController extends Controller
         $qTag = $request->tag;
 
         $posts = [];
-        $tag = Tag::where('name', $qTag)->first();
+        $tag = Tag::where('name', "ILIKE", $qTag)->first();
         $allPosts = Post::where("status", "public")->orderByDesc("created_at")->get();
+
 
         $posts = [];
         if ($tag) {
@@ -72,7 +73,10 @@ class PostController extends Controller
                 "user_id" => $posts[$i]->user_id,
                 "img_url" => $posts[$i]->img_url,
                 "is_saved" => $isSaved,
-                "user_name" => $user->first_name . " " . $user->last_name,
+                "first_name" => $user->first_name,
+                "last_name" => $user->last_name,
+                "full_name" => $user->first_name . " " . $user->last_name,
+                "username" => $user->username,
                 "user_pf_img_url" => $user->pf_img_url,
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
@@ -137,8 +141,6 @@ class PostController extends Controller
         ]);
     }
 
-
-
     public function getMyPosts()
     {
         $user = Auth::user();
@@ -164,7 +166,10 @@ class PostController extends Controller
                 "img_url" => $posts[$i]->img_url,
                 "is_saved" => $isSaved,
                 "user_id" => $posts[$i]->user_id,
-                "user_name" => $user->first_name . " " . $user->last_name,
+                "first_name" => $user->first_name,
+                "last_name" => $user->last_name,
+                "full_name" => $user->first_name . " " . $user->last_name,
+                "username" => $user->username,
                 "user_pf_img_url" => $user->pf_img_url,
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
@@ -244,7 +249,10 @@ class PostController extends Controller
                 "id" => $posts[$i]->id,
                 "img_url" => $posts[$i]->img_url,
                 "user_id" => $posts[$i]->user_id,
-                "user_name" => $user->first_name . " " . $user->last_name,
+                "first_name" => $user->first_name,
+                "last_name" => $user->last_name,
+                "full_name" => $user->first_name . " " . $user->last_name,
+                "username" => $user->username,
                 "user_pf_img_url" => $user->pf_img_url,
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
@@ -498,6 +506,14 @@ class PostController extends Controller
             $isLiked = true;
         }
 
+        $saves = SavedPost::where("post_id", $post->id)->where("user_id", $userId)->get();
+
+        $isSaved = false;
+        if (count($saves) > 0) {
+            $isSaved = true;
+        }
+
+
         //get group info if there is a group_id
         if ($post->group_id != null) {
             $group = Group::find($post->group_id);
@@ -529,6 +545,7 @@ class PostController extends Controller
             "likes" => $likes,
             "like_count" => count($likes),
             "is_liked" => $isLiked,
+            "is_saved" => $isSaved,
             "user_name" => $postOwner->first_name . " " . $postOwner->last_name,
             "user_pf_img_url" => $postOwner->pf_img_url,
             "created_at" => $post->created_at,

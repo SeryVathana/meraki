@@ -36,7 +36,7 @@ const GroupMembersDialog = ({ group, type }: { group: any; type: string }) => {
           <DialogTitle className="my-3 flex items-center">Members</DialogTitle>
           <div className="flex gap-2">
             <div className="relative w-full mr-auto">
-              <Input placeholder="Search groups..." className="pr-10 " value={searchQuery} onChange={(e) => setSearchQuery(e.target.value.trim())} />
+              <Input placeholder="Search groups..." className="pr-10 " value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
               <Search className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 w-5" />
             </div>
           </div>
@@ -72,6 +72,10 @@ const GroupMemberContent = ({ group, searchQuery }) => {
   useEffect(() => {
     if (searchQuery && searchQuery.length < 2) return;
     handleFetchGroupMembers();
+
+    return () => {
+      setMembers([]);
+    };
   }, [group, searchQuery]);
 
   useEffect(() => {
@@ -110,13 +114,13 @@ const GroupMemberContent = ({ group, searchQuery }) => {
         return (
           <div key={index} className="flex w-full justify-between px-2 py-2 rounded-md border-[1px]">
             <div className="flex w-full gap-5">
-              <Avatar className="hover:border-2 cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
+              <Avatar className="hover:border-2 cursor-pointer" onClick={() => navigate(`/user/${user.user_id}`)}>
                 <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
               <div className="flex gap-2 items-center">
-                <h1 className="text-md hover:underline hover:text-primary cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
+                <h1 className="text-md hover:underline hover:text-primary cursor-pointer" onClick={() => navigate(`/user/${user.user_id}`)}>
                   {user.first_name} {user.last_name}
                 </h1>
                 <div className="flex items-center text-gray-400 cursor-default">

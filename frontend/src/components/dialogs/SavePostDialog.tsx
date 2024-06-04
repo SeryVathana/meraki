@@ -2,27 +2,38 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { getToken } from "@/utils/HelperFunctions";
-import { Check, Search } from "lucide-react";
+import { Check, Pin, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 
-const SavePostDialog = ({ postId, isSaved }: { postId: number; isSaved: boolean }) => {
+const SavePostDialog = ({ postId, isSaved, type }: { postId: number; isSaved: boolean; type: string }) => {
   const [isSavedPost, setIsSavedPost] = useState<boolean>(isSaved);
   return (
     <Dialog>
       <DialogTrigger asChild>
-        {isSavedPost ? (
-          <Button
-            variant={"default"}
-            size={"sm"}
-            className={cn("hidden absolute top-3 right-3 z-10 group-hover:flex hover:border-primary bg-primary text-white rounded-full")}
-          >
-            <h1 className="font-semibold">Saved</h1>
-          </Button>
+        {type == "icon" ? (
+          isSavedPost ? (
+            <Button
+              variant={"default"}
+              size={"sm"}
+              className={cn("hidden absolute top-3 right-3 z-10 group-hover:flex hover:border-primary bg-primary text-white rounded-full")}
+            >
+              <h1 className="font-semibold">Saved</h1>
+            </Button>
+          ) : (
+            <Button variant={"secondary"} size={"sm"} className={cn("hidden absolute top-3 right-3 z-10 rounded-full group-hover:flex")}>
+              <h1 className="font-semibold">Save</h1>
+            </Button>
+          )
         ) : (
-          <Button variant={"secondary"} size={"sm"} className={cn("hidden absolute top-3 right-3 z-10 rounded-full group-hover:flex")}>
-            <h1 className="font-semibold">Save</h1>
-          </Button>
+          <button
+            className={cn(
+              "w-1/2 border-r flex items-center justify-center py-3 group hover:bg-gray-50 text-gray-500",
+              isSavedPost && "text-red-500 bg-red-50 hover:bg-red-100"
+            )}
+          >
+            <Pin className="w-5 h-5" />
+          </button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] lg:max-w-screen-sm">

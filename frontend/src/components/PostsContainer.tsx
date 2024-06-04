@@ -8,6 +8,7 @@ const PostsContainer = ({ posts }: { posts: any[] }) => {
   const [data, setData]: any[] = useState<any[]>(posts);
   useEffect(() => {
     setData(posts);
+    console.log(posts);
   }, [posts]);
 
   if (!data) {
@@ -19,16 +20,19 @@ const PostsContainer = ({ posts }: { posts: any[] }) => {
       {data?.map((post: any, index: number) => {
         return (
           <div className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer" key={index}>
-            <SavePostDialog postId={post.id} isSaved={post.is_saved} />
+            <SavePostDialog postId={post.id} isSaved={post.is_saved} type="icon" />
 
-            <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user/${1}`)}>
+            <div
+              className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center"
+              onClick={() => navigate(`/user/${post.user_id}`)}
+            >
               <Avatar className="w-6 h-6">
                 <AvatarImage src={post.user_pf_img_url} alt="@shadcn" className="object-cover w-full h-full" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col text-white">
-                <h1 className="font-medium text-sm line-clamp-1 truncate">{post.user_name}</h1>
+                <h1 className="font-medium text-sm line-clamp-1 truncate">@{post.username}</h1>
               </div>
             </div>
 

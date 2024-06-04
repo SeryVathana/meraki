@@ -52,7 +52,7 @@ const GroupsDialog = ({ userId, type }: { userId: number; type: string }) => {
           <DialogTitle className="my-3 flex items-center">My Groups</DialogTitle>
           <div className="flex gap-2">
             <div className="relative w-full mr-auto">
-              <Input placeholder="Search groups..." className="pr-10 " value={searchQuery} onChange={(e) => setSearchQuery(e.target.value.trim())} />
+              <Input placeholder="Search groups..." className="pr-10 " value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
               <Search className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 w-5" />
             </div>
             <Select defaultValue="none" onValueChange={(val) => setSearchStatus(val)}>
@@ -94,15 +94,24 @@ const GroupDialogContent = ({ userId, searchQuery, searchStatus, searchType }) =
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     setIsLoading(true);
     fetch(`http://localhost:8000/api/group/mygroups?` + new URLSearchParams({ search: searchQuery, type: searchType, status: searchStatus }), {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
+      signal,
     })
       .then((res) => res.json())
       .then((data) => setGroups(data.groups))
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
+
+    return () => {
+      abortController.abort();
+      setGroups([]);
+    };
   }, [userId, searchQuery, searchStatus, searchType]);
 
   if (isLoading && groups.length == 0) {

@@ -23,7 +23,7 @@ const FollowerDialog = ({ user }: { user: User }) => {
         <DialogHeader>
           <DialogTitle className="mb-3 flex items-center">{capitalizeFirstLetter(user.first_name)}'s followers </DialogTitle>
           <div className="relative w-full mr-auto">
-            <Input placeholder="Search groups..." className="pr-10 " value={searchQuery} onChange={(e) => setSearchQuery(e.target.value.trim())} />
+            <Input placeholder="Search groups..." className="pr-10 " value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             <Search className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 w-5" />
           </div>
         </DialogHeader>
@@ -61,6 +61,10 @@ const FollowerContent = ({ user, searchQuery }) => {
 
     setIsLoading(true);
     handleFetchFollowers();
+
+    return () => {
+      setFollowers([]);
+    };
   }, [searchQuery]);
 
   if (followers.length == 0 && !isLoading) {
