@@ -10,6 +10,7 @@ import DashboardGroupPage from "./pages/DashboardGroupPage";
 import DashboardOverviewPage from "./pages/DashboardOverviewPage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardUserPage from "./pages/DashboardUserPage";
+import DashboardReportPage from "./pages/DashboardReportPage";
 import FolderPage from "./pages/FolderPage";
 import GroupPage from "./pages/GroupPage";
 import HomePage from "./pages/HomePage";
@@ -24,6 +25,7 @@ import { store } from "./redux/store";
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "./layouts/ProtectedLayout";
 import PostsPage from "./pages/PostsPage";
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -52,6 +54,7 @@ const router = createBrowserRouter(
             <Route index element={<DashboardPage />} />
             <Route path="overview" element={<DashboardOverviewPage />} />
             <Route path="users" element={<DashboardUserPage />} />
+            <Route path="report" element={<DashboardReportPage />} />
             <Route path="group" element={<DashboardGroupPage />} />
             <Route path="admin" element={<DashboardAdminPage />} />
           </Route>
