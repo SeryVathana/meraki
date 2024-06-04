@@ -16,9 +16,11 @@ import {
   Heart,
   LoaderCircle,
   MessageCircle,
+  Pen,
   Pin,
   SearchX,
   SendHorizonal,
+  Trash,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -30,6 +32,7 @@ import SavePostDialog from "@/components/dialogs/SavePostDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import PostsContainer from "@/components/PostsContainer";
 
 const PostDetailPage = () => {
   const auth = useSelector((state: RootState) => state.auth);
@@ -48,6 +51,7 @@ const PostDetailPage = () => {
   const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
   const [report, setReport] = useState<string>("");
   const [isReporting, setIsReporting] = useState<boolean>(false);
+  const [posts, setPosts] = useState<any[]>([]);
   const { toast } = useToast();
 
   const navigate = useNavigate();
@@ -140,7 +144,14 @@ const PostDetailPage = () => {
       .finally(() => setIsLoading(false));
   };
 
+  const handleFetchRelatedPosts = () => {
+    fetch(`http://localhost:8000/api/post`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+      .then((res) => res.json())
+      .then((data) => setPosts(data.posts));
+  };
+
   const handleSubmitReport = () => {
+    if (isReporting) return;
     if (report.trim().length == 0) {
       toast({
         title: "Report cannot be empty.",
@@ -190,9 +201,34 @@ const PostDetailPage = () => {
     // close dialog
   };
 
+  const handleDeletePost = () => {
+    fetch(`http://localhost:8000/api/post/${post.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status == 200) {
+          navigate("/profile");
+          toast({
+            title: "Post deleted successfully.",
+            variant: "success",
+          });
+        } else {
+          toast({
+            title: "Failed to delete post.",
+            variant: "destructive",
+          });
+        }
+      });
+  };
+
   useEffect(() => {
     setIsLoading(true);
     handleFetchPost();
+    handleFetchRelatedPosts();
 
     window.scrollTo(0, 0);
   }, [postId]);
@@ -272,33 +308,66 @@ const PostDetailPage = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" className="w-full text-left cursor-pointer">
-                        <div className="flex gap-2 justify-center items-center">
-                          <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                {auth.userData.id == post.user_id || auth.userData.role == "admin" ? (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to={`/post/edit/${post.id}`} className="w-full py-0 text-left cursor-pointer">
+                        <div className="flex gap-2 justify-start items-center py-1">
+                          <Pen className="w-4 h-4" />
+                          <span>Edit</span>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+                        <DialogTrigger asChild>
+                          <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                            <Trash className="w-4 h-4" />
+                            <span>Delete</span>
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogTitle>Delete Post</DialogTitle>
+                          <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
+                          <div className="flex gap-5 justify-end">
+                            <Button variant="outline" onClick={() => setIsReportOpen(!isReportOpen)}>
+                              Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={() => handleDeletePost()}>
+                              Delete
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <DropdownMenuItem asChild>
+                    <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+                      <DialogTrigger asChild>
+                        <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                          <AlertTriangle className="w-4 h-4" />
                           <span>Report</span>
                         </div>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogTitle>Report Post</DialogTitle>
-                      <DialogDescription>If you believe this post violates our community guidelines, please report it.</DialogDescription>
-                      <div className="flex flex-col gap-5">
-                        <Textarea
-                          placeholder="Add reason here."
-                          className="border-2 min-h-[150px]"
-                          value={report}
-                          onChange={(e) => setReport(e.target.value)}
-                        />
-                        <Button variant="default" className="w-full font-semibold" onClick={() => handleSubmitReport()}>
-                          Report
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogTitle>Report Post</DialogTitle>
+                        <DialogDescription>If you believe this post violates our community guidelines, please report it.</DialogDescription>
+                        <div className="flex flex-col gap-5">
+                          <Textarea
+                            placeholder="Add reason here."
+                            className="border-2 min-h-[150px]"
+                            value={report}
+                            onChange={(e) => setReport(e.target.value)}
+                          />
+                          <Button variant="default" className="w-full font-semibold" onClick={() => handleSubmitReport()}>
+                            Report
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -478,7 +547,7 @@ const PostDetailPage = () => {
         </div>
       </div>
 
-      {/* <PostsContainer posts={pos} /> */}
+      <PostsContainer posts={posts} />
     </div>
   );
 };

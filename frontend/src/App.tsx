@@ -24,6 +24,7 @@ import { store } from "./redux/store";
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "./layouts/ProtectedLayout";
 import PostsPage from "./pages/PostsPage";
+import EditPostPage from "./pages/EditPostPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
           <Route path="create-post" element={<CreatePostPage />} />
 
           <Route path="create-group" element={<CreateGroupPage />} />
+          <Route path="post/edit/:postId" element={<EditPostPage />} />
           <Route path="post/:postId" element={<PostDetailPage />} />
           <Route path="group/:groupId" element={<GroupPage />} />
           <Route path="user/:userId" element={<UserPage />} />
