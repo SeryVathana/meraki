@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\SavedPost;
 use App\Models\Tag;
 use App\Models\Group;
 use App\Models\GroupMember;
@@ -19,18 +21,102 @@ class PostController extends Controller
      * Display a listing of the resource.
      */
 
-
-
-    public function index()
+    public function index(Request $request)
     {
 
-        $post = Post::where("status", "public")->get();
+        $loggedUser = Auth::user();
+        $qTag = $request->tag;
+
+        $posts = [];
+        $tag = Tag::where('name', $qTag)->first();
+        $allPosts = Post::where("status", "public")->orderByDesc("created_at")->get();
+
+        $posts = [];
+        if ($tag) {
+            for ($i = 0; $i < count($allPosts); $i++) {
+                $postTag = json_decode($allPosts[$i]->tag);
+
+
+                if (in_array($tag->id, $postTag)) {
+                    array_push($posts, $allPosts[$i]);
+                }
+            }
+        } else {
+            $posts = $allPosts;
+        }
+
+        $result = [];
+        for ($i = 0; $i < count($posts); $i++) {
+            $tags = json_decode($posts[$i]->tag);
+
+            $tagDetails = [];
+
+            for ($j = 0; $j < count($tags); $j++) {
+                $tag = Tag::find($tags[$j]);
+                if ($tag) {
+                    array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
+                }
+            }
+            $user = User::find($posts[$i]->user_id);
+
+            $isSaved = false;
+            $savePost = SavedPost::where("user_id", $loggedUser->id)->where("post_id", $posts[$i]->id)->first();
+            if ($savePost) {
+                $isSaved = true;
+            } else {
+                $isSaved = false;
+            }
+
+            $post = [
+                "id" => $posts[$i]->id,
+                "user_id" => $posts[$i]->user_id,
+                "img_url" => $posts[$i]->img_url,
+                "is_saved" => $isSaved,
+                "user_name" => $user->first_name . " " . $user->last_name,
+                "user_pf_img_url" => $user->pf_img_url,
+                "created_at" => $posts[$i]->created_at,
+                "updated_at" => $posts[$i]->updated_at
+            ];
+
+
+
+            array_push($result, $post);
+        }
+
         $data = [
             'status' => 200,
-            'posts' => $post,
+            'posts' => $result,
         ];
-        
+
         return response()->json($data, 200);
+
+    }
+    public function getAllPosts(Request $request)
+    {
+        $posts = Post::where("status", "public")->orderByDesc("created_at")->get();
+
+        $result = [];
+        for ($i = 0; $i < count($posts); $i++) {
+            $post = [
+                "id" => $posts[$i]->id,
+                "user_id" => $posts[$i]->user_id,
+                "title" => $posts[$i]->title,
+                "description" => $posts[$i]->description,
+                "img_url" => $posts[$i]->img_url,
+                "user_name" => "vathana",
+                "user_pf_img_url" => "https://i.pinimg.com/564x/44/06/42/440642d919661e04315f376b6e59eba0.jpg",
+                "created_at" => $posts[$i]->created_at,
+                "updated_at" => $posts[$i]->updated_at
+            ];
+
+
+
+            array_push($result, $post);
+        }
+
+
+
+        return response()->json($result, 200);
 
     }
     public function getHighlightedPosts()
@@ -51,23 +137,82 @@ class PostController extends Controller
         ]);
     }
 
+
+
     public function getMyPosts()
     {
         $user = Auth::user();
         $userId = $user->id;
 
-        $post = Post::where("user_id", $userId)->get();
+        $posts = Post::where("user_id", $userId)->get();
+
+
+        $postDetails = [];
+
+        for ($i = 0; $i < count($posts); $i++) {
+
+            $isSaved = false;
+            $savePost = SavedPost::where("user_id", $userId)->where("post_id", $posts[$i]->id)->first();
+            if ($savePost) {
+                $isSaved = true;
+            } else {
+                $isSaved = false;
+            }
+
+            $detail = [
+                "id" => $posts[$i]->id,
+                "img_url" => $posts[$i]->img_url,
+                "is_saved" => $isSaved,
+                "user_id" => $posts[$i]->user_id,
+                "user_name" => $user->first_name . " " . $user->last_name,
+                "user_pf_img_url" => $user->pf_img_url,
+                "created_at" => $posts[$i]->created_at,
+                "updated_at" => $posts[$i]->updated_at
+            ];
+
+            array_push($postDetails, $detail);
+        }
+
         $data = [
             'status' => 200,
-            'posts' => $post
+            'posts' => $postDetails
         ];
 
         return response()->json($data, 200);
     }
+    public function getMyPostsMobile()
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $posts = Post::where("user_id", $userId)->orderByDesc("created_at")->get();
+
+
+        $postDetails = [];
+
+        for ($i = 0; $i < count($posts); $i++) {
+
+            $detail = [
+                "id" => $posts[$i]->id,
+                "title" => $posts[$i]->title,
+                "description" => $posts[$i]->description,
+                "img_url" => $posts[$i]->img_url,
+                "user_id" => $posts[$i]->user_id,
+                "user_name" => $user->first_name . " " . $user->last_name,
+                "user_pf_img_url" => $user->pf_img_url,
+                "created_at" => $posts[$i]->created_at,
+                "updated_at" => $posts[$i]->updated_at
+            ];
+
+            array_push($postDetails, $detail);
+        }
+
+
+        return response()->json($postDetails, 200);
+    }
     public function getUserPosts($id)
     {
         $curUser = Auth::user();
-        $curUserId = $curUser->id;
 
         $user = User::find($id);
         if (!$user) {
@@ -78,17 +223,42 @@ class PostController extends Controller
 
             return response()->json($data, 404);
         }
-        $post = "";
 
-        if ($curUser->role == "admin") {
-            $post = Post::where("user_id", $id)->get();
-        } else {
-            $post = Post::where("user_id", $id)->where("status", "public")->get();
+        $posts = Post::where("user_id", $id)->where("status", "public")->get();
+
+        $result = [];
+        for ($i = 0; $i < count($posts); $i++) {
+            $tags = json_decode($posts[$i]->tag);
+
+            $tagDetails = [];
+
+            for ($j = 0; $j < count($tags); $j++) {
+                $tag = Tag::find($tags[$j]);
+                if ($tag) {
+                    array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
+                }
+            }
+            $user = User::find($posts[$i]->user_id);
+
+            $post = [
+                "id" => $posts[$i]->id,
+                "img_url" => $posts[$i]->img_url,
+                "user_id" => $posts[$i]->user_id,
+                "user_name" => $user->first_name . " " . $user->last_name,
+                "user_pf_img_url" => $user->pf_img_url,
+                "created_at" => $posts[$i]->created_at,
+                "updated_at" => $posts[$i]->updated_at
+            ];
+
+
+
+            array_push($result, $post);
         }
+
 
         $data = [
             'status' => 200,
-            'posts' => $post
+            'posts' => $result
         ];
 
         return response()->json($data, 200);
@@ -121,10 +291,44 @@ class PostController extends Controller
         $posts = [];
         if ($authorized) {
             $posts = Post::where("group_id", $id)->get();
+            $result = [];
+            for ($i = 0; $i < count($posts); $i++) {
+                $tags = json_decode($posts[$i]->tag);
+
+                $tagDetails = [];
+
+                for ($j = 0; $j < count($tags); $j++) {
+                    $tag = Tag::find($tags[$j]);
+                    if ($tag) {
+                        array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
+                    }
+                }
+                $user = User::find($posts[$i]->user_id);
+
+                $post = [
+                    "id" => $posts[$i]->id,
+                    "user_id" => $posts[$i]->user_id,
+                    "group_id" => $posts[$i]->group_id,
+                    "tags" => $tagDetails,
+                    "title" => $posts[$i]->title,
+                    "description" => $posts[$i]->description,
+                    "img_url" => $posts[$i]->img_url,
+                    "status" => $posts[$i]->status,
+                    "likes" => count(json_decode($posts[$i]->likes)),
+                    "user_name" => $user->first_name . " " . $user->last_name,
+                    "user_pf_img_url" => $user->pf_img_url,
+                    "created_at" => $posts[$i]->created_at,
+                    "updated_at" => $posts[$i]->updated_at
+                ];
+
+
+
+                array_push($result, $post);
+            }
 
             $data = [
                 "status" => 200,
-                "posts" => $posts,
+                "posts" => $result,
             ];
 
             return response()->json($data, 200);
@@ -157,11 +361,11 @@ class PostController extends Controller
 
         $validator = Validator::make($request->all(), [
             'group_id' => 'nullable',
-            'title' => 'required',
-            'description' => 'nullable|max:255',
+            'title' => 'nullable|max:255',
+            'description' => 'nullable|max:1000',
             'img_url' => 'nullable',
             'status' => 'required',
-            'tag' => 'required|string|max:255',
+            'tag' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -201,6 +405,15 @@ class PostController extends Controller
             $post->status = $request->status;
         }
 
+        $goodTags = [];
+
+        $tags = json_decode($request->tag);
+        for ($i = 0; $i < count($tags); $i++) {
+            $tag = Tag::find($tags[$i]);
+            if ($tag) {
+                array_push($goodTags, $tag->id);
+            }
+        }
 
         $post->group_id = $request->group_id;
         $post->user_id = $userId;
@@ -208,7 +421,7 @@ class PostController extends Controller
         $post->description = $request->description;
         $post->likes = '[]';
         $post->img_url = $request->img_url;
-        $post->tag = $request->tag;
+        $post->tag = json_encode($goodTags);
         $post->save();
 
         $data = [
@@ -218,6 +431,34 @@ class PostController extends Controller
 
         return response()->json($data, 201);
 
+    }
+
+    public function searchPostByTitle(Request $request)
+    {
+        $searchQuery = $request->query("q");
+        $posts = Post::where("title", "like", "%" . $searchQuery . "%")->get();
+        return response()->json($posts, 200);
+    }
+
+    public function createMobilePost(Request $request)
+    {
+        $post = new Post();
+        $post->group_id = null;
+        $post->user_id = $request->user_id;
+        $post->title = $request->title;
+        $post->description = $request->description;
+        $post->likes = '[]';
+        $post->status = "public";
+        $post->img_url = $request->img_url;
+        $post->tag = json_encode([]);
+        $post->save();
+
+        $data = [
+            "status" => 201,
+            "message" => "Post created successfully",
+        ];
+
+        return response()->json($data, 201);
     }
 
     /**
@@ -247,9 +488,63 @@ class PostController extends Controller
             return response()->json($data, 403);
         }
 
+        $postOwner = User::find($post->user_id);
+
+        $likes = json_decode($post->likes);
+
+        $isLiked = false;
+
+        if (in_array($user->id, $likes)) {
+            $isLiked = true;
+        }
+
+        //get group info if there is a group_id
+        if ($post->group_id != null) {
+            $group = Group::find($post->group_id);
+            $post->group_title = $group->title;
+        }
+
+        $tags = json_decode($post->tag);
+
+        $tagDetails = [];
+
+        for ($j = 0; $j < count($tags); $j++) {
+            $tag = Tag::find($tags[$j]);
+            if ($tag) {
+                array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
+            }
+        }
+        $user = User::find($post->user_id);
+
+        $postData = [
+            "id" => $post->id,
+            "user_id" => $post->user_id,
+            "group_id" => $post->group_id,
+            "group_title" => "",
+            "tags" => $tagDetails,
+            "title" => $post->title,
+            "description" => $post->description,
+            "img_url" => $post->img_url,
+            "status" => $post->status,
+            "likes" => $likes,
+            "like_count" => count($likes),
+            "is_liked" => $isLiked,
+            "user_name" => $postOwner->first_name . " " . $postOwner->last_name,
+            "user_pf_img_url" => $postOwner->pf_img_url,
+            "created_at" => $post->created_at,
+            "updated_at" => $post->updated_at
+        ];
+
+        if ($post->group_id != null) {
+            $group = Group::find($post->group_id);
+            $postData["group_title"] = $group->title;
+        }
+
+
+
         $data = [
             "status" => 200,
-            "post" => $post,
+            "post" => $postData,
         ];
 
         return response()->json($data, 200);
@@ -277,17 +572,62 @@ class PostController extends Controller
 
             return response()->json($data, 403);
         }
-        
+
         $relatedPosts = Post::where('tag', $post->tag)
-        ->where('id', '!=', $post->id)
-        ->get();
+            ->where('id', '!=', $post->id)
+            ->get();
 
-$data = [
-"post" => $post,
-"relatedPosts" => $relatedPosts,
-];
+        $data = [
+            "post" => $post,
+            "relatedPosts" => $relatedPosts,
+        ];
 
-return response()->json($data, 200);
+        return response()->json($data, 200);
+    }
+
+    public function likePost($id)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $post = Post::find($id);
+        if (!$post) {
+            $data = [
+                "status" => 404,
+                "message" => "Post not found",
+            ];
+            return response()->json($data, 404);
+        }
+
+        if ($post->status == "private" && $post->user_id != $userId && $user->role != "admin") {
+            $data = [
+                "status" => 401,
+                "message" => "Unauthorized",
+            ];
+
+            return response()->json($data, 403);
+        }
+
+        $likes = json_decode($post->likes);
+
+        if (in_array($userId, $likes)) {
+            $key = array_search($userId, $likes);
+            array_splice($likes, $key, 1);
+        } else {
+            array_push($likes, $userId);
+        }
+
+        $uArr = array_unique($likes);
+
+
+        $post->likes = json_encode($uArr);
+        $post->save();
+
+        $data = [
+            "status" => 200,
+            "message" => "Post updated successfully",
+        ];
+        return response()->json($data, 200);
     }
 
     /**
@@ -357,7 +697,7 @@ return response()->json($data, 200);
         $post->description = $request->get('description');
         $post->img_url = $request->get('img_url');
         $post->status = $request->get('status');
-        $tags = Tag::find($request->tags); 
+        $tags = Tag::find($request->tags);
         $post->tags()->sync($tags);
 
         $post->save();
@@ -434,33 +774,33 @@ return response()->json($data, 200);
     }
 
     //Post CRUD By Admin
-     //Get ALL Post
-     public function adminIndex()
-     {
-         $comments = Post::all();
-         return response()->json($comments);
-     }
- 
-     //Get Post By Id
-     public function adminShow($id)
-     {
-         $comment = Post::find($id);
- 
-         if (!$comment) {
-             return response()->json(['error' => 'Comment not found'], 404);
-         }
- 
-         return response()->json($comment);
-     }
- 
-     //Delete Post
-     public function adminDestroy($id)
-     {
-         $comment = Post::find($id);
-         if (!$comment) {
-             return response()->json(['error' => 'Comment not found'], 404);
-         }
-         $comment->delete();
-         return response()->json(['message' => 'Comment deleted successfully']);
-     }
+    //Get ALL Post
+    public function adminIndex()
+    {
+        $comments = Post::all();
+        return response()->json($comments);
+    }
+
+    //Get Post By Id
+    public function adminShow($id)
+    {
+        $comment = Post::find($id);
+
+        if (!$comment) {
+            return response()->json(['error' => 'Comment not found'], 404);
+        }
+
+        return response()->json($comment);
+    }
+
+    //Delete Post
+    public function adminDestroy($id)
+    {
+        $comment = Post::find($id);
+        if (!$comment) {
+            return response()->json(['error' => 'Comment not found'], 404);
+        }
+        $comment->delete();
+        return response()->json(['message' => 'Comment deleted successfully']);
+    }
 }

@@ -18,7 +18,6 @@ import { useState } from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"; // Import your Dialog components
 
 const DashboardUserPage = () => {
-
   const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
 
@@ -34,14 +33,13 @@ const DashboardUserPage = () => {
 
   const userInfo = () => ({
     username: "Laser Lemonade Machine",
-    email:"yooseryvathana@gmail.com",
-    img_url:"http://example.png"
-    
+    email: "yooseryvathana@gmail.com",
+    img_url: "http://example.png",
   });
 
   // Call the food function to get the object
   const userObject = userInfo();
-  
+
   return (
     <main className="grid flex-1 items-start gap-4 p-2">
       <div className="flex items-center justify-between">

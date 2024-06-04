@@ -1,19 +1,13 @@
 import PostsContainer from "@/components/PostsContainer";
 import { RootState } from "@/redux/store";
+import { getToken } from "@/utils/HelperFunctions";
+import { useEffect, useState } from "react";
+import { set } from "react-hook-form";
 import { useSelector } from "react-redux";
+import { Navigate, redirect } from "react-router-dom";
 
 const HomePage = () => {
-  const auth = useSelector((state: RootState) => state.auth);
-
-  if (auth?.userData.email) {
-    return <PostsContainer />;
-  } else {
-    return (
-      <div>
-        <h1>Welcome page</h1>
-      </div>
-    );
-  }
+  return <Navigate to="/tag/all" />;
 };
 
 export default HomePage;

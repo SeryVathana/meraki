@@ -3,20 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\User;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+
 class CommentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($id)
     {
-        $comments = Comment::with('replies', 'replies.replies')->whereNull('reply_cmt_id')->get();
-        return response()->json($comments);
+        $comments = Comment::whereNull('reply_cmt_id')->where("post_id", $id)->orderBy("created_at", 'desc')->get();
+
+        $comments->map(function ($comment) {
+
+            $user = User::find($comment->user_id);
+            $comment->user_name = $user->first_name . ' ' . $user->last_name;
+            $comment->user_pf_img_url = $user->pf_img_url;
+
+            $arrCmt = Comment::where('reply_cmt_id', $comment->id)->get();
+            $comment->replies = $arrCmt;
+
+            $comment->replies->map(function ($reply) {
+                $user = User::find($reply->user_id);
+                $reply->user_name = $user->first_name . ' ' . $user->last_name;
+                $reply->user_pf_img_url = $user->pf_img_url;
+            });
+        });
+
+
+        $data = [
+            "status" => 200,
+            "message" => "Comments retrieved successfully",
+            "comments" => $comments
+        ];
+
+        return response()->json($data);
     }
     public function store(Request $request)
     {
@@ -39,8 +65,25 @@ class CommentController extends Controller
         $comment->reply_cmt_id = $request->input('reply_cmt_id'); // Assuming 'reply_cmt_id' is the field name for reply comment id
         $comment->save();
 
-        return response()->json($comment, 201);
-    
+        $cmtInfo = [
+            'user_id' => $userId,
+            'user_name' => $user->first_name . ' ' . $user->last_name,
+            'user_pf_img_url' => $user->pf_img_url,
+            "comment" => $comment->comment,
+            'post_id' => $comment->post_id,
+            'reply_cmt_id' => $comment->reply_cmt_id,
+            'created_at' => $comment->created_at,
+            'updated_at' => $comment->updated_at
+        ];
+
+        $data = [
+            'status' => 200,
+            'message' => 'Comment created successfully',
+            'comment' => $cmtInfo
+        ];
+
+        return response()->json($data, 200);
+
     }
     public function reply(Request $request, $id)
     {
@@ -63,7 +106,24 @@ class CommentController extends Controller
         $reply->reply_cmt_id = $parentComment->id;
         $reply->save();
 
-        return response()->json(['message' => 'Reply created successfully'], 201);
+        $cmtInfo = [
+            'user_id' => $userId,
+            'user_name' => $user->first_name . ' ' . $user->last_name,
+            'user_pf_img_url' => $user->pf_img_url,
+            "comment" => $reply->comment,
+            'post_id' => $reply->post_id,
+            'reply_cmt_id' => $reply->reply_cmt_id,
+            'created_at' => $reply->created_at,
+            'updated_at' => $reply->updated_at
+        ];
+
+        $data = [
+            "status" => 200,
+            'message' => 'Reply created successfully',
+            "reply" => $cmtInfo
+        ];
+
+        return response()->json($data, 200);
     }
 
     /**

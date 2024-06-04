@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GroupInvite;
 use App\Models\GroupMember;
 use App\Models\Group;
 use App\Http\Requests\StoreGroupMemberRequest;
 use App\Http\Requests\UpdateGroupMemberRequest;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use Validator;
@@ -18,6 +21,72 @@ class GroupMemberController extends Controller
     public function index()
     {
         //
+    }
+
+    public function getNotMembers(Request $request, $id)
+    {
+        $searchQuery = $request->query("q");
+
+        $auth = Auth::user();
+
+        $group = Group::find($id);
+
+        if (!$group) {
+            $data = [
+                "status" => 404,
+                "message" => "Group not found",
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $groupMembers = GroupMember::where("group_id", $id)->get();
+
+        $membersIds = $groupMembers->pluck("user_id")->toArray();
+
+        $users = User::whereNotIn('id', $membersIds)
+            ->where(function ($query) use ($searchQuery) {
+                $query->where('first_name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('email', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('username', 'like', '%' . $searchQuery . '%');
+            })
+            ->limit(50)
+            ->get();
+        $result = [];
+        foreach ($users as $user) {
+            $res = [
+                "id" => $user->id,
+                "first_name" => $user->first_name,
+                "last_name" => $user->last_name,
+                "email" => $user->email,
+                "pf_img_url" => $user->pf_img_url,
+            ];
+
+            //check if user is followed by auth user
+            $authFollowing = json_decode($auth->followings);
+            if (in_array($user->id, $authFollowing)) {
+                $res["is_following"] = true;
+            } else {
+                $res["is_following"] = false;
+            }
+
+            $invited = GroupInvite::where("user_id", $user->id)->where("group_id", $id)->first();
+            if (!$invited) {
+                $res["is_invited"] = false;
+            } else {
+                $res["is_invited"] = true;
+            }
+
+            array_push($result, $res);
+        }
+
+        $data = [
+            'status' => 200,
+            'users' => $result
+        ];
+
+        return response()->json($data, 200);
     }
 
     /**
@@ -39,8 +108,9 @@ class GroupMemberController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
+        $searchQuery = $request->query('q');
         $group = Group::find($id);
 
         if (!$group) {
@@ -54,9 +124,41 @@ class GroupMemberController extends Controller
 
         $members = GroupMember::where("group_id", $id)->get();
 
+        $result = [];
+        foreach ($members as $member) {
+            $user = User::where("id", $member->user_id)->where(function ($query) use ($searchQuery) {
+                $query->where('first_name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('email', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('username', 'like', '%' . $searchQuery . '%');
+            })->first();
+
+            if (!$user) {
+                continue;
+            }
+
+            $mem = GroupMember::where("group_id", $id)->where("user_id", $user->id)->first();
+            if (!$mem) {
+                continue;
+            }
+
+            $res = [
+                "id" => $mem->id,
+                "user_id" => $user->id,
+                "first_name" => $user->first_name,
+                "last_name" => $user->last_name,
+                "email" => $user->email,
+                "pf_img_url" => $user->pf_img_url,
+                "group_role" => $mem->role
+            ];
+
+
+            array_push($result, $res);
+        }
+
         $data = [
             'status' => 200,
-            'member' => $members
+            'members' => $result
         ];
 
         return response()->json($data, 200);
