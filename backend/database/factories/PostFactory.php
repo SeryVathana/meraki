@@ -22,10 +22,10 @@ class PostFactory extends Factory
         return [
             'user_id' => User::factory(),
             'group_id' => Group::factory(),
-            'title' => fake()->title(), 
-            'description' => fake()->description(), 
+            'title' => fake()->title(),
+            'description' => fake()->description(),
             'tag' => Tag::factory(),
-            'img_url' => "https://i.pinimg.com/736x/2f/21/94/2f21940ee0948af25337e339d4899c36.jpg",
+            'img_url' => "https://i.pinimg.com/564x/25/ee/de/25eedef494e9b4ce02b14990c9b5db2d.jpg",
             'status' => "public",
             'likes' => "[1, 2, 3]"
         ];

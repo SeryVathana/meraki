@@ -15,8 +15,8 @@ import { toast, useToast } from "@/components/ui/use-toast";
 
 const formSchema = z
   .object({
-    firstName: z.string().min(2, "First name must be at least 2 characters").max(50),
-    lastName: z.string().min(2, "Last name must be at least 2 characters").max(50),
+    firstName: z.string().min(1, "First name must be at least 1 characters").max(50),
+    lastName: z.string().min(1, "Last name must be at least 1 characters").max(50),
     userName: z.string().min(2, "Username must be at least 2 characters").max(16, "Username must be at most 16 characters"),
     email: z.string().email(),
     password: z

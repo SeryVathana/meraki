@@ -52,7 +52,7 @@ class UserController extends Controller
             }
 
             if (!$request->pf_img_url) {
-                $pfImgUrl = "https://i.pinimg.com/736x/e7/fd/e7/e7fde7197f89cac7846e66ad629287cc.jpg";
+                $pfImgUrl = "https://i.pinimg.com/564x/25/ee/de/25eedef494e9b4ce02b14990c9b5db2d.jpg";
             } else {
                 $pfImgUrl = $request->pf_img_url;
             }
