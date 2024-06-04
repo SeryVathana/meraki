@@ -686,7 +686,7 @@ class PostController extends Controller
             'description' => 'nullable|max:255',
             'img_url' => 'required',
             'status' => 'required',
-            'tags' => 'required|array'
+            'tags' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -710,23 +710,26 @@ class PostController extends Controller
         }
 
 
+
+
         $post->title = $request->get('title');
         $post->description = $request->get('description');
         $post->img_url = $request->get('img_url');
         $post->status = $request->get('status');
-        $tags = Tag::find($request->tags);
-        $post->tags()->sync($tags);
+
+        $newTags = json_decode($request->tags);
+
+        $tags = Tag::find($newTags)->pluck('id')->toArray();
+        $post->tag = $newTags;
 
         $post->save();
-        $tags->save();
 
         $data = [
             "status" => 200,
             "message" => "Post updated successfully",
-            "tags" => $tags,
         ];
 
-        return response()->json($data, $post->load('tags'));
+        return response()->json($data, 200);
 
     }
 
@@ -765,7 +768,7 @@ class PostController extends Controller
             }
         }
 
-        if ($post->status != "private" && $post->user_id == $userId && $user->role == "admin") {
+        if (($post->user_id == $userId) || $user->role == "admin") {
             $authorized = true;
         }
 
