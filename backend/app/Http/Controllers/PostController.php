@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Tag;
 use App\Models\Group;
 use App\Models\GroupMember;
@@ -10,20 +11,42 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Gate;
 use Validator;
+use OpenApi\Annotations as OA;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      */
 
-
-
+    /**
+     * @OA\Get(
+     *     path="/api/post",
+     *     operationId="getPostsList",
+     *     tags={"UserPost"},
+     *     summary="Get list of posts",
+     *     description="Returns list of posts",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function index()
     {
-
         $post = Post::where("status", "public")->get();
         $data = [
             'status' => 200,
@@ -31,8 +54,22 @@ class PostController extends Controller
         ];
         
         return response()->json($data, 200);
-
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/post/highlighted",
+     *     operationId="getHighlightedPosts",
+     *     tags={"UserPost"},
+     *     summary="Get highlighted posts",
+     *     description="Returns the highlighted post",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function getHighlightedPosts()
     {
         $highlightedPost = Post::where('is_highlighted', true)->first();
@@ -42,6 +79,20 @@ class PostController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/post/latest",
+     *     operationId="getLatestPosts",
+     *     tags={"UserPost"},
+     *     summary="Get latest posts",
+     *     description="Returns the latest post",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function getLatestPosts()
     {
         $latestPost = Post::orderBy('created_at', 'desc')->first();
@@ -51,6 +102,24 @@ class PostController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/post/mypost",
+     *     operationId="getMyPosts",
+     *     tags={"UserPost"},
+     *     summary="Get my posts",
+     *     description="Returns the authenticated user's posts",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     )
+     * )
+     */
     public function getMyPosts()
     {
         $user = Auth::user();
@@ -64,6 +133,41 @@ class PostController extends Controller
 
         return response()->json($data, 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/post/user/{id}",
+     *     operationId="getUserPosts",
+     *     tags={"UserPost"},
+     *     summary="Get posts by user ID",
+     *     description="Returns posts for a specific user",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *     )
+     * )
+     */
     public function getUserPosts($id)
     {
         $curUser = Auth::user();
@@ -94,6 +198,40 @@ class PostController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/post/group/{id}",
+     *     operationId="getGroupPosts",
+     *     tags={"UserPost"},
+     *     summary="Get posts by group ID",
+     *     description="Returns posts for a specific group",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *     )
+     * )
+     */
     public function getGroupPosts($id)
     {
         $user = Auth::user();
@@ -103,7 +241,6 @@ class PostController extends Controller
 
         $group = Group::find($id);
         if (!$group) {
-
             $data = [
                 "status" => 404,
                 "message" => "Group not found"
@@ -131,7 +268,7 @@ class PostController extends Controller
         } else {
             $data = [
                 "status" => 403,
-                "message" => "Unathorized",
+                "message" => "Unauthorized",
             ];
 
             return response()->json($data, 403);
@@ -139,40 +276,61 @@ class PostController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created resource in storage.
      */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/post",
+     *     operationId="storePost",
+     *     tags={"UserPost"},
+     *     summary="Create new post",
+     *     description="Creates a new post",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"title", "status", "tag"},
+     *             @OA\Property(property="group_id", type="integer"),
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="img_url", type="string"),
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="tag", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Post created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     )
+     * )
      */
     public function store(StorePostRequest $request)
     {
-
         $user = Auth::user();
         $userId = $user->id;
 
         $validator = Validator::make($request->all(), [
             'group_id' => 'nullable',
-            'title' => 'required',
-            'description' => 'nullable|max:255',
-            'img_url' => 'nullable',
-            'status' => 'required',
+            'title' => 'required|string',
+            'description' => 'nullable|string|max:255',
+            'img_url' => 'nullable|string',
+            'status' => 'required|string',
             'tag' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
-
             $data = [
                 "status" => 400,
                 "message" => $validator->messages()
             ];
 
             return response()->json($data, 400);
-
         }
 
         if ($request->status != "public" && $request->status != "private") {
@@ -181,7 +339,7 @@ class PostController extends Controller
                 "message" => "Invalid input"
             ];
 
-            return response()->json($data, 404);
+            return response()->json($data, 400);
         }
 
         $post = new Post;
@@ -193,14 +351,13 @@ class PostController extends Controller
                     "status" => 404,
                     "message" => "Group not found"
                 ];
-                return response()->json($data, 402);
+                return response()->json($data, 404);
             }
 
             $post->status = $group1->status;
         } else {
             $post->status = $request->status;
         }
-
 
         $post->group_id = $request->group_id;
         $post->user_id = $userId;
@@ -217,11 +374,45 @@ class PostController extends Controller
         ];
 
         return response()->json($data, 201);
-
     }
 
     /**
      * Display the specified resource.
+     */
+
+    /**
+     * @OA\Get(
+     *     path="/api/post/{id}",
+     *     operationId="showPost",
+     *     tags={"UserPost"},
+     *     summary="Get post by ID",
+     *     description="Returns a specific post by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found",
+     *     )
+     * )
      */
     public function show($id, Post $post)
     {
@@ -235,7 +426,7 @@ class PostController extends Controller
                 "status" => 404,
                 "message" => "Post not found",
             ];
-            return response()->json($data, 200);
+            return response()->json($data, 404);
         }
 
         if ($post->status == "private" && $post->user_id != $userId && $user->role != "admin") {
@@ -253,8 +444,42 @@ class PostController extends Controller
         ];
 
         return response()->json($data, 200);
-
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/post/{id}/related",
+     *     operationId="getRelatedPosts",
+     *     tags={"UserPost"},
+     *     summary="Get related posts",
+     *     description="Returns related posts based on tag",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found",
+     *     )
+     * )
+     */
     public function related($id)
     {
         $user = Auth::user();
@@ -267,7 +492,7 @@ class PostController extends Controller
                 "status" => 404,
                 "message" => "Post not found",
             ];
-            return response()->json($data, 200);
+            return response()->json($data, 404);
         }
         if ($post->status == "private" && $post->user_id != $userId && $user->role != "admin") {
             $data = [
@@ -277,33 +502,76 @@ class PostController extends Controller
 
             return response()->json($data, 403);
         }
-        
+
         $relatedPosts = Post::where('tag', $post->tag)
-        ->where('id', '!=', $post->id)
-        ->get();
+            ->where('id', '!=', $post->id)
+            ->get();
 
-$data = [
-"post" => $post,
-"relatedPosts" => $relatedPosts,
-];
+        $data = [
+            "post" => $post,
+            "relatedPosts" => $relatedPosts,
+        ];
 
-return response()->json($data, 200);
+        return response()->json($data, 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Post $post, )
-    {
 
+    public function edit(Post $post)
+    {
+        //
     }
 
     /**
      * Update the specified resource in storage.
      */
+
+    /**
+     * @OA\Put(
+     *     path="/api/post/{id}",
+     *     operationId="updatePost",
+     *     tags={"UserPost"},
+     *     summary="Update post",
+     *     description="Updates a specific post",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"title", "status", "tags"},
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="img_url", type="string"),
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="tags", type="array", @OA\Items(type="integer"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post updated successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found"
+     *     )
+     * )
+     */
     public function update(Request $request, $id)
     {
-
         $post = Post::find($id);
 
         if (!$post) {
@@ -325,22 +593,20 @@ return response()->json($data, 200);
         }
 
         $validator = Validator::make($request->all(), [
-            'title' => 'required',
-            'description' => 'nullable|max:255',
-            'img_url' => 'required',
-            'status' => 'required',
+            'title' => 'required|string',
+            'description' => 'nullable|string|max:255',
+            'img_url' => 'required|string',
+            'status' => 'required|string',
             'tags' => 'required|array'
         ]);
 
         if ($validator->fails()) {
-
             $data = [
                 "status" => 400,
                 "message" => $validator->messages()
             ];
 
             return response()->json($data, 400);
-
         }
 
         if ($request->status != "public" && $request->status != "private") {
@@ -352,12 +618,11 @@ return response()->json($data, 200);
             return response()->json($data, 400);
         }
 
-
         $post->title = $request->get('title');
         $post->description = $request->get('description');
         $post->img_url = $request->get('img_url');
         $post->status = $request->get('status');
-        $tags = Tag::find($request->tags); 
+        $tags = Tag::find($request->tags);
         $post->tags()->sync($tags);
 
         $post->save();
@@ -370,11 +635,41 @@ return response()->json($data, 200);
         ];
 
         return response()->json($data, $post->load('tags'));
-
     }
 
     /**
      * Remove the specified resource from storage.
+     */
+
+    /**
+     * @OA\Delete(
+     *     path="/api/post/{id}",
+     *     operationId="deletePost",
+     *     tags={"UserPost"},
+     *     summary="Delete post",
+     *     description="Deletes a specific post",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found",
+     *     )
+     * )
      */
     public function destroy($id)
     {
@@ -421,7 +716,6 @@ return response()->json($data, 200);
             return response()->json($data, 403);
         }
 
-
         $post->delete();
 
         $data = [
@@ -430,37 +724,125 @@ return response()->json($data, 200);
         ];
 
         return response()->json($data, 200);
-
     }
 
-    //Post CRUD By Admin
-     //Get ALL Post
-     public function adminIndex()
-     {
-         $comments = Post::all();
-         return response()->json($comments);
-     }
- 
-     //Get Post By Id
-     public function adminShow($id)
-     {
-         $comment = Post::find($id);
- 
-         if (!$comment) {
-             return response()->json(['error' => 'Comment not found'], 404);
-         }
- 
-         return response()->json($comment);
-     }
- 
-     //Delete Post
-     public function adminDestroy($id)
-     {
-         $comment = Post::find($id);
-         if (!$comment) {
-             return response()->json(['error' => 'Comment not found'], 404);
-         }
-         $comment->delete();
-         return response()->json(['message' => 'Comment deleted successfully']);
-     }
+    /**
+     * Post CRUD By Admin
+     */
+
+    /**
+     * @OA\Get(
+     *     path="/api/admin/post",
+     *     operationId="adminGetPostsList",
+     *     tags={"AdminPost"},
+     *     summary="Get all posts for admin",
+     *     description="Returns all posts for admin",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
+    public function adminIndex()
+    {
+        $posts = Post::all();
+        return response()->json($posts);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/admin/post/{id}",
+     *     operationId="adminGetPostById",
+     *     tags={"AdminPost"},
+     *     summary="Get post by ID for admin",
+     *     description="Returns a specific post by ID for admin",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found",
+     *     )
+     * )
+     */
+    public function adminShow($id)
+    {
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json(['error' => 'Post not found'], 404);
+        }
+
+        return response()->json($post);
+    }
+
+   /**
+     * @OA\Delete(
+     *     path="/api/admin/post/{id}",
+     *     operationId="adminDeletePost",
+     *     tags={"AdminPost"},
+     *     summary="Delete post for admin",
+     *     description="Deletes a specific post for admin",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found",
+     *     )
+     * )
+     */
+    public function adminDestroy($id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return response()->json(['error' => 'Post not found'], 404);
+        }
+        $post->delete();
+        return response()->json(['message' => 'Post deleted successfully']);
+    }
 }

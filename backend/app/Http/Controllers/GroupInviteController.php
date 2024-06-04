@@ -18,6 +18,41 @@ class GroupInviteController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+     /**
+     * @OA\Get(
+     *     path="/api/group/invite/{id}",
+     *     operationId="getGroupInviteById",
+     *     tags={"UserGroupInvite"},
+     *     summary="Get GroupInvite information",
+     *     description="Returns GroupInvite data",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="GroupInvite not found",
+     *     )
+     * )
+     */
     public function index($id)
     {
         $group = Group::find($id);
@@ -58,6 +93,48 @@ class GroupInviteController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     */
+
+     /**
+     * @OA\Post(
+     *     path="/api/group/invite/{id}",
+     *     operationId="storeGroupInvite",
+     *     tags={"UserGroupInvite"},
+     *     summary="Create Group Invite",
+     *     description="Creates a Group Invite",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"group_id", "user_id"},
+     *             @OA\Property(property="group_id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Request created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="User already in group or already requested",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *         @OA\JsonContent()
+     *     )
+     * )
      */
     public function store(StoreGroupInviteRequest $request, $id)
     {
@@ -163,6 +240,51 @@ class GroupInviteController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    /**
+     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/group/invite/accept/{id}",
+     *     operationId="updateGroupInvite",
+     *     tags={"UserGroupInvite"},
+     *     summary="Update group Invite",
+     *     description="Updates a specific group Invite",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"group_id", "user_id", "role"},
+     *             @OA\Property(property="group_id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="role", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Member updated successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
+     */
     public function update(UpdateGroupInviteRequest $request, $id)
     {
         $user = Auth::user();
@@ -211,6 +333,50 @@ class GroupInviteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/group/invite/{id}",
+     *     operationId="deleteGroupInvite",
+     *     tags={"UserGroupInvite"},
+     *     summary="Delete group Invite",
+     *     description="Deletes a specific group invite",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"user_id"},
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="GroupInvite deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
+     */
+
     public function destroy(UpdateGroupInviteRequest $request, $id)
     {
         $user = Auth::user();

@@ -13,6 +13,32 @@ class FolderController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+     /**
+     * @OA\Get(
+     *     path="/api/folder",
+     *     operationId="getFolder",
+     *     tags={"UserFolder"},
+     *     summary="Get list of Folders",
+     *     description="Returns list of Folders",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function index()
     {
         $user = Auth::user();
@@ -38,6 +64,51 @@ class FolderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+       /**
+     * @OA\Post(
+     *     path="/api/folder",
+     *     operationId="storeFolder",
+     *     tags={"UserFolder"},
+     *     summary="Create Folder ",
+     *     description="Creates a Folder ",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"description", "title", "status", "user_id"},
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Request created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="User already in group or already requested",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
+
     public function store(StoreFolderRequest $request)
     {
         $user = Auth::user();
@@ -103,6 +174,52 @@ class FolderController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+     /**
+     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/folder/{id}",
+     *     operationId="updateFolder",
+     *     tags={"UserFolder"},
+     *     summary="Update Folder ",
+     *     description="Updates a specific Folder ",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"description", "title", "status"},
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Member updated successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
+     */
     public function update(UpdateFolderRequest $request, $id)
     {
         $user = Auth::user();
@@ -164,6 +281,49 @@ class FolderController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     */
+     /**
+     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/folder/{id}",
+     *     operationId="deleteFolder",
+     *     tags={"UserFolder"},
+     *     summary="Delete Folder ",
+     *     description="Deletes a specific Folder ",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"user_id"},
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="GroupInvite deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
      */
     public function destroy($id)
     {

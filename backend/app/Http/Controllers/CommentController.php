@@ -13,11 +13,81 @@ class CommentController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+      /**
+     * @OA\Get(
+     *     path="/api/comment",
+     *     operationId="getComment",
+     *     tags={"UserComment"},
+     *     summary="Get list of Comments",
+     *     description="Returns list of Comments",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function index()
     {
         $comments = Comment::with('replies', 'replies.replies')->whereNull('reply_cmt_id')->get();
         return response()->json($comments);
     }
+
+       /**
+     * @OA\Post(
+     *     path="/api/comment",
+     *     operationId="storeComment",
+     *     tags={"UserComment"},
+     *     summary="Create Comment ",
+     *     description="Creates a Comment ",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"reply_cmt_id", "comment", "post_id", "user_id"},
+     *             @OA\Property(property="reply_cmt_id", type="integer"),
+     *             @OA\Property(property="comment", type="string"),
+     *             @OA\Property(property="post_id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Request created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="User already in group or already requested",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -42,6 +112,50 @@ class CommentController extends Controller
         return response()->json($comment, 201);
     
     }
+
+      /**
+     * @OA\Post(
+     *     path="/api/comment/{id}/reply",
+     *     operationId="storeReplyComment",
+     *     tags={"UserComment"},
+     *     summary="Create ReplyComment ",
+     *     description="Creates a ReplyComment ",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"reply_cmt_id", "comment", "post_id", "user_id"},
+     *             @OA\Property(property="reply_cmt_id", type="integer"),
+     *             @OA\Property(property="comment", type="string"),
+     *             @OA\Property(property="post_id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Request created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="User already in group or already requested",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function reply(Request $request, $id)
     {
         $user = Auth::user();
@@ -87,6 +201,32 @@ class CommentController extends Controller
     // For Role Admin CRUD Comments
 
     //Get ALL Comments
+
+     /**
+     * @OA\Get(
+     *     path="/api/admin/comment",
+     *     operationId="AdmingetComment",
+     *     tags={"AdminComment"},
+     *     summary="Get list of Comments",
+     *     description="Returns list of Comments",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function adminIndex()
     {
         $comments = Comment::all();
@@ -94,6 +234,40 @@ class CommentController extends Controller
     }
 
     //Get Comment By Id
+     /**
+     * @OA\Get(
+     *     path="/api/admin/comment/{id}",
+     *     operationId="AdmingetCommnetById",
+     *     tags={"AdminCommnet"},
+     *     summary="Get Commnet information",
+     *     description="Returns Commnet data",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="GroupInvite not found",
+     *     )
+     * )
+     */
     public function adminShow($id)
     {
         $comment = Comment::find($id);
@@ -106,6 +280,50 @@ class CommentController extends Controller
     }
 
     //Delete Comments
+    /**
+     * Remove the specified resource from storage.
+     */
+     /**
+     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/admin/comment/{id}",
+     *     operationId="AdmindeleteComment",
+     *     tags={"AdminComment"},
+     *     summary="Delete Comment ",
+     *     description="Deletes a specific Comment ",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="GroupInvite deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
+     */
     public function adminDestroy($id)
     {
         $comment = Comment::find($id);

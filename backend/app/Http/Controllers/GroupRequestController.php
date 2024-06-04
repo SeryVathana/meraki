@@ -9,6 +9,7 @@ use App\Http\Requests\StoreGroupRequestRequest;
 use App\Http\Requests\UpdateGroupRequestRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\JsonResponse;
 
 class GroupRequestController extends Controller
 {
@@ -29,7 +30,45 @@ class GroupRequestController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/group/request/{id}",
+     *     operationId="storeGroupRequest",
+     *     tags={"UserGroupRequest"},
+     *     summary="Create Group Request",
+     *     description="Creates a Group Request",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"group_id", "user_id"},
+     *             @OA\Property(property="group_id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Request created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="User already in group or already requested",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *         @OA\JsonContent()
+     *     )
+     * )
      */
     public function store(StoreGroupRequestRequest $request, $id)
     {
@@ -52,7 +91,7 @@ class GroupRequestController extends Controller
         if ($existedReqCount > 0) {
             $data = [
                 "status" => 400,
-                "message" => "User already request",
+                "message" => "User already requested",
             ];
 
             return response()->json($data, 400);
@@ -76,11 +115,11 @@ class GroupRequestController extends Controller
         $groupReq->save();
 
         $data = [
-            "status" => 200,
+            "status" => 201,
             "message" => "Request created successfully"
         ];
 
-        return response()->json($data, 200);
+        return response()->json($data, 201);
     }
 
     /**
@@ -100,7 +139,51 @@ class GroupRequestController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/group/request/accept/{id}",
+     *     operationId="updateGroupRequest",
+     *     tags={"GroupRequest"},
+     *     summary="Update Group Request",
+     *     description="Updates a specific Group Request",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"group_id","user_id", "role"},
+     *             @OA\Property(property="group_id", type="integer"),
+     * *           @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="role", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Request accepted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Request not found",
+     *         @OA\JsonContent()
+     *     )
+     * )
      */
     public function update(UpdateGroupRequestRequest $request, $id)
     {
@@ -130,9 +213,7 @@ class GroupRequestController extends Controller
         $newMember->group_id = $group->id;
         $newMember->user_id = $groupReq->user_id;
         $newMember->role = "member";
-
         $newMember->save();
-
         $groupReq->delete();
 
         $data = [
@@ -144,7 +225,41 @@ class GroupRequestController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/group/request/{id}",
+     *     operationId="deleteGroupRequest",
+     *     tags={"UserGroupRequest"},
+     *     summary="Delete Group Request",
+     *     description="Deletes a specific Group Request",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Request deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Request not found",
+     *         @OA\JsonContent()
+     *     )
+     * )
      */
     public function destroy($id)
     {
@@ -179,7 +294,6 @@ class GroupRequestController extends Controller
 
             $authorized = true;
         }
-
 
         if ($authorized) {
             $groupReq->delete();

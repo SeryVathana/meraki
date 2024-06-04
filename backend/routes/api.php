@@ -11,6 +11,7 @@ use App\Http\Controllers\GroupRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SearchController;
 use App\Http\Middleware\AdminRoleMiddleware;
 use App\Models\Comment;
 
@@ -36,6 +37,7 @@ Route::group([
     Route::get('post/highlighted', [PostController::class, 'getHighlightedPosts']);
     Route::get('post/latest', [PostController::class, 'getLatestPosts']);
 
+    // Group 
     Route::get('group', [GroupController::class, "index"]);
     Route::get('group/{id}', [GroupController::class, "show"]);
     Route::post('group', [GroupController::class, "store"]);
@@ -65,9 +67,9 @@ Route::group([
     Route::delete('folder/{id}', [FolderController::class, "destroy"]);
 
     //Comment with multi level
-    Route::get('/comment', [CommentController::class, 'index']);
-    Route::post('/comment',  [CommentController::class,  'store']);
-    Route::post('/comment/{id}/reply',  [CommentController::class,  'reply']);
+    Route::get('comment', [CommentController::class, 'index']);
+    Route::post('comment',  [CommentController::class,  'store']);
+    Route::post('comment/{id}/reply',  [CommentController::class,  'reply']);
 
     //Report 
     Route::post('report', [ReportController::class, 'store']);
@@ -80,6 +82,8 @@ Route::group([
     Route::delete('tag/{id}', [TagController::class, "destroy"]); 
     Route::put('tag/{id}', [TagController::class, "update"]);
 
+    // Advance search
+    Route::get('post/advancesearch', [SearchController::class, "advancedsearch"]);
 
 
     Route::group([
@@ -87,7 +91,6 @@ Route::group([
     ], function() {
     //Group
     Route::get('admin/group', [GroupController::class, 'index']);
-
 
     //comment
     Route::get('admin/comment', [CommentController::class, 'adminIndex']);
@@ -103,6 +106,9 @@ Route::group([
      Route::get('admin/report', [ReportController::class, 'adminIndex']);
      Route::get('admin/postId/{id}', [ReportController::class, 'adminShow']);
      Route::delete('admin/report/{id}', [ReportController::class, 'adminDestroy']);
+
+     //user
+     Route::get('admin/users', [UserController::class, 'getAllUsers']);
     
     });
 });
