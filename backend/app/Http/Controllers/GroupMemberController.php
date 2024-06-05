@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Validator;
 
 class GroupMemberController extends Controller
@@ -20,7 +21,7 @@ class GroupMemberController extends Controller
      */
     public function index()
     {
-        //
+        // Implementation here
     }
 
     public function getNotMembers(Request $request, $id)
@@ -94,7 +95,7 @@ class GroupMemberController extends Controller
      */
     public function create()
     {
-        //
+        // Implementation here
     }
 
     /**
@@ -102,11 +103,43 @@ class GroupMemberController extends Controller
      */
     public function store(StoreGroupMemberRequest $request)
     {
-        //
+        // Implementation here
     }
 
     /**
      * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/group/member/{id}",
+     *     operationId="getGroupMember",
+     *     tags={"UserGroupMember"},
+     *     summary="Get group member",
+     *     description="Returns group member based on group",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
      */
     public function show(Request $request, $id)
     {
@@ -169,11 +202,52 @@ class GroupMemberController extends Controller
      */
     public function edit(GroupMember $groupMember)
     {
-        //
+        // Implementation here
     }
 
     /**
      * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/group/member/{id}",
+     *     operationId="updateGroupMember",
+     *     tags={"UserGroupMember"},
+     *     summary="Update group member",
+     *     description="Updates a specific group member",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"user_id", "role"},
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="role", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Member updated successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
      */
     public function update(UpdateGroupMemberRequest $request, $id)
     {
@@ -197,8 +271,8 @@ class GroupMemberController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'role' => 'required',
+            'user_id' => 'required|integer',
+            'role' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -212,7 +286,7 @@ class GroupMemberController extends Controller
         if ($userId == $request->user_id) {
             $data = [
                 "status" => 403,
-                "message" => "You can't change your self"
+                "message" => "You can't change yourself"
             ];
             return response()->json($data, 403);
         }
@@ -246,8 +320,48 @@ class GroupMemberController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/group/member/{id}",
+     *     operationId="deleteGroupMember",
+     *     tags={"UserGroupMember"},
+     *     summary="Delete group member",
+     *     description="Deletes a specific group member",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"user_id"},
+     *             @OA\Property(property="user_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Member deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
      */
-    public function destroy(UpdateGroupMemberRequest $request, $id)
+    public function destroy(Request $request, $id)
     {
         $user = Auth::user();
         $userId = $user->id;
@@ -269,7 +383,7 @@ class GroupMemberController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
+            'user_id' => 'required|integer',
         ]);
 
         if ($validator->fails()) {

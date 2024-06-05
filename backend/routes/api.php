@@ -12,6 +12,7 @@ use App\Http\Controllers\GroupRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SearchController;
 use App\Http\Middleware\AdminRoleMiddleware;
 use App\Http\Middleware\Cors;
 use App\Models\Comment;
@@ -55,6 +56,7 @@ Route::group([
     Route::get('post/latest', [PostController::class, 'getLatestPosts']);
     Route::PUT('post/like/{id}', [PostController::class, 'likePost']);
 
+    // Group 
     Route::get('group', [GroupController::class, "index"]);
     Route::get("group/user/{id}", [GroupController::class, "getUserGroups"]);
     Route::get("group/mygroups", [GroupController::class, "getMyGroups"]);
@@ -95,6 +97,7 @@ Route::group([
     Route::get("folder/post/{id}", [FolderController::class, "getFoldersByPostId"]);
 
     //Comment with multi level
+
     Route::get('/comment/{id}', [CommentController::class, 'index']);
     Route::post('/comment', [CommentController::class, 'store']);
     Route::post('/comment/{id}/reply', [CommentController::class, 'reply']);
@@ -111,11 +114,14 @@ Route::group([
     Route::get('tag', [TagController::class, "index"]);
     Route::get('tag/{id}', [TagController::class, "show"]);
 
+    // Advance search
+    Route::get('post/advancesearch', [SearchController::class, "advancedsearch"]);
 
 
     Route::group([
         'middleware' => AdminRoleMiddleware::class
     ], function () {
+          Route::get('admin/users', [UserController::class, 'getAllUsers']);
         //Group
         Route::post('tag', [TagController::class, "store"]);
         Route::put('tag/{id}', [TagController::class, "update"]);
@@ -137,6 +143,5 @@ Route::group([
         Route::get('admin/report', [ReportController::class, 'adminIndex']);
         Route::get('admin/postId/{id}', [ReportController::class, 'adminShow']);
         Route::delete('admin/report/{id}', [ReportController::class, 'adminDestroy']);
-
     });
 });

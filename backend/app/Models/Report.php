@@ -44,7 +44,7 @@ class Report extends Model
         'reason',
     ];
 
-    public function user()
+    public function users()
     {
         return $this->belongsTo(User::class);
     }
