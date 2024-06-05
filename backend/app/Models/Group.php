@@ -33,6 +33,7 @@ class Group extends Model
     protected $fillable = [
         'title',
         'owner_id',
+        'img_url',
         'status',
     ];
 }

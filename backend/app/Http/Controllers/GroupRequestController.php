@@ -7,6 +7,7 @@ use App\Models\GroupRequest;
 use App\Models\GroupMember;
 use App\Http\Requests\StoreGroupRequestRequest;
 use App\Http\Requests\UpdateGroupRequestRequest;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\JsonResponse;
@@ -75,9 +76,8 @@ class GroupRequestController extends Controller
         $user = Auth::user();
         $userId = $user->id;
 
-        $existedMember = GroupMember::where("group_id", $id)->where("user_id", $userId)->get();
-        $existedMemberCount = $existedMember->count();
-        if ($existedMemberCount > 0) {
+        $existedMember = GroupMember::where("group_id", $id)->where("user_id", $userId)->first();
+        if ($existedMember) {
             $data = [
                 "status" => 400,
                 "message" => "User already in group",
@@ -86,15 +86,19 @@ class GroupRequestController extends Controller
             return response()->json($data, 400);
         }
 
-        $existedReq = GroupRequest::where("group_id", $id)->where("user_id", $userId)->get();
-        $existedReqCount = $existedReq->count();
-        if ($existedReqCount > 0) {
+        $existedReq = GroupRequest::where("group_id", $id)->where("user_id", $userId)->first();
+        if ($existedReq) {
+
+            //delete request
+
+            $existedReq->delete();
+
             $data = [
-                "status" => 400,
-                "message" => "User already requested",
+                "status" => 200,
+                "message" => "Request deleted successfully",
             ];
 
-            return response()->json($data, 400);
+            return response()->json($data, 200);
         }
 
         $group = Group::find($id);
@@ -120,6 +124,48 @@ class GroupRequestController extends Controller
         ];
 
         return response()->json($data, 201);
+    }
+
+    public function getPendingRequests($id)
+    {
+        $group = Group::find($id);
+        if (!$group) {
+            $data = [
+                "status" => 404,
+                "message" => "Group not found"
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        if (!Gate::allows('accept_request', $group)) {
+            $data = [
+                "status" => 403,
+                "message" => "Unauthorized"
+            ];
+
+            return response()->json($data, 403);
+        }
+
+        $requests = GroupRequest::where("group_id", $id)->get();
+
+        //get user info
+        foreach ($requests as $req) {
+            $user = User::find($req->user_id);
+            $req->user_id = $user->id;
+            $req->first_name = $user->first_name;
+            $req->last_name = $user->last_name;
+            $req->email = $user->email;
+            $req->pf_img_url = $user->pf_img_url;
+        }
+
+        $data = [
+            "status" => 200,
+            "message" => "Requests",
+            "data" => $requests
+        ];
+
+        return response()->json($data, 200);
     }
 
     /**

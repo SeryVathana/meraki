@@ -9,9 +9,9 @@ const DashboardLayout = () => {
 
   const auth = useSelector((state: RootState) => state.auth);
 
-  // if (auth?.userData.role != "admin") {
-  //   return <Navigate to={"/"} />;
-  // }
+  if (auth?.userData.role != "admin") {
+    return <Navigate to={"/"} />;
+  }
 
   useEffect(() => {
     switch (window.location.pathname) {
@@ -20,6 +20,9 @@ const DashboardLayout = () => {
         break;
       case "/dashboard/user":
         setActivePage("user");
+        break;
+      case "/dashboard/report":
+        setActivePage("report");
         break;
       case "/dashboard/group":
         setActivePage("group");
@@ -54,6 +57,15 @@ const DashboardLayout = () => {
             }}
           >
             Users
+          </Link>
+          <Link
+            to="/dashboard/report"
+            className={cn(activePage == "report" ? "font-semibold text-primary" : "")}
+            onClick={() => {
+              setActivePage("report");
+            }}
+          >
+            Report
           </Link>
           <Link
             to="/dashboard/admin"

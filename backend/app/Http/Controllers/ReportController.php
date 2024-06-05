@@ -73,6 +73,7 @@ class ReportController extends Controller
             return response()->json($data, 400);
         }
 
+
         $report = new Report;
         $report->user_id = $userId;
         $report->post_id = $request->post_id;

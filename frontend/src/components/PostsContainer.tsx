@@ -1,76 +1,29 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button.js";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { Dot, Heart, Pin, PinOff, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import mockData from "../db/mock-post.json";
-
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import SavePostDialog from "./dialogs/SavePostDialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { AlertTriangle, Ellipsis, Pen, Trash } from "lucide-react";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Textarea } from "./ui/textarea";
+import { useToast } from "./ui/use-toast";
+import { getToken } from "@/utils/HelperFunctions";
 
-const myFolders = [
-  {
-    id: "1",
-    img_url: "https://github.com/shadcn.png",
-    group_name: "Kab Jak",
-    isPublic: true,
-  },
-  {
-    id: "2",
-    img_url: "https://github.com/shadcn.png",
-    group_name: "Informationo Technology and Engineering",
-    isPublic: false,
-  },
-  {
-    id: "3",
-    img_url: "https://github.com/shadcn.png",
-    group_name: "Royal University of Phnom Penh",
-    isPublic: true,
-  },
-];
+const PostsContainer = ({ posts }: { posts: any[] }) => {
+  const [data, setData]: any[] = useState<any[]>(posts);
 
-const PostsContainer = () => {
-  const navigate = useNavigate();
-
-  const [data, setData]: any[] = useState<any[]>(mockData);
-
-  const [savedPosts, setSavedPosts] = useState<string[]>([]);
-  const [likedPosts, setLikedPosts] = useState<string[]>([]);
-
-  const handleSavePost = (postId: string) => {
-    if (savedPosts.includes(postId)) {
-      setSavedPosts((prev) => {
-        const indexToRemove = prev.indexOf(postId);
-        if (indexToRemove !== -1) {
-          // Create a new array without the item to remove
-          const updatedPosts = [...prev.slice(0, indexToRemove), ...prev.slice(indexToRemove + 1)];
-          return updatedPosts;
-        }
-        // If the item is not found, return the original array
-        return prev;
-      });
-    } else {
-      setSavedPosts([...savedPosts, postId]);
-    }
+  const handleRemovePosts = (postId: number) => {
+    const updatedPosts = data.filter((post) => post.id !== postId);
+    setData(updatedPosts);
   };
 
-  const handleLikePost = (id: string) => {
-    if (likedPosts.includes(id)) {
-      setLikedPosts((prev) => {
-        const indexToRemove = prev.indexOf(id);
-        if (indexToRemove !== -1) {
-          // Create a new array without the item to remove
-          const updatedPosts = [...prev.slice(0, indexToRemove), ...prev.slice(indexToRemove + 1)];
-          return updatedPosts;
-        }
-        // If the item is not found, return the original array
-        return prev;
-      });
-    } else {
-      setLikedPosts([...savedPosts, id]);
-    }
-  };
+  useEffect(() => {
+    setData(posts);
+    console.log(posts);
+  }, [posts]);
 
   if (!data) {
     return <h1>Loading</h1>;
@@ -78,103 +31,189 @@ const PostsContainer = () => {
 
   return (
     <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-5 space-y-5 mt-3">
-      {data.map((post: any, index: number) => {
-        return (
-          <div className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer" key={index}>
-            {savedPosts.includes(post.id) ? (
-              <Button
-                variant={"secondary"}
-                size={"icon"}
-                className={cn(
-                  "hidden absolute top-3 right-3 z-10 group-hover:flex hover:border-primary bg-primary text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-primary"
-                )}
-                onClick={() => handleSavePost(post.id)}
-              >
-                <Pin className="w-5 h-5" />
-              </Button>
-            ) : (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant={"secondary"}
-                    size={"icon"}
-                    className={cn(
-                      "hidden absolute top-3 right-3 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary"
-                    )}
-                  >
-                    <Pin className="w-5 h-5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] lg:max-w-screen-sm">
-                  <DialogHeader>
-                    <DialogTitle className="my-3 flex items-center">My Folder</DialogTitle>
-                    <div className="flex gap-2">
-                      <div className="relative w-full mr-auto">
-                        <Input placeholder="Search groups..." className="pr-10 " />
-                        <Search className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 w-5" />
-                      </div>
-                    </div>
-                  </DialogHeader>
-                  <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
-                    {myFolders.map((group, index) => {
-                      return (
-                        <DialogTrigger asChild key={index}>
-                          <Button
-                            key={group.id}
-                            className="flex w-full justify-start gap-5 py-7"
-                            variant={"outline"}
-                            onClick={() => handleSavePost(post.id)}
-                          >
-                            <Avatar className="">
-                              <AvatarImage src={group.img_url} />
-                              <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
+      {data?.map((post: any, index: number) => {
+        return <PostCard post={post} handleRemovePosts={handleRemovePosts} />;
+      })}
+    </div>
+  );
+};
 
-                            <div className="flex gap-2 items-center">
-                              <h1 className="text-lg">{group.group_name}</h1>
-                              <Dot className="text-gray-500" />
-                              <p className="text-gray-500">{group.isPublic ? "public" : "private"}</p>
-                            </div>
-                          </Button>
-                        </DialogTrigger>
-                      );
-                    })}
+const PostCard = ({ post, handleRemovePosts }) => {
+  const auth = useSelector((state: RootState) => state.auth);
+  const [report, setReport] = useState<string>("");
+  const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmitReport = () => {
+    if (report.trim().length == 0) {
+      toast({
+        title: "Report cannot be empty.",
+        description: "Please provide a reason for reporting this post.",
+        variant: "destructive",
+      });
+      return;
+    }
+    // handle report
+    const reqBody = {
+      user_id: auth.userData.id,
+      post_id: post.id,
+      reason: report,
+    };
+
+    console.log(reqBody);
+
+    fetch("http://localhost:8000/api/report", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(reqBody),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+
+        if (data.status == 200) {
+          setIsReportOpen(false);
+          setReport("");
+          toast({
+            title: "Reported successfully.",
+            description: "Your report has been submitted. Post will be reviewed by our team.",
+            variant: "success",
+          });
+        } else {
+          toast({
+            title: "Failed to report.",
+            description: "Please try again later.",
+            variant: "destructive",
+          });
+        }
+      });
+
+    // close dialog
+  };
+
+  const handleDeletePost = () => {
+    fetch(`http://localhost:8000/api/post/${post.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status == 200) {
+          handleRemovePosts(post.id);
+          toast({
+            title: "Post deleted successfully.",
+            variant: "success",
+          });
+        } else {
+          toast({
+            title: "Failed to delete post.",
+            variant: "destructive",
+          });
+        }
+      });
+  };
+
+  return (
+    <div className="group relative border-[1px] rounded-2xl overflow-hidden cursor-pointer" key={post}>
+      <SavePostDialog postId={post.id} isSaved={post.is_saved} type="icon" />
+
+      <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user/${post.user_id}`)}>
+        <Avatar className="w-6 h-6">
+          <AvatarImage src={post.user_pf_img_url} alt="@shadcn" className="object-cover w-full h-full" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+
+        <div className="flex flex-col text-white">
+          <h1 className="font-medium text-sm line-clamp-1 truncate">@{post.username}</h1>
+        </div>
+      </div>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute w-8 h-5 bottom-3 right-3 z-20 opacity-0 group-hover:opacity-100 group-hover:bg-white"
+          >
+            <Ellipsis className="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {auth.userData.id == post.user_id || auth.userData.role == "admin" ? (
+            <>
+              <DropdownMenuItem asChild>
+                <Link to={`/post/edit/${post.id}`} className="w-full py-0 text-left cursor-pointer">
+                  <div className="flex gap-2 justify-start items-center py-1">
+                    <Pen className="w-4 h-4" />
+                    <span>Edit</span>
+                  </div>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+                  <DialogTrigger asChild>
+                    <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                      <Trash className="w-4 h-4" />
+                      <span>Delete</span>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Delete Post</DialogTitle>
+                    <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
+                    <div className="flex gap-5 justify-end">
+                      <Button variant="outline" onClick={() => setIsReportOpen(!isReportOpen)}>
+                        Cancel
+                      </Button>
+                      <Button variant="destructive" onClick={() => handleDeletePost()}>
+                        Delete
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <DropdownMenuItem asChild>
+              <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+                <DialogTrigger asChild>
+                  <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Report</span>
+                  </div>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>Report Post</DialogTitle>
+                  <DialogDescription>If you believe this post violates our community guidelines, please report it.</DialogDescription>
+                  <div className="flex flex-col gap-5">
+                    <Textarea
+                      placeholder="Add reason here."
+                      className="border-2 min-h-[150px]"
+                      value={report}
+                      onChange={(e) => setReport(e.target.value)}
+                    />
+                    <Button variant="default" className="w-full font-semibold" onClick={() => handleSubmitReport()}>
+                      Report
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
-            )}
-            <Button
-              variant={"secondary"}
-              size={"icon"}
-              className={cn(
-                "hidden absolute bottom-3 right-3 z-10 group-hover:flex bg-white text-primary bg-opacity-70 hover:bg-opacity-100 hover:border-primary",
-                likedPosts.includes(String(post.id)) ? "bg-primary text-secondary bg-opacity-70 hover:bg-opacity-100 hover:bg-primary" : ""
-              )}
-              onClick={() => handleLikePost(String(post.id))}
-            >
-              <Heart className="w-5 h-5" />
-            </Button>
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-            <div className="hidden group-hover:flex absolute bottom-3 left-3 z-10 gap-2 items-center" onClick={() => navigate(`/user?id=${1}`)}>
-              <Avatar className="w-6 h-6">
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-
-              <div className="flex flex-col text-white ">
-                <h1 className="font-medium text-sm">Sery Vathana</h1>
-              </div>
-            </div>
-
-            <div key={index} onClick={() => navigate(`/post?id=${post.id}`)}>
-              <img className="w-full bg-gray-300" src={post.img_url} alt="" />
-              <div className="hidden group-hover:flex">
-                <div className="absolute top-0 left-0 w-full h-full opacity-50 bg-gray-900" />
-              </div>
-            </div>
-          </div>
-        );
-      })}
+      <div onClick={() => navigate(`/post/${post.id}`)}>
+        <img className="w-full bg-gray-300" src={post.img_url} alt="" />
+        <div className="hidden group-hover:flex">
+          <div className="absolute top-0 left-0 w-full h-full opacity-80 bg-gradient-to-t from-black to-[#80808050]" />
+        </div>
+      </div>
     </div>
   );
 };

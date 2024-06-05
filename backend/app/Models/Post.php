@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tag;
 use App\Models\Comment;
+
 /**
  * 
  *
@@ -41,13 +42,23 @@ class Post extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id', 'group_id', 'category_id', 'title', 'description', 'img_url', 'status', 'likes', 'highlighted', 'name',
+        'user_id',
+        'group_id',
+        'title',
+        'description',
+        'img_url',
+        'status',
+        'likes',
+        'highlighted',
+        'tag',
     ];
 
-    public function posts() {
+    public function posts()
+    {
         return $this->belongsTo(User::class);
     }
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 
@@ -55,6 +66,6 @@ class Post extends Model
     {
         return $this->belongsToMany(Tag::class);
     }
-   
+
 
 }

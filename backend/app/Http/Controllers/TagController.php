@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TagController extends Controller
 {
@@ -35,7 +36,10 @@ class TagController extends Controller
     public function index()
     {
         $tags = Tag::all();
-        return response()->json($tags, 200);
+        return response()->json([
+            "status" => 200,
+            "tags" => $tags
+        ], 200);
     }
 
     /**
@@ -74,8 +78,18 @@ class TagController extends Controller
      */
     public function show($id)
     {
-        $tag = Tag::findOrFail($id);
-        return response()->json($tag, 200);
+        $tag = Tag::find($id);
+        if (!$tag) {
+            return response()->json([
+                "status" => 404,
+                "message" => "Tag not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "status" => 200,
+            "tag" => $tag
+        ], 200);
     }
 
     /**
@@ -114,15 +128,34 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
         ]);
 
-        $tag = Tag::create([
-            'name' => $request->name,
-        ]);
+        if ($validator->fails()) {
+            $data = [
+                "status" => 400,
+                "message" => $validator->messages()
+            ];
+            return response()->json($data, 400);
+        }
 
-        return response()->json($tag, 201);
+        $existedTag = Tag::where('name', $request->name)->first();
+        if ($existedTag) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Tag already exists',
+            ], 400);
+        }
+
+        $tag = new Tag;
+        $tag->name = $request->name;
+        $tag->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Tag created successfully',
+        ], 200);
     }
 
     /**
@@ -174,17 +207,42 @@ class TagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $tag = Tag::findOrFail($id);
+        $tag = Tag::find($id);
 
-        $request->validate([
+        if (!$tag) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Tag not found'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
         ]);
 
-        $tag->update([
-            'name' => $request->name,
-        ]);
+        if ($validator->fails()) {
+            $data = [
+                "status" => 400,
+                "message" => $validator->messages()
+            ];
+            return response()->json($data, 400);
+        }
 
-        return response()->json($tag, 200);
+
+        $existedTag = Tag::where("name", $request->name)->first();
+        if ($existedTag && $existedTag->id != $id && $existedTag->name == $request->name) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Tag already exists',
+            ], 400);
+        }
+
+        $tag->name = $request->name;
+        $tag->save();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Tag updated successfully'
+        ], 200);
     }
 
     /**
@@ -225,6 +283,9 @@ class TagController extends Controller
         $tag = Tag::findOrFail($id);
         $tag->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Tag deleted successfully'
+        ], 200);
     }
 }

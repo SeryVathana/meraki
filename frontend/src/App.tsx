@@ -10,6 +10,7 @@ import DashboardGroupPage from "./pages/DashboardGroupPage";
 import DashboardOverviewPage from "./pages/DashboardOverviewPage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardUserPage from "./pages/DashboardUserPage";
+import DashboardReportPage from "./pages/DashboardReportPage";
 import FolderPage from "./pages/FolderPage";
 import GroupPage from "./pages/GroupPage";
 import HomePage from "./pages/HomePage";
@@ -21,7 +22,11 @@ import SettingPage from "./pages/SettingPage";
 import SignUpPage from "./pages/SignUpPage";
 import UserPage from "./pages/UserPage";
 import { store } from "./redux/store";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import { Toaster } from "@/components/ui/toaster";
+import ProtectedRoute from "./layouts/ProtectedLayout";
+import PostsPage from "./pages/PostsPage";
+import EditPostPage from "./pages/EditPostPage";
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,93 +34,35 @@ const router = createBrowserRouter(
       <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignUpPage />} />
 
-      <Route path="/" element={<MainLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="profile">
-          <Route
-            index
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="setting"
-            element={
-              <ProtectedRoute>
-                <SettingPage />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
-        <Route
-          path="create-post"
-          element={
-            <ProtectedRoute>
-              <CreatePostPage />
-            </ProtectedRoute>
-          }
-        />
+      <Route path="/" element={<ProtectedRoute />}>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="tag/:tag" element={<PostsPage />} />
+          <Route path="profile">
+            <Route index element={<ProfilePage />} />
+            <Route path="setting" element={<SettingPage />} />
+          </Route>
+          <Route path="create-post" element={<CreatePostPage />} />
 
-        <Route
-          path="create-group"
-          element={
-            <ProtectedRoute>
-              <CreateGroupPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="post"
-          element={
-            <ProtectedRoute>
-              <PostDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="group"
-          element={
-            <ProtectedRoute>
-              <GroupPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="user"
-          element={
-            <ProtectedRoute>
-              <UserPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route path="create-group" element={<CreateGroupPage />} />
+          <Route path="post/edit/:postId" element={<EditPostPage />} />
+          <Route path="post/:postId" element={<PostDetailPage />} />
+          <Route path="group/:groupId" element={<GroupPage />} />
+          <Route path="user/:userId" element={<UserPage />} />
 
-        <Route
-          path="folder"
-          element={
-            <ProtectedRoute>
-              <FolderPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route path="/folder/:id" element={<FolderPage />} />
 
-        <Route
-          path="dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DashboardPage />} />
-          <Route path="overview" element={<DashboardOverviewPage />} />
-          <Route path="user" element={<DashboardUserPage />} />
-          <Route path="group" element={<DashboardGroupPage />} />
-          <Route path="admin" element={<DashboardAdminPage />} />
+          <Route path="dashboard" element={<DashboardLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="overview" element={<DashboardOverviewPage />} />
+            <Route path="users" element={<DashboardUserPage />} />
+            <Route path="report" element={<DashboardReportPage />} />
+            <Route path="group" element={<DashboardGroupPage />} />
+            <Route path="admin" element={<DashboardAdminPage />} />
+          </Route>
+          <Route path="/*" element={<NotFoundPage />} />
         </Route>
       </Route>
-      <Route path="/*" element={<NotFoundPage />} />
     </Route>
   )
 );
@@ -124,6 +71,7 @@ function App() {
   return (
     <Provider store={store}>
       <RouterProvider router={router} />
+      <Toaster />
     </Provider>
   );
 }

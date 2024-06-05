@@ -19,40 +19,94 @@ import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import GroupsDialog from "./dialogs/GroupsDialog";
 import PendingGroupInviteDialog from "./dialogs/PendingGroupInviteDialog";
 import SearchDialog from "./dialogs/SearchDialog";
 import { Button } from "./ui/button";
 import { signOut } from "@/redux/slices/authThunk";
 import { useAppDispatch } from "@/redux/hook";
+import { capitalizeFirstLetter, getToken } from "@/utils/HelperFunctions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function Navbar() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
+  const [tags, setTags] = React.useState([]);
   const [openDropDown, setOpenDropDown] = React.useState<boolean>(false);
 
   const auth = useSelector((state: RootState) => state.auth);
   const user = auth?.userData.email;
+  const [selectedTag, setSelectedTag] = React.useState<string>("all");
 
-  const handleUserLogout = () => {
+  const handleUserLogout = async () => {
     dispatch(signOut());
     navigate("/login");
   };
 
+  const tag = useParams().tag;
+
+  const getFullName = () => {
+    if (auth?.userData.first_name && auth?.userData.last_name) {
+      return `${capitalizeFirstLetter(auth?.userData.first_name)} ${capitalizeFirstLetter(auth?.userData.last_name)}`;
+    } else {
+      return auth?.userData.email;
+    }
+  };
+
+  React.useEffect(() => {
+    if (window.location.href.includes("tag") || window.location.href == "/") {
+      navigate(`/tag/${selectedTag}`);
+    }
+  }, [selectedTag]);
+
+  React.useEffect(() => {
+    fetch("http://localhost:8000/api/tag", { headers: { Authorization: `Bearer ${getToken()}` } })
+      .then((res) => res.json())
+      .then((data) => {
+        setTags(data.tags);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    if (tag) {
+      setSelectedTag(tag);
+    }
+  }, [tag]);
   return (
     <div className="w-full flex items-center gap-10">
-      <NavLink to={"/"}>
+      <NavLink to="/">
         <h1 className="scroll-m-20 text-lg text-primary font-extrabold tracking-tight lg:text-xl ">Meraki</h1>
       </NavLink>
-      <NavigationMenu>
+      <NavigationMenu className="flex gap-2">
+        {(window.location.href.includes("tag") || window.location.href == "/") && (
+          <NavigationMenuList>
+            <Select
+              value={selectedTag}
+              onValueChange={(val) => {
+                setSelectedTag(val);
+              }}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Tags" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                {tags.map((tag, i) => (
+                  <SelectItem key={tag.id} value={String(tag.name).toLowerCase()}>
+                    {tag.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </NavigationMenuList>
+        )}
         <NavigationMenuList>
           {user && (
             <NavigationMenuItem asChild>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                <Link to="/create-post">Create Post</Link>
-              </NavigationMenuLink>
+              <Link to="/create-post">
+                <Button>Create Post</Button>
+              </Link>
             </NavigationMenuItem>
           )}
         </NavigationMenuList>
@@ -62,65 +116,88 @@ export function Navbar() {
         <div className="flex gap-5 ml-auto">
           <SearchDialog />
 
-          <GroupsDialog user_id="1" type="icon" />
+          <GroupsDialog userId={auth.userData.id} type="icon" />
 
           <DropdownMenu open={openDropDown} onOpenChange={() => setOpenDropDown(!openDropDown)}>
             <DropdownMenuTrigger asChild className=" cursor-pointer">
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="border rounded-full">
+                  <AvatarImage src={auth.userData.pf_img_url} alt="@shadcn" className="object-cover w-full h-full" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                {auth.userData.total_noti > 0 && (
+                  <div className="absolute -right-1 -top-1 px-[5px] py-[0px] text-xs border rounded-full bg-destructive text-white">
+                    {auth.userData.total_noti}
+                  </div>
+                )}
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 mr-10">
-              <DropdownMenuLabel>{auth.userData.fullname}</DropdownMenuLabel>
+              <DropdownMenuLabel>{getFullName()}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 {auth.userData.role == "admin" && (
                   <DropdownMenuItem asChild>
-                    <NavLink to={"/dashboard"}>Admin Dashboard</NavLink>
+                    <NavLink to={"/dashboard"} className="cursor-pointer">
+                      Admin Dashboard
+                    </NavLink>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile"}>Profile</NavLink>
+                  <NavLink to={"/profile"} className="cursor-pointer">
+                    Profile
+                  </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile/setting"}>Setting</NavLink>
+                  <NavLink to={"/profile/setting"} className="cursor-pointer">
+                    Setting
+                  </NavLink>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile?post=my-posts"}>My Posts</NavLink>
+                  <NavLink to={"/profile?post=my-posts"} className="cursor-pointer">
+                    My Posts
+                  </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/create-post"}>Create Posts</NavLink>
+                  <NavLink to={"/create-post"} className="cursor-pointer">
+                    Create Posts
+                  </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/profile?post=saved-posts"}>Saved Posts</NavLink>
+                  <NavLink to={"/profile?post=saved-posts"} className="cursor-pointer">
+                    Saved Posts
+                  </NavLink>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
-                  <GroupsDialog user_id="1" type="drop-down-link" />
+                  <GroupsDialog userId={auth.userData.id} type="drop-down-link" />
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/create-group")}>Create Groups</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/create-group")} className="cursor-pointer">
+                  Create Groups
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
-                  <PendingGroupInviteDialog user_id="1" type="drop-down-link" />
+                  <PendingGroupInviteDialog type="drop-down-link" />
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleUserLogout()}>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleUserLogout()} className="cursor-pointer">
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       ) : (
         <div className="flex gap-5 ml-auto">
           <Button variant={"secondary"} asChild>
-            <Link to={"/login"}>Login</Link>
+            <Link to={"/login"}>Log in</Link>
           </Button>
           <Button variant={"default"} asChild>
-            <Link to={"/register"}>Register</Link>
+            <Link to={"/signup"}>Sign up</Link>
           </Button>
         </div>
       )}

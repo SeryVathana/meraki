@@ -27,7 +27,7 @@ use App\Models\Post;
 class Tag extends Model
 {
     use HasFactory;
-    protected $fillable = ['name'];
+    protected $fillable = ['tag'];
 
     public function posts()
     {

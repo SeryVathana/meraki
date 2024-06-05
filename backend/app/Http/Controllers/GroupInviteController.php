@@ -83,6 +83,44 @@ class GroupInviteController extends Controller
         return response()->json($data, 200);
     }
 
+
+    public function getPendingInvites()
+    {
+        $auth = Auth::user();
+        if (!$auth) {
+            $data = [
+                "status" => 401,
+                "message" => "Unauthorized"
+            ];
+
+            return response()->json($data, 401);
+        }
+
+        $invites = GroupInvite::where("user_id", $auth->id)->get();
+
+        $result = [];
+
+        foreach ($invites as $invite) {
+            $group = Group::find($invite->group_id);
+            $res = [
+                "id" => $invite->id,
+                "group_id" => $group->id,
+                "title" => $group->title,
+                "img_url" => $group->img_url,
+                "status" => $group->status,
+                "created_at" => $invite->created_at,
+            ];
+
+            array_push($result, $res);
+        }
+
+        $data = [
+            "status" => 200,
+            "invites" => $result
+        ];
+        return response()->json($data, 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
