@@ -5,8 +5,38 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MoreHorizontalIcon, PlusCircleIcon, Search } from "lucide-react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+
+import { Label } from "@/components/ui/label";
 
 const DashboardAdminPage = () => {
+
+  const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
+  const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+
+  const handleRemoveUser = (userId: string) => {
+    setOpenRemoveAlert(false);
+    // Add your logic to handle user removal here
+  };
+
+  const handleEditUser = (userId: string) => {
+    setOpenEditDialog(true);
+    // Add your logic to handle user editing here
+  };
+
+  const userInfo = () => ({
+    group_name: "Laser Lemonade Machine",
+    owner_email:"yooseryvathana@gmail.com",
+    img_url:"http://example.png",
+    status:"private"
+    
+  });
+
+  // Call the food function to get the object
+  const userObject = userInfo();
+
   return (
     <main className="grid flex-1 items-start gap-4 p-2">
       <div className="flex items-center justify-between">
@@ -33,10 +63,8 @@ const DashboardAdminPage = () => {
                 <TableHead className="hidden w-[100px] sm:table-cell">
                   <span className="sr-only">Image</span>
                 </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">Price</TableHead>
-                <TableHead className="hidden md:table-cell">Total Sales</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead className="hidden md:table-cell">Created at</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
@@ -51,14 +79,10 @@ const DashboardAdminPage = () => {
                       <img alt="Product image" className="aspect-square rounded-full object-cover" height="48" src="/placeholder.svg" width="48" />
                     </TableCell>
                     <TableCell className="font-medium">Laser Lemonade Machine</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">Draft</Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">$499.99</TableCell>
-                    <TableCell className="hidden md:table-cell">25</TableCell>
+                    <TableCell className="hidden md:table-cell">example@gmail.com</TableCell>
                     <TableCell className="hidden md:table-cell">2023-07-12 10:42 AM</TableCell>
                     <TableCell>
-                      <DropdownMenu>
+                    <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button aria-haspopup="true" size="icon" variant="ghost">
                             <MoreHorizontalIcon className="h-4 w-4" />
@@ -66,10 +90,81 @@ const DashboardAdminPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
+                          {/* <DropdownMenuLabel>Actions</DropdownMenuLabel> */}
+                          <DropdownMenuItem asChild>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button className="text-sm w-full text-left justify-start p-2" variant="ghost" size="sm">
+                                  Edit
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[625px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit group details</DialogTitle>
+                                  <DialogDescription>Enter new information about group to change it.</DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="img_url">Image URL</Label>
+                                    <Input id="img_url" defaultValue={userObject.img_url} className="col-span-3" />
+                                  </div>
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="title">Group name</Label>
+                                    <Input id="username" defaultValue={userObject.group_name} className="col-span-3" />
+                                  </div>
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="description">Owner Email</Label>
+                                    <Input id="description" defaultValue={userObject.owner_email} className="col-span-3" />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="shift">Status</Label>
+                                    <Select defaultValue="available">
+                                      <SelectTrigger id="shift" defaultValue={userObject.status} className="col-span-3">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent position="popper">
+                                        <SelectItem value="private">Private</SelectItem>
+                                        <SelectItem value="public">Public</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                
+                                <DialogFooter>
+                                  <Button type="submit">Save Changes</Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Dialog open={openRemoveAlert} onOpenChange={setOpenRemoveAlert}>
+                              <DialogTrigger asChild>
+                                <Button className="text-sm w-full text-left justify-start p-2" variant="ghost" size="sm">
+                                  Delete
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[525px]">
+                                <DialogHeader>
+                                  <DialogTitle>Confirm</DialogTitle>
+                                  <DialogDescription>Are you sure you want to delete this group?</DialogDescription>
+                                  {/* <div className="space-y-2">
+                                    <p className="text-sm">
+                                      Name: <span className="font-semibold">food name</span>
+                                    </p>
+                                  </div> */}
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button type="submit" variant="secondary" onClick={() => setOpenRemoveAlert(false)}>
+                                    Cancel
+                                  </Button>
+                                  <Button variant="destructive" onClick={() => handleRemoveUser}>
+                                    Confirm
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </DropdownMenuItem>
+                          </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
