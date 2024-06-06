@@ -38,7 +38,6 @@ const DashboardReportPage = () => {
             <DropdownMenuLabel>Filter by</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem checked>None</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Name</DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem>Newest</DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem>Oldest</DropdownMenuCheckboxItem>
           </DropdownMenuContent>
@@ -88,10 +87,7 @@ const DashboardReportPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem>View Post</DropdownMenuItem>
-                          <DropdownMenuItem>Approved</DropdownMenuItem>
-                          <DropdownMenuItem>Reply</DropdownMenuItem>
                   
                         </DropdownMenuContent>
                       </DropdownMenu>

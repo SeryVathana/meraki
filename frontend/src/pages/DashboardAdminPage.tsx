@@ -4,11 +4,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontalIcon, PlusCircleIcon, Search } from "lucide-react";
+import { AlertCircle, MoreHorizontalIcon, PlusCircleIcon, Search } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 
 const DashboardAdminPage = () => {
@@ -37,6 +37,47 @@ const DashboardAdminPage = () => {
   // Call the food function to get the object
   const userObject = userInfo();
 
+    const [firstName, setFirstName] = useState<string>("");
+    const [lastName, setLastName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
+    const [errMsg, setErrMsg] = useState<string>("");
+  
+    const handleRegisterAdmin = (e) => {
+      e.preventDefault();
+  
+      setIsError(false);
+      setErrMsg("");
+  
+      if (!firstName || !lastName || !email || !password) {
+        setIsError(true);
+        setErrMsg("All fields are required");
+        return;
+      }
+  
+      fetch("http://localhost:3000/auth/admin/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          if (data.code === 200) {
+            setIsOpen(false);
+            // handleFetchAdmins();
+          } else {
+            setIsError(true);
+            setErrMsg(data.message);
+          }
+        });
+    };
+  
+
   return (
     <main className="grid flex-1 items-start gap-4 p-2">
       <div className="flex items-center justify-between">
@@ -47,10 +88,52 @@ const DashboardAdminPage = () => {
             Search
           </Button>
         </div>
+        <Dialog open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
+      <DialogTrigger asChild>
         <Button className="gap-1">
           <PlusCircleIcon className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Add Admin</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Add New Admin </span>
         </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[625px]">
+        <DialogHeader>
+          <DialogTitle>Add new admin</DialogTitle>
+          <DialogDescription>Enter information about new admin to add to list.</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="first_name">First Name</Label>
+            <Input id="first_name" className="col-span-3" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="last_name">Last Name</Label>
+            <Input id="last_name" className="col-span-3" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" className="col-span-3" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" className="col-span-3" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+
+          {isError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{errMsg}</AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button type="submit" onClick={(e) => handleRegisterAdmin(e)}>
+            Add New
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
       </div>
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="py-4">
@@ -184,5 +267,6 @@ const DashboardAdminPage = () => {
     </main>
   );
 };
+
 
 export default DashboardAdminPage;
