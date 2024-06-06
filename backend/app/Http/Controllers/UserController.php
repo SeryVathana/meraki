@@ -20,6 +20,41 @@ class UserController extends Controller
      * @param Request $request
      * @return User 
      */
+    /**
+     * @OA\Post(
+     *     path="/api/auth/register",
+     *     operationId="register/createUser",
+     *     tags={"Register"},
+     *     summary="register Insert",
+     *     description="-",
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"username","email", "password"},
+     *                 @OA\Property(property="username", type="string"),
+     *                 @OA\Property(property="email", type="string"),
+     *                 @OA\Property(property="password", type="password"),
+     *                 @OA\Property(property="first_name", type="string"),
+     *                 @OA\Property(property="last_name", type="string"),
+     *                 @OA\Property(property="pf_img_url", type="string"),
+     *                 @OA\Property(property="social_login_info", type="string")
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Register Successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function createUser(Request $request)
     {
         try {
@@ -164,6 +199,36 @@ class UserController extends Controller
      * @param Request $request
      * @return User
      */
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     operationId="authLogin",
+     *     tags={"Login"},
+     *     summary="User Login",
+     *     description="Login User Here",
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"email", "password"},
+     *                 @OA\Property(property="email", type="email"),
+     *                 @OA\Property(property="password", type="password")
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Login Successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function loginUser(Request $request)
     {
         try {
@@ -213,6 +278,47 @@ class UserController extends Controller
                 'message' => $th->getMessage()
             ], 500);
         }
+    }
+    /**
+     * Get All Users
+     * @OA\Get(
+     *     path="/api/auth/users",
+     *     operationId="getAllUsers",
+     *     tags={"User"},
+     *     summary="Get All Users",
+     *     description="Retrieve all users. Only accessible to admin users.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Users Retrieved Successfully",
+     *         @OA\JsonContent(type="array", @OA\Items())
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
+    public function getAllUsers(Request $request)
+    {
+        // Check if the authenticated user is an admin
+        $user = Auth::user();
+        if ($user->role !== 'admin') {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Forbidden: You do not have permission to access this resource.'
+            ], 403);
+        }
+
+
+        // Get all users
+        $users = User::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Users Retrieved Successfully',
+            'data' => $users
+        ], 200);
     }
 
     public function getUserData(Request $request)

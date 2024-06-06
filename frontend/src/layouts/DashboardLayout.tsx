@@ -21,6 +21,9 @@ const DashboardLayout = () => {
       case "/dashboard/user":
         setActivePage("user");
         break;
+      case "/dashboard/report":
+        setActivePage("report");
+        break;
       case "/dashboard/group":
         setActivePage("group");
         break;
@@ -54,6 +57,15 @@ const DashboardLayout = () => {
             }}
           >
             Users
+          </Link>
+          <Link
+            to="/dashboard/report"
+            className={cn(activePage == "report" ? "font-semibold text-primary" : "")}
+            onClick={() => {
+              setActivePage("report");
+            }}
+          >
+            Report
           </Link>
           <Link
             to="/dashboard/admin"
