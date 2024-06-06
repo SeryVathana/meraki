@@ -67,6 +67,29 @@ const LoginPage = () => {
     }
   });
 
+  useEffect(() => {
+    handleCallback();
+  }, []);
+
+  // Redirect user to the provider
+  function authenticate(provider) {
+    window.location.href = `http://127.0.0.1:8000/api/auth/${provider}`;
+  }
+
+  // Handle the callback
+  async function handleCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (token) {
+      // Store the token in localStorage or a cookie
+      localStorage.setItem("token", token);
+    } else {
+      // Handle error
+      console.error("Authentication failed");
+    }
+  }
+
   return (
     <div className="w-full lg:grid lg:grid-cols-2 min-h-[100vh]">
       <div className="flex items-center justify-center py-12 min-h-[100vh]">
@@ -109,14 +132,7 @@ const LoginPage = () => {
               Sign up
             </Link>
           </div>
-          {/* <GoogleLogin
-            clientId="584573966192-8vas8uq7o2p04la9pva2eo5pkla0km91.apps.googleusercontent.com"
-            buttonText="Login with Google"
-            onSuccess={responseGoogle}
-            onFailure={responseGoogle} // Handle failure case if needed
-            cookiePolicy={"single_host_origin"}
-            className="w-full mt-3"
-          /> */}
+          <Button onClick={() => authenticate("google")}>Login With Google</Button>
         </div>
       </div>
       <div className="hidden bg-muted lg:block h-[100vh]">

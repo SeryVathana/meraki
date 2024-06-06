@@ -67,8 +67,6 @@ export const authSlice = createSlice({
         state.token = accessToken;
         state.userData = {
           ...user,
-          followers: JSON.parse(user.followers).length,
-          followings: JSON.parse(user.followings).length,
         };
         state.loading = false;
       })

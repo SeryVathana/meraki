@@ -1,8 +1,10 @@
 <?php
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FolderController;
+use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\SavedPostController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SocialiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
@@ -24,6 +26,9 @@ Route::post("auth/register-mobile", [UserController::class, "createUserMobile"])
 
 Route::post('auth/register', [UserController::class, 'createUser']);
 Route::post('auth/login', [UserController::class, 'loginUser']);
+
+Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 
 Route::group([
     'middleware' => ['auth:sanctum']
@@ -54,7 +59,8 @@ Route::group([
     Route::delete('post/{id}', [PostController::class, "destroy"]);
     Route::get('post/highlighted', [PostController::class, 'getHighlightedPosts']);
     Route::get('post/latest', [PostController::class, 'getLatestPosts']);
-    Route::PUT('post/like/{id}', [PostController::class, 'likePost']);
+    Route::PUT('post/like/{id}', [PostLikeController::class, 'likePost']);
+    Route::delete('post/like/{id}', [PostLikeController::class, 'unlikePost']);
 
     Route::get('group', [GroupController::class, "index"]);
     Route::get("group/user/{id}", [GroupController::class, "getUserGroups"]);

@@ -17,8 +17,7 @@ return new class extends Migration {
             $table->string("title")->nullable();
             $table->string("description")->nullable();
             $table->string("img_url");
-            $table->string("status");
-            $table->json("likes");
+            $table->string("status")->default("public");
             $table->boolean('is_highlighted')->default(false);
             $table->timestamps();
         });

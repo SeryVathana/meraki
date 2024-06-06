@@ -122,7 +122,7 @@ export function Navbar() {
             <DropdownMenuTrigger asChild className=" cursor-pointer">
               <div className="relative">
                 <Avatar className="border rounded-full">
-                  <AvatarImage src={auth.userData.pf_img_url} alt="@shadcn" className="object-cover w-full h-full" />
+                  <AvatarImage src={auth.userData.pf_img_url} referrerPolicy="no-referrer" alt="@shadcn" className="object-cover w-full h-full" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 {auth.userData.total_noti > 0 && (

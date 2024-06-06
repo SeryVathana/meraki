@@ -48,7 +48,6 @@ class Post extends Model
         'description',
         'img_url',
         'status',
-        'likes',
         'is_highlighted',
     ];
 

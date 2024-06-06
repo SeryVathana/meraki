@@ -257,7 +257,7 @@ const PostsContainer = ({ searchQuery }) => {
         )}
       </div>
       {isLoading ? (
-        <div className="my-5 w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto gap-5">
+        <div className="my-5 columns-2  md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-5 space-y-1 sm:space-y-2 md:space-y-3 lg:space-y-4 xl:space-y-5 mt-3">
           {Array.from({ length: 10 }, (_, index) => {
             return <Skeleton className={cn("min-h-[200px] rounded-xl")} key={index} />;
           })}

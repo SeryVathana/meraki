@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PostLike;
 use App\Models\PostTag;
 use App\Models\SavedPost;
 use App\Models\Tag;
@@ -308,7 +309,6 @@ class PostController extends Controller
                     "description" => $posts[$i]->description,
                     "img_url" => $posts[$i]->img_url,
                     "status" => $posts[$i]->status,
-                    "likes" => count(json_decode($posts[$i]->likes)),
                     "user_name" => $user->first_name . " " . $user->last_name,
                     "user_pf_img_url" => $user->pf_img_url,
                     "created_at" => $posts[$i]->created_at,
@@ -405,7 +405,6 @@ class PostController extends Controller
         $post->user_id = $userId;
         $post->title = $request->title;
         $post->description = $request->description;
-        $post->likes = '[]';
         $post->img_url = $request->img_url;
         $post->save();
 
@@ -448,7 +447,6 @@ class PostController extends Controller
         $post->user_id = $request->user_id;
         $post->title = $request->title;
         $post->description = $request->description;
-        $post->likes = '[]';
         $post->status = "public";
         $post->img_url = $request->img_url;
         $post->tag = json_encode([]);
@@ -491,26 +489,23 @@ class PostController extends Controller
 
         $postOwner = User::find($post->user_id);
 
-        $likes = json_decode($post->likes);
 
         $isLiked = false;
-
-        if (in_array($user->id, $likes)) {
+        $likePost = PostLike::where("post_id", $post->id)->where("user_id", $userId)->first();
+        if ($likePost)
             $isLiked = true;
-        }
-
-        $saves = SavedPost::where("post_id", $post->id)->where("user_id", $userId)->get();
 
         $isSaved = false;
-        if (count($saves) > 0) {
+        $save = SavedPost::where("post_id", $post->id)->where("user_id", $userId)->first();
+        if ($save)
             $isSaved = true;
-        }
 
 
-        //get group info if there is a group_id
+
+        $groupTitle = "";
         if ($post->group_id != null) {
             $group = Group::find($post->group_id);
-            $post->group_title = $group->title;
+            $groupTitle = $group->title;
         }
 
         $tags = PostTag::where("post_id", $post->id)->get();
@@ -523,20 +518,20 @@ class PostController extends Controller
                 array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
             }
         }
+
         $user = User::find($post->user_id);
 
         $postData = [
             "id" => $post->id,
             "user_id" => $post->user_id,
             "group_id" => $post->group_id,
-            "group_title" => "",
+            "group_title" => $groupTitle,
             "tags" => $tagDetails,
             "title" => $post->title,
             "description" => $post->description,
             "img_url" => $post->img_url,
             "status" => $post->status,
-            "likes" => $likes,
-            "like_count" => count($likes),
+            "like_count" => PostLike::where("post_id", $post->id)->count(),
             "is_liked" => $isLiked,
             "is_saved" => $isSaved,
             "user_name" => $postOwner->first_name . " " . $postOwner->last_name,
@@ -545,20 +540,12 @@ class PostController extends Controller
             "updated_at" => $post->updated_at
         ];
 
-        if ($post->group_id != null) {
-            $group = Group::find($post->group_id);
-            $postData["group_title"] = $group->title;
-        }
-
-
-
         $data = [
             "status" => 200,
             "post" => $postData,
         ];
 
         return response()->json($data, 200);
-
     }
     public function related($id)
     {
@@ -627,58 +614,7 @@ class PostController extends Controller
         return response()->json($data, 200);
     }
 
-    public function likePost($id)
-    {
-        $user = Auth::user();
-        $userId = $user->id;
 
-        $post = Post::find($id);
-        if (!$post) {
-            $data = [
-                "status" => 404,
-                "message" => "Post not found",
-            ];
-            return response()->json($data, 404);
-        }
-
-        if ($post->status == "private" && $post->user_id != $userId && $user->role != "admin") {
-            $data = [
-                "status" => 401,
-                "message" => "Unauthorized",
-            ];
-
-            return response()->json($data, 403);
-        }
-
-        $likes = json_decode($post->likes);
-
-        if (in_array($userId, $likes)) {
-            $key = array_search($userId, $likes);
-            array_splice($likes, $key, 1);
-        } else {
-            array_push($likes, $userId);
-        }
-
-        $uArr = array_unique($likes);
-
-
-        $post->likes = json_encode($uArr);
-        $post->save();
-
-        $data = [
-            "status" => 200,
-            "message" => "Post updated successfully",
-        ];
-        return response()->json($data, 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Post $post, )
-    {
-
-    }
 
     /**
      * Update the specified resource in storage.

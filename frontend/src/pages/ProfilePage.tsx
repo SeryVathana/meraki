@@ -119,7 +119,7 @@ const ProfilePage = () => {
               <div className="flex justify-center gap-5 p-5">
                 <label htmlFor="dropzone-file" className="w-32 h-32 rounded-full relative group cursor-pointer">
                   <Avatar className="w-32 h-32 border group-hover:border-4 border-gray-200">
-                    <AvatarImage src={pfImgUrl ? pfImgUrl : user.pf_img_url} className="object-cover w-full h-full" />
+                    <AvatarImage src={pfImgUrl ? pfImgUrl : user.pf_img_url} referrerPolicy="no-referrer" className="object-cover w-full h-full" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
 
@@ -186,17 +186,10 @@ const ProfilePage = () => {
         ) : (
           <div className="flex py-10 w-full justify-center">
             {isLoading ? (
-              <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-5">
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
-                <Skeleton className="min-w-[100px] min-h-[150px] rounded-xl" />
+              <div className="my-5 w-full columns-2  md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-5 space-y-1 sm:space-y-2 md:space-y-3 lg:space-y-4 xl:space-y-5 mt-3">
+                {Array.from({ length: 10 }, (_, index) => {
+                  return <Skeleton className={cn("min-h-[200px] rounded-xl")} key={index} />;
+                })}
               </div>
             ) : (
               <h1>No post found.</h1>

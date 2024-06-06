@@ -2,7 +2,9 @@
 
 namespace App\Policies;
 
+use App\Models\Group;
 use App\Models\GroupInvite;
+use App\Models\GroupMember;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -21,17 +23,17 @@ class GroupInvitePolicy
      */
     public function view(User $user, GroupInvite $groupInvite): bool
     {
-        
+
         $authorized = false;
-        
+
         $member = GroupMember::where("group_id", $group->id)->where("user_id", $user->id)->get();
         $memberCount = $member->count();
 
-        if($user->role == "admin") {
+        if ($user->role == "admin") {
             $authorized = true;
         }
 
-        if ($memberCount > 0 && $member[0]->role == "admin") {   
+        if ($memberCount > 0 && $member[0]->role == "admin") {
             $authorized = true;
         }
 
@@ -45,15 +47,17 @@ class GroupInvitePolicy
     public function create(User $user): bool
     {
         $authorized = false;
-        
+
+
+
         $member = GroupMember::where("group_id", $group->id)->where("user_id", $user->id)->get();
         $memberCount = $member->count();
 
-        if($user->role == "admin") {
+        if ($user->role == "admin") {
             $authorized = true;
         }
 
-        if ($memberCount > 0 && $member[0]->role == "admin") {   
+        if ($memberCount > 0 && $member[0]->role == "admin") {
             $authorized = true;
         }
 
@@ -67,15 +71,18 @@ class GroupInvitePolicy
     public function update(User $user, GroupInvite $groupInvite): bool
     {
         $authorized = false;
-        
+
+
+        $memberCount = $group->count();
+
         $member = GroupMember::where("group_id", $group->id)->where("user_id", $user->id)->get();
         $memberCount = $member->count();
 
-        if($user->role == "admin") {
+        if ($user->role == "admin") {
             $authorized = true;
         }
 
-        if ($memberCount > 0 && $member[0]->role == "admin") {   
+        if ($memberCount > 0 && $member[0]->role == "admin") {
             $authorized = true;
         }
 
@@ -89,15 +96,15 @@ class GroupInvitePolicy
     public function delete(User $user, GroupInvite $groupInvite): bool
     {
         $authorized = false;
-        
+
         $member = GroupMember::where("group_id", $group->id)->where("user_id", $user->id)->get();
         $memberCount = $member->count();
 
-        if($user->role == "admin") {
+        if ($user->role == "admin") {
             $authorized = true;
         }
 
-        if ($memberCount > 0 && $member[0]->role == "admin") {   
+        if ($memberCount > 0 && $member[0]->role == "admin") {
             $authorized = true;
         }
 

@@ -22,7 +22,6 @@ const PostsContainer = ({ posts }: { posts: any[] }) => {
 
   useEffect(() => {
     setData(posts);
-    console.log(posts);
   }, [posts]);
 
   if (!data) {
@@ -32,7 +31,7 @@ const PostsContainer = ({ posts }: { posts: any[] }) => {
   return (
     <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-5 space-y-1 sm:space-y-2 md:space-y-3 lg:space-y-4 xl:space-y-5 mt-3">
       {data?.map((post: any, index: number) => {
-        return <PostCard post={post} handleRemovePosts={handleRemovePosts} />;
+        return <PostCard post={post} handleRemovePosts={handleRemovePosts} key={index} />;
       })}
     </div>
   );
