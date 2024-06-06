@@ -15,7 +15,6 @@ use App\Http\Controllers\GroupRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\SearchController;
 use App\Http\Middleware\AdminRoleMiddleware;
 use App\Http\Middleware\Cors;
 use App\Models\Comment;
@@ -137,7 +136,7 @@ Route::group([
     Route::group([
         'middleware' => AdminRoleMiddleware::class
     ], function () {
-          Route::get('admin/users', [UserController::class, 'getAllUsers']);
+        Route::get('admin/users', [UserController::class, 'getAllUsers']);
         //Group
         Route::post('tag', [TagController::class, "store"]);
         Route::put('tag/{id}', [TagController::class, "update"]);
