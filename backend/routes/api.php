@@ -1,7 +1,10 @@
 <?php
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FolderController;
+use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\SavedPostController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SocialiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
@@ -24,6 +27,9 @@ Route::post("auth/register-mobile", [UserController::class, "createUserMobile"])
 
 Route::post('auth/register', [UserController::class, 'createUser']);
 Route::post('auth/login', [UserController::class, 'loginUser']);
+
+Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 
 Route::group([
     'middleware' => ['auth:sanctum']
@@ -50,11 +56,12 @@ Route::group([
     Route::get('post/{id}', [PostController::class, "show"]);
     Route::post('post', [PostController::class, "store"]);
     Route::put('post/{id}', [PostController::class, "update"]);
-    Route::get('post/{id}/related', [PostController::class, "related"]);
+    Route::get('post/related/{id}', [PostController::class, "related"]);
     Route::delete('post/{id}', [PostController::class, "destroy"]);
     Route::get('post/highlighted', [PostController::class, 'getHighlightedPosts']);
     Route::get('post/latest', [PostController::class, 'getLatestPosts']);
-    Route::PUT('post/like/{id}', [PostController::class, 'likePost']);
+    Route::PUT('post/like/{id}', [PostLikeController::class, 'likePost']);
+    Route::delete('post/like/{id}', [PostLikeController::class, 'unlikePost']);
 
     // Group 
     Route::get('group', [GroupController::class, "index"]);
@@ -117,6 +124,15 @@ Route::group([
     // Advance search
     Route::get('post/advancesearch', [SearchController::class, "advancedsearch"]);
 
+    //Search
+    Route::get("search/user", [SearchController::class, "searchUsers"]);
+    Route::get("search/group", [SearchController::class, "searchGroups"]);
+    Route::get("search/post", [SearchController::class, "searchPosts"]);
+
+    //Random
+    Route::get("random/user", [SearchController::class, "getRandomUsers"]);
+    Route::get("random/group", [SearchController::class, "getRandomGroups"]);
+    Route::get("random/post", [SearchController::class, "getRandomPosts"]);
 
     Route::group([
         'middleware' => AdminRoleMiddleware::class

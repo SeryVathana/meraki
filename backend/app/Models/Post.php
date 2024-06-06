@@ -48,9 +48,7 @@ class Post extends Model
         'description',
         'img_url',
         'status',
-        'likes',
-        'highlighted',
-        'tag',
+        'is_highlighted',
     ];
 
     public function posts()

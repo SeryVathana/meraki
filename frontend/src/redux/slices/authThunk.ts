@@ -14,7 +14,7 @@ export const fetchUserData = createAsyncThunk("auth/fetchUserData", async (_, { 
 
     return { ...response.data.data, accessToken };
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     // removeToken();
     return rejectWithValue("");
   }

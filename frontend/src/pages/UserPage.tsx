@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import NotFoundPage from "./NotFoundPage";
 import { LoaderCircle } from "lucide-react";
+import { set } from "date-fns";
 
 const UserPage = () => {
   const { userId } = useParams();
@@ -41,9 +42,7 @@ const UserPage = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.status == 200) {
-            // setIsFollowing(false);
-            // change follower count
-            // setUser((prev) => ({ ...prev, followers: prev.followers - 1 }));
+            setIsFollowing(false);
           }
         });
     } else {
@@ -56,7 +55,7 @@ const UserPage = () => {
         });
     }
 
-    // handleFetchUserInfo();
+    handleFetchUserInfo();
   };
 
   const handleFetchUserInfo = () => {
@@ -72,11 +71,11 @@ const UserPage = () => {
     //validate user id must be number
     if (isNaN(Number(userId))) {
       console.log("User ID must be a number");
+      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
-
     handleFetchUserInfo();
   }, [userId]);
 
@@ -91,7 +90,6 @@ const UserPage = () => {
   }, [user]);
 
   useEffect(() => {
-    console.log(auth.userData.id, userId);
     if (auth.userData.id == Number(userId)) {
       naigate("/profile");
     }

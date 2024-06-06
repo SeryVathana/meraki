@@ -6,6 +6,7 @@ use App\Models\GroupInvite;
 use App\Models\GroupMember;
 use App\Models\GroupRequest;
 use App\Models\User;
+use App\Models\UserFollower;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -63,7 +64,6 @@ class UserController extends Controller
                 [
                     'first_name' => 'required',
                     'last_name' => 'required',
-                    'username' => 'required|unique:users',
                     'email' => 'required|email|unique:users,email',
                     'password' => [
                         'required',
@@ -74,7 +74,6 @@ class UserController extends Controller
                         'regex:/[@$!%*#?&]/', // must contain a special character
                     ],
                     'pf_img_url' => 'nullable',
-                    'social_login_info' => 'nullable',
                 ]
             );
 
@@ -101,14 +100,10 @@ class UserController extends Controller
             $user = User::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
-                'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => "user",
                 'pf_img_url' => $pfImgUrl,
-                'social_login_info' => $socialLoginInfo,
-                'followers' => "[]",
-                'followings' => "[]",
             ]);
 
             return response()->json([
@@ -262,6 +257,11 @@ class UserController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
+            $user->followers = UserFollower::where('user_id', $user->id)->count();
+            $user->followings = UserFollower::where('follower_id', $user->id)->count();
+
+
+
             return response()->json([
                 'status' => 200,
                 'message' => 'User Logged In Successfully',
@@ -335,6 +335,9 @@ class UserController extends Controller
         $groupIds = $myGroupsAsAdmin->pluck('group_id');
         $joinRequests = GroupRequest::whereIn('group_id', $groupIds)->get();
 
+        $followerCount = UserFollower::where('user_id', $user->id)->count();
+        $followingCount = UserFollower::where('follower_id', $user->id)->count();
+
         $data = [
             "id" => $user->id,
             "first_name" => $user->first_name,
@@ -344,8 +347,8 @@ class UserController extends Controller
             "role" => $user->role,
             "pf_img_url" => $user->pf_img_url,
             "social_login_info" => $user->social_login_info,
-            "followers" => $user->followers,
-            "followings" => $user->followings,
+            "followers" => $followerCount,
+            "followings" => $followingCount,
             "created_at" => $user->created_at,
             "updated_at" => $user->updated_at,
             "invites" => count($invites),
@@ -381,16 +384,12 @@ class UserController extends Controller
             ], 404);
         }
 
-        // get followers length and followings length
-        $followers = json_decode($user->followers);
-        $follings = json_decode($user->followings);
-
-        $user->followers = count($followers);
-        $user->followings = count($follings);
+        $followerCount = UserFollower::where('user_id', $id)->count();
+        $followingCount = UserFollower::where('follower_id', $id)->count();
 
         $isFollowing = false;
-        $key = array_search($loggedInUser->id, $followers);
-        if ($key !== false) {
+        $follwing = UserFollower::where("user_id", $id)->where("follower_id", $loggedInUser->id)->first();
+        if ($follwing) {
             $isFollowing = true;
         }
 
@@ -403,8 +402,8 @@ class UserController extends Controller
             'email' => $user->email,
             'role' => $user->role,
             'pf_img_url' => $user->pf_img_url,
-            'followers' => $user->followers,
-            'followings' => $user->followings,
+            'followers' => $followerCount,
+            'followings' => $followingCount,
             'created_at' => $user->created_at,
             'updated_at' => $user->updated_at
         ];

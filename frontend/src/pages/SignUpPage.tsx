@@ -17,7 +17,6 @@ const formSchema = z
   .object({
     firstName: z.string().min(1, "First name must be at least 1 characters").max(50),
     lastName: z.string().min(1, "Last name must be at least 1 characters").max(50),
-    userName: z.string().min(2, "Username must be at least 2 characters").max(16, "Username must be at most 16 characters"),
     email: z.string().email(),
     password: z
       .string()
@@ -42,7 +41,6 @@ const SignUpPage = () => {
     defaultValues: {
       firstName: "",
       lastName: "",
-      userName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -56,7 +54,6 @@ const SignUpPage = () => {
     const reqBody = {
       first_name: data.firstName,
       last_name: data.lastName,
-      username: data.userName,
       email: data.email,
       password: data.password,
     };
@@ -82,9 +79,6 @@ const SignUpPage = () => {
             // Handle error here
             if (data.errors.email && data.errors?.email[0] == "The email has already been taken.") {
               form.setError("email", { message: "Email already exists" });
-            }
-            if (data.errors.username && data.errors.username[0] == "The username has already been taken.") {
-              form.setError("userName", { message: "Username already exists" });
             }
           }
         }
@@ -126,11 +120,6 @@ const SignUpPage = () => {
                 <Input id="lastName" type="text" placeholder="Doe" {...form.register("lastName")} required />
                 {errors.lastName && <p className="text-red-500">{errors.lastName.message}</p>}
               </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="userName">Username</Label>
-              <Input id="userName" type="text" placeholder="johndoe" {...form.register("userName")} required />
-              {errors.userName && <p className="text-red-500">{errors.userName.message}</p>}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>

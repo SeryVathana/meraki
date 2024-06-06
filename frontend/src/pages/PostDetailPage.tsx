@@ -109,23 +109,41 @@ const PostDetailPage = () => {
     }
   };
 
-  const handleLikePost = (postId: number) => {
+  const handleToggleLikePost = (postId: number) => {
     setIsLiking(true);
-    setIsLiked((prev) => !prev);
-    fetch(`http://localhost:8000/api/post/like/${postId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status == 200) {
-          handleFetchPost();
-        }
+    if (!isLiked) {
+      setIsLiked(true);
+      fetch(`http://localhost:8000/api/post/like/${postId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
       })
-      .finally(() => setIsLiking(false));
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status == 200) {
+            handleFetchPost();
+          }
+        })
+        .finally(() => setIsLiking(false));
+    } else {
+      setIsLiked(false);
+      fetch(`http://localhost:8000/api/post/like/${postId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status == 200) {
+            handleFetchPost();
+          }
+        })
+        .finally(() => setIsLiking(false));
+    }
   };
 
   const handleFetchComments = () => {
@@ -145,9 +163,9 @@ const PostDetailPage = () => {
   };
 
   const handleFetchRelatedPosts = () => {
-    fetch(`http://localhost:8000/api/post`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`http://localhost:8000/api/post/related/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
-      .then((data) => setPosts(data.posts));
+      .then((data) => setPosts(data.relatedPosts));
   };
 
   const handleSubmitReport = () => {
@@ -311,61 +329,67 @@ const PostDetailPage = () => {
                 {auth.userData.id == post.user_id || auth.userData.role == "admin" ? (
                   <>
                     <DropdownMenuItem asChild>
-                      <Link to={`/post/edit/${post.id}`} className="w-full py-0 text-left cursor-pointer">
-                        <div className="flex gap-2 justify-start items-center py-1">
-                          <Pen className="w-4 h-4" />
-                          <span>Edit</span>
-                        </div>
-                      </Link>
+                      <>
+                        <Link to={`/post/edit/${post.id}`} className="w-full py-0 text-left cursor-pointer">
+                          <div className="flex gap-2 justify-start items-center py-1">
+                            <Pen className="w-4 h-4" />
+                            <span>Edit</span>
+                          </div>
+                        </Link>
+                      </>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
-                        <DialogTrigger asChild>
-                          <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
-                            <Trash className="w-4 h-4" />
-                            <span>Delete</span>
-                          </div>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogTitle>Delete Post</DialogTitle>
-                          <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
-                          <div className="flex gap-5 justify-end">
-                            <Button variant="outline" onClick={() => setIsReportOpen(!isReportOpen)}>
-                              Cancel
-                            </Button>
-                            <Button variant="destructive" onClick={() => handleDeletePost()}>
-                              Delete
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <>
+                        <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+                          <DialogTrigger asChild>
+                            <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                              <Trash className="w-4 h-4" />
+                              <span>Delete</span>
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogTitle>Delete Post</DialogTitle>
+                            <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
+                            <div className="flex gap-5 justify-end">
+                              <Button variant="outline" onClick={() => setIsReportOpen(!isReportOpen)}>
+                                Cancel
+                              </Button>
+                              <Button variant="destructive" onClick={() => handleDeletePost()}>
+                                Delete
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </>
                     </DropdownMenuItem>
                   </>
                 ) : (
                   <DropdownMenuItem asChild>
-                    <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
-                      <DialogTrigger asChild>
-                        <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
-                          <AlertTriangle className="w-4 h-4" />
-                          <span>Report</span>
-                        </div>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogTitle>Report Post</DialogTitle>
-                        <DialogDescription>If you believe this post violates our community guidelines, please report it.</DialogDescription>
-                        <div className="flex flex-col gap-5">
-                          <Textarea
-                            placeholder="Add reason here."
-                            className="border-2 min-h-[150px]"
-                            value={report}
-                            onChange={(e) => setReport(e.target.value)}
-                          />
-                          <Button variant="default" className="w-full font-semibold" onClick={() => handleSubmitReport()}>
-                            Report
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <>
+                      <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+                        <DialogTrigger asChild>
+                          <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                            <AlertTriangle className="w-4 h-4" />
+                            <span>Report</span>
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogTitle>Report Post</DialogTitle>
+                          <DialogDescription>If you believe this post violates our community guidelines, please report it.</DialogDescription>
+                          <div className="flex flex-col gap-5">
+                            <Textarea
+                              placeholder="Add reason here."
+                              className="border-2 min-h-[150px]"
+                              value={report}
+                              onChange={(e) => setReport(e.target.value)}
+                            />
+                            <Button variant="default" className="w-full font-semibold" onClick={() => handleSubmitReport()}>
+                              Report
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </>
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -407,7 +431,7 @@ const PostDetailPage = () => {
                   "w-1/2 border-r flex items-center justify-center py-3 group hover:bg-gray-50 text-gray-500",
                   isLiked && "text-red-500 bg-red-50 hover:bg-red-100"
                 )}
-                onClick={() => handleLikePost(post.id)}
+                onClick={() => handleToggleLikePost(post.id)}
               >
                 {isLiking ? <LoaderCircle className="w-5 h-5 text-gray-400 animate-spin" /> : <Heart className="h-5" />}
               </button>
@@ -547,7 +571,10 @@ const PostDetailPage = () => {
         </div>
       </div>
 
-      <PostsContainer posts={posts} />
+      <div className="my-20">
+        <h1 className="text-lg font-semibold mt-3">Related Posts</h1>
+        <PostsContainer posts={posts} />
+      </div>
     </div>
   );
 };

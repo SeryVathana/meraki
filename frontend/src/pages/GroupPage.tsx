@@ -219,23 +219,33 @@ const GroupPage = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <GroupMembersDialog group={group} type="dropdown" />
+                  <>
+                    <GroupMembersDialog group={group} type="dropdown" />
+                  </>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <GroupJoinRequestsDailog group={group} type="dropdown" />
+                  <>
+                    <GroupJoinRequestsDailog group={group} type="dropdown" />
+                  </>
                 </DropdownMenuItem>
                 {isOwner && (
                   <>
                     {isPublicGroup ?? (
                       <DropdownMenuItem asChild>
-                        <GroupJoinRequestsDailog group={group} type="dropdown" />
+                        <>
+                          <GroupJoinRequestsDailog group={group} type="dropdown" />
+                        </>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <GroupAddMembersDialog group={group} type="dropdown" />
+                      <>
+                        <GroupAddMembersDialog group={group} type="dropdown" />
+                      </>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <EditGroupDialog group={group} handleFetchGroupInfo={handleFetchGroupInfo} type="dropdown" />
+                      <>
+                        <EditGroupDialog group={group} handleFetchGroupInfo={handleFetchGroupInfo} type="dropdown" />
+                      </>
                     </DropdownMenuItem>
                     {/* <DropdownMenuSeparator /> */}
                   </>

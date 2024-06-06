@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PostLike;
+use App\Models\PostTag;
 use App\Models\SavedPost;
 use App\Models\Tag;
 use App\Models\Group;
@@ -54,35 +56,22 @@ class PostController extends Controller
 
         $posts = [];
         $tag = Tag::where('name', "ILIKE", $qTag)->first();
-        $allPosts = Post::where("status", "public")->orderByDesc("created_at")->get();
 
 
-        $posts = [];
         if ($tag) {
-            for ($i = 0; $i < count($allPosts); $i++) {
-                $postTag = json_decode($allPosts[$i]->tag);
-
-
-                if (in_array($tag->id, $postTag)) {
-                    array_push($posts, $allPosts[$i]);
+            $postTags = PostTag::where("tag_id", $tag->id)->get();
+            foreach ($postTags as $postTag) {
+                $post = Post::where("status", "public")->find($postTag->post_id);
+                if ($post) {
+                    array_push($posts, $post);
                 }
             }
         } else {
-            $posts = $allPosts;
+            $posts = Post::where("status", "public")->orderByDesc("created_at")->get();
         }
 
         $result = [];
         for ($i = 0; $i < count($posts); $i++) {
-            $tags = json_decode($posts[$i]->tag);
-
-            $tagDetails = [];
-
-            for ($j = 0; $j < count($tags); $j++) {
-                $tag = Tag::find($tags[$j]);
-                if ($tag) {
-                    array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
-                }
-            }
             $user = User::find($posts[$i]->user_id);
 
             $isSaved = false;
@@ -106,8 +95,6 @@ class PostController extends Controller
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
             ];
-
-
 
             array_push($result, $post);
         }
@@ -463,7 +450,6 @@ class PostController extends Controller
                     "description" => $posts[$i]->description,
                     "img_url" => $posts[$i]->img_url,
                     "status" => $posts[$i]->status,
-                    "likes" => count(json_decode($posts[$i]->likes)),
                     "user_name" => $user->first_name . " " . $user->last_name,
                     "user_pf_img_url" => $user->pf_img_url,
                     "created_at" => $posts[$i]->created_at,
@@ -537,7 +523,6 @@ class PostController extends Controller
             'description' => 'nullable|max:1000',
             'img_url' => 'nullable',
             'status' => 'required',
-            'tag' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -575,24 +560,31 @@ class PostController extends Controller
             $post->status = $request->status;
         }
 
-        $goodTags = [];
 
-        $tags = json_decode($request->tag);
-        for ($i = 0; $i < count($tags); $i++) {
-            $tag = Tag::find($tags[$i]);
-            if ($tag) {
-                array_push($goodTags, $tag->id);
-            }
-        }
+
 
         $post->group_id = $request->group_id;
         $post->user_id = $userId;
         $post->title = $request->title;
         $post->description = $request->description;
-        $post->likes = '[]';
         $post->img_url = $request->img_url;
-        $post->tag = json_encode($goodTags);
         $post->save();
+
+        $tags = json_decode($request->tag);
+
+        for ($i = 0; $i < count($tags); $i++) {
+            $tag = Tag::find($tags[$i]);
+
+            if (!$tag)
+                continue;
+
+            //create post tag
+            $postTag = new PostTag;
+            $postTag->post_id = $post->id;
+            $postTag->tag_id = $tag->id;
+            $postTag->save();
+
+        }
 
         $data = [
             "status" => 201,
@@ -616,7 +608,6 @@ class PostController extends Controller
         $post->user_id = $request->user_id;
         $post->title = $request->title;
         $post->description = $request->description;
-        $post->likes = '[]';
         $post->status = "public";
         $post->img_url = $request->img_url;
         $post->tag = json_encode([]);
@@ -694,52 +685,49 @@ class PostController extends Controller
 
         $postOwner = User::find($post->user_id);
 
-        $likes = json_decode($post->likes);
 
         $isLiked = false;
-
-        if (in_array($user->id, $likes)) {
+        $likePost = PostLike::where("post_id", $post->id)->where("user_id", $userId)->first();
+        if ($likePost)
             $isLiked = true;
-        }
-
-        $saves = SavedPost::where("post_id", $post->id)->where("user_id", $userId)->get();
 
         $isSaved = false;
-        if (count($saves) > 0) {
+        $save = SavedPost::where("post_id", $post->id)->where("user_id", $userId)->first();
+        if ($save)
             $isSaved = true;
-        }
 
 
-        //get group info if there is a group_id
+
+        $groupTitle = "";
         if ($post->group_id != null) {
             $group = Group::find($post->group_id);
-            $post->group_title = $group->title;
+            $groupTitle = $group->title;
         }
 
-        $tags = json_decode($post->tag);
+        $tags = PostTag::where("post_id", $post->id)->get();
 
         $tagDetails = [];
 
-        for ($j = 0; $j < count($tags); $j++) {
-            $tag = Tag::find($tags[$j]);
+        for ($i = 0; $i < count($tags); $i++) {
+            $tag = Tag::find($tags[$i]->tag_id);
             if ($tag) {
                 array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
             }
         }
+
         $user = User::find($post->user_id);
 
         $postData = [
             "id" => $post->id,
             "user_id" => $post->user_id,
             "group_id" => $post->group_id,
-            "group_title" => "",
+            "group_title" => $groupTitle,
             "tags" => $tagDetails,
             "title" => $post->title,
             "description" => $post->description,
             "img_url" => $post->img_url,
             "status" => $post->status,
-            "likes" => $likes,
-            "like_count" => count($likes),
+            "like_count" => PostLike::where("post_id", $post->id)->count(),
             "is_liked" => $isLiked,
             "is_saved" => $isSaved,
             "user_name" => $postOwner->first_name . " " . $postOwner->last_name,
@@ -747,13 +735,6 @@ class PostController extends Controller
             "created_at" => $post->created_at,
             "updated_at" => $post->updated_at
         ];
-
-        if ($post->group_id != null) {
-            $group = Group::find($post->group_id);
-            $postData["group_title"] = $group->title;
-        }
-
-
 
         $data = [
             "status" => 200,
@@ -846,33 +827,53 @@ class PostController extends Controller
             return response()->json($data, 404);
         }
 
-        if ($post->status == "private" && $post->user_id != $userId && $user->role != "admin") {
+        if ($post->status == "private" && $post->user_id != $userId) {
             $data = [
                 "status" => 401,
                 "message" => "Unauthorized",
             ];
 
-            return response()->json($data, 403);
+            return response()->json($data, 401);
         }
 
-        $likes = json_decode($post->likes);
+        $postTags = PostTag::where("post_id", $post->id)->get()->pluck("tag_id")->toArray();
 
-        if (in_array($userId, $likes)) {
-            $key = array_search($userId, $likes);
-            array_splice($likes, $key, 1);
-        } else {
-            array_push($likes, $userId);
+        $relatedPostIds = PostTag::whereIn("tag_id", $postTags)->get()->pluck("post_id")->toArray();
+
+        $relatedPostIds = array_unique($relatedPostIds);
+
+        $relatedPosts = Post::whereIn('id', $relatedPostIds)->orWhere('user_id', $post->user_id)
+            ->where('id', '!=', $post->id)
+            ->select('id', 'img_url', 'user_id')->inRandomOrder()->get();
+
+        $relatedPosts = $relatedPosts->filter(function ($relatedPost) use ($post) {
+            return $relatedPost->id != $post->id;
+        });
+        foreach ($relatedPosts as $relatedPost) {
+
+            // get user info
+            $user = User::find($relatedPost->user_id);
+            $relatedPost->full_name = $user->first_name . " " . $user->last_name;
+            $relatedPost->user_pf_img_url = $user->pf_img_url;
+            $relatedPost->username = $user->username;
+
+            // check if saved
+            $isSaved = SavedPost::where("post_id", $relatedPost->id)->where("user_id", $userId)->first();
+            if ($isSaved) {
+                $relatedPost->is_saved = true;
+            } else {
+                $relatedPost->is_saved = false;
+            }
         }
 
-        $uArr = array_unique($likes);
+        //convert to array
+        $relatedPostsArray = $relatedPosts->values()->all();
 
 
-        $post->likes = json_encode($uArr);
-        $post->save();
 
         $data = [
             "status" => 200,
-            "message" => "Post updated successfully",
+            "relatedPosts" => $relatedPostsArray,
         ];
       
         return response()->json($data, 200);
@@ -988,8 +989,23 @@ class PostController extends Controller
 
         $newTags = json_decode($request->tags);
 
-        $tags = Tag::find($newTags)->pluck('id')->toArray();
-        $post->tag = $newTags;
+        //delete old post tags
+        PostTag::where("post_id", $post->id)->delete();
+
+        //create new post tags
+        for ($i = 0; $i < count($newTags); $i++) {
+            $tag = Tag::find($newTags[$i]);
+
+            if (!$tag)
+                continue;
+
+            //create post tag
+            $postTag = new PostTag;
+            $postTag->post_id = $post->id;
+            $postTag->tag_id = $tag->id;
+            $postTag->save();
+
+        }
 
         $post->save();
 
@@ -1081,6 +1097,8 @@ class PostController extends Controller
         }
 
         $post->delete();
+
+        PostTag::where("post_id", $id)->delete();
 
         $data = [
             "status" => 200,

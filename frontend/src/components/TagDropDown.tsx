@@ -47,14 +47,14 @@ function TagDropDown({ selectedTags, setSelectedTags }: { selectedTags: any[]; s
         </div>
       )}
 
-      <div className="flex gap-5">
+      <div className="flex gap-5 ">
         <DropdownMenu>
           <DropdownMenuTrigger className="w-fit" asChild>
             <Button variant="outline" className="">
               Select Tags <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="max-h-[200px] overflow-auto">
             {tags.map((tag, i) => (
               <DropdownMenuCheckboxItem
                 key={tag.id}

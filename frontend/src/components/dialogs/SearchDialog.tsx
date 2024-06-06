@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { LoaderCircle, Search } from "lucide-react";
 import { useState } from "react";
 import SearchResultContainer from "../SearchResultContainer";
+import { getToken } from "@/utils/HelperFunctions";
 
 export function SearchDialog() {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -25,8 +26,8 @@ export function SearchDialog() {
           <Search className="w-5 h-5" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-screen-xl h-[90vh]">
-        <DialogHeader>
+      <DialogContent className="max-w-screen-xl h-[90vh] flex flex-col">
+        <DialogHeader className="h-fit">
           <div className="w-full relative mx-auto  sm:px-5">
             <Input type="text" className="" placeholder="Search" onChange={(e) => handleSearch(e)} />
             <Search className=" absolute right-3 sm:mr-5 top-1/2 w-5 h-5 cursor-pointer -translate-y-[50%] text-slate-500" />
@@ -34,17 +35,16 @@ export function SearchDialog() {
           <DialogTitle className="pt-5 text-start sm:px-5">Search: {searchTerm}</DialogTitle>
         </DialogHeader>
 
-        {result.length === 0 ? (
+        {result.length !== 0 ? (
           <div className="h-[20vh] w-full flex flex-col justify-center items-center gap-2">
             <LoaderCircle className="w-10 h-10 text-gray-400 animate-spin" />
             <p>Loading...</p>
           </div>
         ) : (
           <div className="overflow-auto w-full h-full px-1 sm:px-5">
-            <SearchResultContainer handleSearchDialog={handleSearchDialog} />
+            <SearchResultContainer searchQuery={searchTerm} />
           </div>
         )}
-        <div className="overflow-auto w-full h-full px-1 sm:px-5">{/* <SearchResultContainer handleSearchDialog={handleSearchDialog} /> */}</div>
       </DialogContent>
     </Dialog>
   );
