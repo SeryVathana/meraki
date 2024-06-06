@@ -24,10 +24,10 @@ class PostFactory extends Factory
             'group_id' => Group::factory(),
             'title' => fake()->title(),
             'description' => fake()->description(),
-            'tag' => Tag::factory(),
             'img_url' => "https://i.pinimg.com/564x/25/ee/de/25eedef494e9b4ce02b14990c9b5db2d.jpg",
             'status' => "public",
-            'likes' => "[1, 2, 3]"
+            'likes' => "[1, 2, 3]",
+            "is_highlighted" => false,
         ];
     }
 }

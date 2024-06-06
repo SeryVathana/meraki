@@ -2,6 +2,7 @@
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\SavedPostController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
@@ -49,7 +50,7 @@ Route::group([
     Route::get('post/{id}', [PostController::class, "show"]);
     Route::post('post', [PostController::class, "store"]);
     Route::put('post/{id}', [PostController::class, "update"]);
-    Route::get('post/{id}/related', [PostController::class, "related"]);
+    Route::get('post/related/{id}', [PostController::class, "related"]);
     Route::delete('post/{id}', [PostController::class, "destroy"]);
     Route::get('post/highlighted', [PostController::class, 'getHighlightedPosts']);
     Route::get('post/latest', [PostController::class, 'getLatestPosts']);
@@ -112,6 +113,15 @@ Route::group([
     Route::get('tag/{id}', [TagController::class, "show"]);
 
 
+    //Search
+    Route::get("search/user", [SearchController::class, "searchUsers"]);
+    Route::get("search/group", [SearchController::class, "searchGroups"]);
+    Route::get("search/post", [SearchController::class, "searchPosts"]);
+
+    //Random
+    Route::get("random/user", [SearchController::class, "getRandomUsers"]);
+    Route::get("random/group", [SearchController::class, "getRandomGroups"]);
+    Route::get("random/post", [SearchController::class, "getRandomPosts"]);
 
     Route::group([
         'middleware' => AdminRoleMiddleware::class

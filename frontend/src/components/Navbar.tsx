@@ -175,13 +175,17 @@ export function Navbar() {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
-                  <GroupsDialog userId={auth.userData.id} type="drop-down-link" />
+                  <>
+                    <GroupsDialog userId={auth.userData.id} type="drop-down-link" />
+                  </>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/create-group")} className="cursor-pointer">
                   Create Groups
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild onClick={() => setOpenDropDown(false)}>
-                  <PendingGroupInviteDialog type="drop-down-link" />
+                  <>
+                    <PendingGroupInviteDialog type="drop-down-link" />
+                  </>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />

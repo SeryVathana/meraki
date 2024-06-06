@@ -30,7 +30,7 @@ const PostsContainer = ({ posts }: { posts: any[] }) => {
   }
 
   return (
-    <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6  sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-2xl mx-auto sm:px-10 lg:px-5 xl:px-10 2xl:px-0 gap-5 space-y-5 mt-3">
+    <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-5 space-y-1 sm:space-y-2 md:space-y-3 lg:space-y-4 xl:space-y-5 mt-3">
       {data?.map((post: any, index: number) => {
         return <PostCard post={post} handleRemovePosts={handleRemovePosts} />;
       })}
@@ -42,6 +42,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
   const auth = useSelector((state: RootState) => state.auth);
   const [report, setReport] = useState<string>("");
   const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -110,6 +111,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
             title: "Post deleted successfully.",
             variant: "success",
           });
+          setIsDeleteOpen(false);
         } else {
           toast({
             title: "Failed to delete post.",
@@ -156,7 +158,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+                <Dialog open={isDeleteOpen} onOpenChange={() => setIsDeleteOpen(!isDeleteOpen)}>
                   <DialogTrigger asChild>
                     <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
                       <Trash className="w-4 h-4" />
@@ -167,7 +169,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
                     <DialogTitle>Delete Post</DialogTitle>
                     <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
                     <div className="flex gap-5 justify-end">
-                      <Button variant="outline" onClick={() => setIsReportOpen(!isReportOpen)}>
+                      <Button variant="outline" onClick={() => setIsDeleteOpen(!isDeleteOpen)}>
                         Cancel
                       </Button>
                       <Button variant="destructive" onClick={() => handleDeletePost()}>

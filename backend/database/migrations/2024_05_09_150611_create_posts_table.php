@@ -18,10 +18,9 @@ return new class extends Migration {
             $table->string("description")->nullable();
             $table->string("img_url");
             $table->string("status");
-            $table->string("tag")->nullable();
             $table->json("likes");
-            $table->timestamps();
             $table->boolean('is_highlighted')->default(false);
+            $table->timestamps();
         });
     }
     /**

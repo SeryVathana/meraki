@@ -82,6 +82,13 @@ const CreatePostPage = () => {
           variant: "success",
           description: "Your post is now live.",
         });
+
+        setUploadFile(null);
+        setTempImgURL("");
+        setSelectedTag([]);
+
+        form.clearErrors();
+        form.reset();
       })
       .catch((err) => {
         console.log(err);
@@ -92,13 +99,6 @@ const CreatePostPage = () => {
           description: "Please try again later.",
         });
       });
-
-    setUploadFile(null);
-    setTempImgURL("");
-    setSelectedTag([]);
-
-    form.clearErrors();
-    form.reset();
   }
 
   function handleTempFileUpload(e: any) {

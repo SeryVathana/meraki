@@ -145,9 +145,9 @@ const PostDetailPage = () => {
   };
 
   const handleFetchRelatedPosts = () => {
-    fetch(`http://localhost:8000/api/post`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`http://localhost:8000/api/post/related/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
-      .then((data) => setPosts(data.posts));
+      .then((data) => setPosts(data.relatedPosts));
   };
 
   const handleSubmitReport = () => {
@@ -547,7 +547,10 @@ const PostDetailPage = () => {
         </div>
       </div>
 
-      <PostsContainer posts={posts} />
+      <div className="my-20">
+        <h1 className="text-lg font-semibold mt-3">Related Posts</h1>
+        <PostsContainer posts={posts} />
+      </div>
     </div>
   );
 };
