@@ -13,8 +13,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Gate;
-use Validator;
 use OpenApi\Annotations as OA;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
@@ -244,7 +244,7 @@ class PostController extends Controller
         return response()->json($data, 200);
     }
 
-    
+
     public function getMyPostsMobile()
     {
         $user = Auth::user();
@@ -275,8 +275,8 @@ class PostController extends Controller
 
         return response()->json($postDetails, 200);
     }
-  
-  /**
+
+    /**
      * @OA\Get(
      *     path="/api/post/user/{id}",
      *     operationId="getUserPosts",
@@ -875,7 +875,7 @@ class PostController extends Controller
             "status" => 200,
             "relatedPosts" => $relatedPostsArray,
         ];
-      
+
         return response()->json($data, 200);
     }
 
@@ -1188,7 +1188,7 @@ class PostController extends Controller
         return response()->json($post);
     }
 
-   /**
+    /**
      * @OA\Delete(
      *     path="/api/admin/post/{id}",
      *     operationId="adminDeletePost",

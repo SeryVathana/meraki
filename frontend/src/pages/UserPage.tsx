@@ -119,7 +119,6 @@ const UserPage = () => {
         <h1 className="text-4xl font-bold tracking-tight lg:text-3xl">
           {capitalizeFirstLetter(user.first_name) + " " + capitalizeFirstLetter(user.last_name)}
         </h1>
-        <h3 className="text-slate-500">@{user.username}</h3>
         <h3 className="text-slate-500">{user.email}</h3>
 
         <div className="flex gap-5">

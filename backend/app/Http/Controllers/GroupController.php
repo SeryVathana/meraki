@@ -12,7 +12,7 @@ use App\Http\Requests\UpdateGroupRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class GroupController extends Controller
 {
@@ -166,7 +166,7 @@ class GroupController extends Controller
             $membersCount = $members->count();
             $g->members = $membersCount;
         }
-      
+
         $data = [
             'status' => 200,
             'group' => $group
@@ -187,7 +187,7 @@ class GroupController extends Controller
      * Store a newly created resource in storage.
      */
 
-      /**
+    /**
      * @OA\Post(
      *     path="/api/group",
      *     operationId="storeGroup",
@@ -286,7 +286,7 @@ class GroupController extends Controller
      * Display the specified resource.
      */
 
-     /**
+    /**
      * @OA\Get(
      *     path="/api/group/{id}",
      *     operationId="getGroupById",
@@ -559,7 +559,7 @@ class GroupController extends Controller
      * Remove the specified resource from storage.
      */
 
-      /**
+    /**
      * Remove the specified resource from storage.
      * @OA\Delete(
      *     path="/api/group/{id}",

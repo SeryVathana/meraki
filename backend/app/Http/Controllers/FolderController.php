@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateFolderRequest;
 use App\Models\Post;
 use App\Models\SavedPost;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class FolderController extends Controller
 {
@@ -16,7 +16,7 @@ class FolderController extends Controller
      * Display a listing of the resource.
      */
 
-     /**
+    /**
      * @OA\Get(
      *     path="/api/folder",
      *     operationId="getFolder",
@@ -147,7 +147,7 @@ class FolderController extends Controller
      * Store a newly created resource in storage.
      */
 
-       /**
+    /**
      * @OA\Post(
      *     path="/api/folder",
      *     operationId="storeFolder",
@@ -273,7 +273,7 @@ class FolderController extends Controller
      * Update the specified resource in storage.
      */
 
-     /**
+    /**
      * Update the specified resource in storage.
      * @OA\Put(
      *     path="/api/folder/{id}",
@@ -380,7 +380,7 @@ class FolderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-     /**
+    /**
      * Remove the specified resource from storage.
      * @OA\Delete(
      *     path="/api/folder/{id}",

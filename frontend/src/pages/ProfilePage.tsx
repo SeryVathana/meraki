@@ -155,7 +155,6 @@ const ProfilePage = () => {
         <div className="max-w-10px">
           <h1 className="text-4xl font-bold tracking-tight lg:text-3xl break-words text-wrap">{getFullName()}</h1>
         </div>
-        <h3 className="text-slate-500">@{user?.username}</h3>
         <h3 className="text-slate-500">{user?.email}</h3>
 
         <div className="flex gap-5">

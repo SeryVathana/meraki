@@ -50,8 +50,6 @@ const CreateGroupPage = () => {
       img_url: imgDownloadURL,
     };
 
-    console.log(reqBody);
-
     fetch("http://localhost:8000/api/group", {
       method: "POST",
       headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
@@ -65,6 +63,13 @@ const CreateGroupPage = () => {
             variant: "success",
             description: "Your group is now live.",
           });
+
+          setUploadProfileFile(null);
+          setTempProfileImgURL("");
+          setStatus("public");
+
+          form.clearErrors();
+          form.reset();
 
           setTimeout(() => {
             navigate(`/group/${data.id}`);
@@ -80,13 +85,6 @@ const CreateGroupPage = () => {
       .finally(() => {
         setIsLoading(false);
       });
-
-    setUploadProfileFile(null);
-    setTempProfileImgURL("");
-    setStatus("public");
-
-    form.clearErrors();
-    form.reset();
   }
 
   function handleTempProfileFileUpload(e: any) {

@@ -115,7 +115,7 @@ const SignUpPage = () => {
   }
 
   return (
-    <div className="w-full lg:grid lg:grid-cols-2">
+    <div className="w-full lg:grid lg:grid-cols-2 min-h-[100vh]">
       <div className="flex items-center justify-center py-12 h-[100vh]">
         <div className="mx-auto grid w-[500px] gap-6">
           <div className="grid gap-2 text-center">
@@ -204,9 +204,7 @@ const SignUpPage = () => {
         <img
           src="https://images.pexels.com/photos/23731983/pexels-photo-23731983/free-photo-of-a-sheep-is-standing-in-a-field-with-a-tree.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          className="min-h-[100vh] w-fu object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>
     </div>

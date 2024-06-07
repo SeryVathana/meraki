@@ -346,7 +346,6 @@ class UserController extends Controller
             "email" => $user->email,
             "role" => $user->role,
             "pf_img_url" => $user->pf_img_url,
-            "social_login_info" => $user->social_login_info,
             "followers" => $followerCount,
             "followings" => $followingCount,
             "created_at" => $user->created_at,
@@ -415,78 +414,7 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function followUser($id)
-    {
-        $loggedInUser = Auth::user();
 
-        if ($loggedInUser->id == $id) {
-            return response()->json([
-                'status' => 401,
-                'message' => 'You can not follow yourself'
-            ], 401);
-        }
-
-
-        $user = User::find($id);
-        $followers = json_decode($user->followers);
-
-        if (!array_key_exists($loggedInUser->id, $followers)) {
-            array_push($followers, $loggedInUser->id);
-        }
-
-
-        $self = User::find($loggedInUser->id);
-        $myFollowing = json_decode($self->followings);
-
-        if (!array_key_exists($user->id, $myFollowing)) {
-            array_push($myFollowing, $user->id);
-        }
-
-        $uArr = array_unique($followers);
-        $selfArr = array_unique($myFollowing);
-
-        $self->followings = json_encode($selfArr);
-        $user->followers = json_encode($uArr);
-
-
-        $user->save();
-        $self->save();
-
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'User Followed Successfully',
-        ], 200);
-    }
-
-    public function unfollowUser($id)
-    {
-        $loggedInUser = Auth::user();
-
-        if ($loggedInUser->id == $id) {
-            return response()->json([
-                'status' => 401,
-                'message' => 'You can not unfollow yourself'
-            ], 401);
-        }
-
-        $user = User::find($id);
-        $followers = json_decode($user->followers);
-
-
-
-        $key = array_search($loggedInUser->id, $followers);
-        if ($key !== false) {
-            unset($followers[$key]);
-        }
-
-        $user->followers = json_encode($followers);
-        $user->save();
-        return response()->json([
-            'status' => 200,
-            'message' => 'User Unfollowed Successfully'
-        ], 200);
-    }
 
     public function editProfileMobile(Request $request)
     {
@@ -554,7 +482,6 @@ class UserController extends Controller
                 [
                     'first_name' => 'required',
                     'last_name' => 'required',
-                    'username' => 'required|unique:users',
                 ]
             );
         } else {
@@ -585,7 +512,6 @@ class UserController extends Controller
 
         $user = User::find($loggedUser->id);
 
-        $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
 
@@ -695,108 +621,5 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUserFollowers(Request $request, $id)
-    {
-        $searchQuery = $request->query('q');
-        $loggedInUser = Auth::user();
-        $user = User::find($id);
 
-        $followers = json_decode($user->followers);
-
-        $data = [];
-
-        foreach ($followers as $follower) {
-            $f = "";
-            if ($searchQuery != "") {
-                $f = User::find($follower)->where("id", $follower)->where(function ($query) use ($searchQuery) {
-                    $query->where('first_name', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('email', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('username', 'like', '%' . $searchQuery . '%');
-                })->first();
-            } else {
-                $f = User::find($follower);
-            }
-            if (!$f) {
-                continue;
-            }
-
-            $isFollowing = false;
-
-            $followers = json_decode($f->followers);
-            if (in_array($loggedInUser->id, $followers)) {
-                $isFollowing = true;
-            }
-
-
-            $userData = [
-                'id' => $f->id,
-                'first_name' => $f->first_name,
-                'last_name' => $f->last_name,
-                'email' => $f->email,
-                'pf_img_url' => $f->pf_img_url,
-                'is_following' => $isFollowing,
-            ];
-            array_push($data, $userData);
-        }
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'User Followers',
-            'data' => $data
-        ], 200);
-    }
-
-
-    public function getUserFollowings(Request $request, $id)
-    {
-        $searchQuery = $request->query('q');
-        $loggedInUser = Auth::user();
-        $user = User::find($id);
-
-        $followings = json_decode($user->followings);
-
-        $data = [];
-
-
-        foreach ($followings as $following) {
-            $f = "";
-            if ($searchQuery != "") {
-                $f = User::find($following)->where("id", $following)->where(function ($query) use ($searchQuery) {
-                    $query->where('first_name', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('email', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('username', 'like', '%' . $searchQuery . '%');
-                })->first();
-            } else {
-                $f = User::find($following);
-            }
-            if (!$f) {
-                continue;
-            }
-            $isFollowing = false;
-
-            $followers = json_decode($f->followers);
-            if (in_array($loggedInUser->id, $followers)) {
-                $isFollowing = true;
-            }
-
-
-            $userData = [
-                'id' => $f->id,
-                'first_name' => $f->first_name,
-                'last_name' => $f->last_name,
-                'email' => $f->email,
-                'pf_img_url' => $f->pf_img_url,
-                'is_following' => $isFollowing,
-            ];
-            array_push($data, $userData);
-        }
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'User Followings',
-            'data' => $data
-        ], 200);
-    }
 }

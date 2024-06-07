@@ -26,7 +26,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "./layouts/ProtectedLayout";
 import PostsPage from "./pages/PostsPage";
 import EditPostPage from "./pages/EditPostPage";
-
+import UserSearchPage from "./pages/UserSearchPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,6 +37,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<ProtectedRoute />}>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="users" element={<UserSearchPage />} />
           <Route path="tag/:tag" element={<PostsPage />} />
           <Route path="profile">
             <Route index element={<ProfilePage />} />

@@ -13,6 +13,7 @@ import { useAppDispatch } from "@/redux/hook";
 import { login } from "@/redux/slices/authThunk";
 import { cn } from "@/lib/utils";
 import { getToken } from "@/utils/HelperFunctions";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -130,6 +131,11 @@ const LoginPage = () => {
             <Link to="/signup" className="underline">
               Sign up
             </Link>
+          </div>
+          <div className="flex justify-center items-center gap-4">
+            <div className="h-[1px] w-full bg-gray-300"></div>
+            <span className="text-muted-foreground">or</span>
+            <div className="h-[1px] w-full bg-gray-300"></div>
           </div>
           <Button onClick={() => authenticate("google")} variant="outline" className="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0 0 48 48">
