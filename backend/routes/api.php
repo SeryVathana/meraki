@@ -5,6 +5,8 @@ use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\SavedPostController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\UserFollowerController;
+use App\Models\UserFollower;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
@@ -41,11 +43,11 @@ Route::group([
     Route::put('user/edit', [UserController::class, 'editProfile']);
     Route::put('user/editMobile', [UserController::class, 'editProfileMobile']);
     Route::get('user/{id}', [UserController::class, 'getUserDataById']);
-    Route::put('user/follow/{id}', [UserController::class, 'followUser']);
-    Route::put('user/unfollow/{id}', [UserController::class, 'unfollowUser']);
+    Route::put('user/follow/{id}', [UserFollowerController::class, 'followUser']);
+    Route::put('user/unfollow/{id}', [UserFollowerController::class, 'unfollowUser']);
     Route::put('user/updatepf', [UserController::class, 'updateUserPfImg']);
-    Route::get('user/follower/{id}', [UserController::class, 'getUserFollowers']);
-    Route::get('user/following/{id}', [UserController::class, 'getUserFollowings']);
+    Route::get('user/follower/{id}', [UserFollowerController::class, 'getUserFollowers']);
+    Route::get('user/following/{id}', [UserFollowerController::class, 'getUserFollowings']);
 
     Route::get('post', [PostController::class, "index"]);
     Route::get('post/mypost', [PostController::class, "getMyPosts"]);

@@ -63,8 +63,6 @@ const SettingPage = () => {
       new_password: values.new_password,
     };
 
-    console.log(reqBody);
-
     fetch(`http://localhost:8000/api/user/password`, {
       method: "PUT",
       headers: {
@@ -164,12 +162,6 @@ const SettingPage = () => {
                       <Label className="w-1/2">Last Name</Label>
                       <div className="w-full">
                         <p className="float-start">{user.last_name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-10">
-                      <Label className="w-1/2">Username</Label>
-                      <div className="w-full">
-                        <p className="float-start">@{user.username}</p>
                       </div>
                     </div>
                   </div>
@@ -273,7 +265,6 @@ const EditUserPfDialog = ({ user, handleFetchUserInfo }: { user: User; handleFet
   const generalChangeSchema = z.object({
     first_name: z.string().optional(),
     last_name: z.string().optional(),
-    username: z.string().optional(),
   });
 
   const generalForm = useForm<z.infer<typeof generalChangeSchema>>({
@@ -281,12 +272,11 @@ const EditUserPfDialog = ({ user, handleFetchUserInfo }: { user: User; handleFet
     defaultValues: {
       first_name: user.first_name,
       last_name: user.last_name,
-      username: user.username,
     },
   });
 
   function onSubmitGeneral(values: z.infer<typeof generalChangeSchema>) {
-    if (!values.first_name && !values.last_name && !values.username) {
+    if (!values.first_name && !values.last_name) {
       return;
     }
     fetch(`http://localhost:8000/api/user/edit`, {
@@ -339,21 +329,6 @@ const EditUserPfDialog = ({ user, handleFetchUserInfo }: { user: User; handleFet
               render={({ field }) => (
                 <FormItem className="flex items-center gap-10">
                   <FormLabel className="w-1/3">Last Name</FormLabel>
-                  <div className="w-2/3 space-y-2">
-                    <FormControl>
-                      <Input placeholder="" type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={generalForm.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-10">
-                  <FormLabel className="w-1/3">Username</FormLabel>
                   <div className="w-2/3 space-y-2">
                     <FormControl>
                       <Input placeholder="" type="text" {...field} />

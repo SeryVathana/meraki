@@ -42,10 +42,9 @@ class SearchController extends Controller
 
         if ($term) {
             // with first name or last name or email or username
-            $query->select("id", "first_name", "last_name", "email", "username", "pf_img_url", "created_at")->where('first_name', 'ilike', '%' . $term . '%')
+            $query->select("id", "first_name", "last_name", "email", "pf_img_url", "created_at")->where('first_name', 'ilike', '%' . $term . '%')
                 ->orWhere('last_name', 'ilike', '%' . $term . '%')
-                ->orWhere('email', 'ilike', '%' . $term . '%')
-                ->orWhere('username', 'ilike', '%' . $term . '%');
+                ->orWhere('email', 'ilike', '%' . $term . '%');
         }
 
         $users = $query->limit(10)->get();

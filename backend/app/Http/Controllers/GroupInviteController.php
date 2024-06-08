@@ -10,7 +10,7 @@ use App\Http\Requests\StoreGroupInviteRequest;
 use App\Http\Requests\UpdateGroupInviteRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 
 class GroupInviteController extends Controller
@@ -19,7 +19,7 @@ class GroupInviteController extends Controller
      * Display a listing of the resource.
      */
 
-     /**
+    /**
      * @OA\Get(
      *     path="/api/group/invite/{id}",
      *     operationId="getGroupInviteById",
@@ -133,7 +133,7 @@ class GroupInviteController extends Controller
      * Store a newly created resource in storage.
      */
 
-     /**
+    /**
      * @OA\Post(
      *     path="/api/group/invite/{id}",
      *     operationId="storeGroupInvite",

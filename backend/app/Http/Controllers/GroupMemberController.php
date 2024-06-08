@@ -8,10 +8,11 @@ use App\Models\Group;
 use App\Http\Requests\StoreGroupMemberRequest;
 use App\Http\Requests\UpdateGroupMemberRequest;
 use App\Models\User;
+use App\Models\UserFollower;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class GroupMemberController extends Controller
 {
@@ -48,8 +49,7 @@ class GroupMemberController extends Controller
             ->where(function ($query) use ($searchQuery) {
                 $query->where('first_name', 'like', '%' . $searchQuery . '%')
                     ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
-                    ->orWhere('email', 'like', '%' . $searchQuery . '%')
-                    ->orWhere('username', 'like', '%' . $searchQuery . '%');
+                    ->orWhere('email', 'like', '%' . $searchQuery . '%');
             })
             ->limit(50)
             ->get();
@@ -64,11 +64,9 @@ class GroupMemberController extends Controller
             ];
 
             //check if user is followed by auth user
-            $authFollowing = json_decode($auth->followings);
-            if (in_array($user->id, $authFollowing)) {
+            $authFollowing = UserFollower::where("user_id", $user->id)->where("follower_id", $auth->id)->first();
+            if ($authFollowing) {
                 $res["is_following"] = true;
-            } else {
-                $res["is_following"] = false;
             }
 
             $invited = GroupInvite::where("user_id", $user->id)->where("group_id", $id)->first();
