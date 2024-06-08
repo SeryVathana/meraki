@@ -41,7 +41,6 @@ const FollowerContent = ({ user, searchQuery }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFetchFollowers = () => {
-    console.log(searchQuery);
     // fetch user followers
     fetch(`http://localhost:8000/api/user/follower/${user.id}?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",

@@ -185,8 +185,6 @@ const PostDetailPage = () => {
       reason: report,
     };
 
-    console.log(reqBody);
-
     fetch("http://localhost:8000/api/report", {
       method: "POST",
       headers: {
@@ -197,8 +195,6 @@ const PostDetailPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         if (data.status == 200) {
           setIsReportOpen(false);
           setReport("");

@@ -297,8 +297,6 @@ const PostCard = ({ post, handleRemovePosts }) => {
       reason: report,
     };
 
-    console.log(reqBody);
-
     fetch("http://localhost:8000/api/report", {
       method: "POST",
       headers: {
@@ -309,7 +307,6 @@ const PostCard = ({ post, handleRemovePosts }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
 
         if (data.status == 200) {
           setIsReportOpen(false);
