@@ -30,6 +30,9 @@ const DashboardLayout = () => {
       case "/dashboard/admin":
         setActivePage("admin");
         break;
+      case "/dashboard/categories":
+        setActivePage("categories");
+        break;
       default:
         setActivePage("overview");
         break;
@@ -84,6 +87,15 @@ const DashboardLayout = () => {
             }}
           >
             Groups
+          </Link>
+          <Link
+            to="/dashboard/categories"
+            className={cn(activePage == "categories" ? "font-semibold text-primary" : "")}
+            onClick={() => {
+              setActivePage("categories");
+            }}
+          >
+            Category
           </Link>
 
           {/* <Link to="#">Support</Link>

@@ -10,7 +10,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 
-const DashboardAdminPage = () => {
+const DashboardCategoriesPage = () => {
 
   const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
@@ -52,25 +52,25 @@ const DashboardAdminPage = () => {
                               <DialogTrigger asChild>
                               <Button className="gap-1">
           <PlusCircleIcon className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Add Admin</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Add Category</span>
         </Button>
                               </DialogTrigger>
                               <DialogContent className="sm:max-w-[625px]">
                                 <DialogHeader>
-                                  <DialogTitle>Add New Admin</DialogTitle>
-                                  <DialogDescription>Enter new admin information</DialogDescription>
+                                  <DialogTitle>Add New Category</DialogTitle>
+                                  <DialogDescription>Enter new category information</DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="img_url">Image URL</Label>
-                                    <Input id="img_url" defaultValue="image" className="col-span-3" />
-                                  </div>
                                   <div className="grid grid-cols-4 items-center gap-4">
                                     <Label htmlFor="title">Username</Label>
                                     <Input id="username" defaultValue="username" className="col-span-3" />
                                   </div>
                                   <div className="grid grid-cols-4 items-center gap-4">
                                     <Label htmlFor="description">Email</Label>
+                                    <Input id="description" defaultValue="example@gmail.com" className="col-span-3" />
+                                  </div>
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="description">Category Name</Label>
                                     <Input id="description" defaultValue="example@gmail.com" className="col-span-3" />
                                   </div>
                                 </div>
@@ -86,7 +86,7 @@ const DashboardAdminPage = () => {
       </div>
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="py-4">
-          <CardTitle>Admins</CardTitle>
+          <CardTitle>Categories</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -97,6 +97,7 @@ const DashboardAdminPage = () => {
                 </TableHead>
                 <TableHead>Name</TableHead> 
                 <TableHead>Email</TableHead>
+                <TableHead>Category</TableHead>
                 <TableHead className="hidden md:table-cell">Created at</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
@@ -114,6 +115,7 @@ const DashboardAdminPage = () => {
                     <TableCell>
                       <Badge variant="outline">email</Badge>
                     </TableCell>
+                    <TableCell className="font-medium">Romance</TableCell>
                     <TableCell className="hidden md:table-cell">2023-07-12 10:42 AM</TableCell>
                     <TableCell>
                     <DropdownMenu>
@@ -134,14 +136,10 @@ const DashboardAdminPage = () => {
                               </DialogTrigger>
                               <DialogContent className="sm:max-w-[625px]">
                                 <DialogHeader>
-                                  <DialogTitle>Edit admin details</DialogTitle>
-                                  <DialogDescription>Enter new information about admin to change it.</DialogDescription>
+                                  <DialogTitle>Edit categories details</DialogTitle>
+                                  <DialogDescription>Enter new information about category to change it.</DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="img_url">Image URL</Label>
-                                    <Input id="img_url" defaultValue={userObject.img_url} className="col-span-3" />
-                                  </div>
                                   <div className="grid grid-cols-4 items-center gap-4">
                                     <Label htmlFor="title">Username</Label>
                                     <Input id="username" defaultValue={userObject.username} className="col-span-3" />
@@ -149,6 +147,10 @@ const DashboardAdminPage = () => {
                                   <div className="grid grid-cols-4 items-center gap-4">
                                     <Label htmlFor="description">Email</Label>
                                     <Input id="description" defaultValue={userObject.email} className="col-span-3" />
+                                  </div>
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="description">Category Name</Label>
+                                    <Input id="description" defaultValue="romance" className="col-span-3" />
                                   </div>
                                 </div>
                                 <DialogFooter>
@@ -167,7 +169,7 @@ const DashboardAdminPage = () => {
                               <DialogContent className="sm:max-w-[525px]">
                                 <DialogHeader>
                                   <DialogTitle>Confirm</DialogTitle>
-                                  <DialogDescription>Are you sure you want to delete this admin?</DialogDescription>
+                                  <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
                                   {/* <div className="space-y-2">
                                     <p className="text-sm">
                                       Name: <span className="font-semibold">food name</span>
@@ -206,4 +208,4 @@ const DashboardAdminPage = () => {
   );
 };
 
-export default DashboardAdminPage;
+export default DashboardCategoriesPage;

@@ -162,8 +162,8 @@ export function Navbar() {
                   </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <NavLink to={"/create-post"} className="cursor-pointer">
-                    Create Posts
+                  <NavLink to={"/profile?post=my-posts"} className="cursor-pointer">
+                    Created Posts
                   </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
