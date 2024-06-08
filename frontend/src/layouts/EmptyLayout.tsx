@@ -24,7 +24,7 @@ const EmptyLayout = () => {
   }, [auth.token]);
 
   return (
-    <div className="px-5 md:px-10">
+    <div className="">
       <Outlet />
     </div>
   );

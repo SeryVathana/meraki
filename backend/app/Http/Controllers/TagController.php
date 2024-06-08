@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers;
 
@@ -33,9 +33,13 @@ class TagController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tags = Tag::all();
+        $searchQuery = $request->query("q");
+
+
+
+        $tags = Tag::orderBy("name")->where("name", "iLike", "%" . $searchQuery . "%")->get();
         return response()->json([
             "status" => 200,
             "tags" => $tags
@@ -128,6 +132,7 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
         ]);

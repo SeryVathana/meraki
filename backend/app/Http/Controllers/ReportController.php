@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Report;
 use Illuminate\Http\Request;
@@ -117,8 +119,31 @@ class ReportController extends Controller
      */
     public function adminIndex()
     {
-        $reports = Report::all();
-        return response()->json($reports);
+        $reports = Report::orderByDesc("created_at")->get();
+
+        foreach ($reports as $report) {
+            $reporter = User::find($report->user_id);
+            if (!$reporter) {
+                continue;
+            }
+
+            $post = Post::find($report->post_id);
+            if (!$post) {
+                continue;
+            }
+
+            $owner = User::find($post->user_id);
+            if (!$owner) {
+                continue;
+            }
+
+            $report["post_owner_id"] = $owner->id;
+            $report["port_owner_email"] = $owner->email;
+            $report["post_img_url"] = $post->img_url;
+            $report["reporter_email"] = $reporter->email;
+        }
+
+        return response()->json(["status" => 200, "reports" => $reports], 200);
     }
 
     // Get Report By postId

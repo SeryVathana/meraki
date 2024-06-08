@@ -22,6 +22,13 @@ class SocialiteController extends Controller
         //split name into first and last name
         $fullName = explode(" ", $userSocial->getName());
 
+        $existedUser = User::where("email", $userSocial->getEmail())->first();
+
+        if ($existedUser) {
+            $token = $existedUser->createToken('authToken')->plainTextToken;
+            return redirect()->away('http://localhost:5173/login?token=' . $token);
+        }
+
         $user = User::updateOrCreate(
             [
                 'provider_id' => $userSocial->getId(),

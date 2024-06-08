@@ -2,16 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendMail;
+use App\Mail\SendMailExisted;
+use App\Models\Folder;
+use App\Models\Group;
 use App\Models\GroupInvite;
 use App\Models\GroupMember;
 use App\Models\GroupRequest;
+use App\Models\Post;
+use App\Models\PostLike;
+use App\Models\SavedPost;
 use App\Models\User;
 use App\Models\UserFollower;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str; // Add this import statement
 
 class UserController extends Controller
 {
@@ -119,6 +128,120 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function createAdmin(Request $request)
+    {
+        try {
+            // Validated
+            $validateUser = Validator::make(
+                $request->all(),
+                [
+                    'first_name' => 'required',
+                    'last_name' => 'required',
+                    'email' => 'required|email',
+                    'pf_img_url' => 'nullable',
+                ]
+            );
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => 401,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+
+            $existedUser = User::where('email', $request->email)->first();
+            if ($existedUser) {
+                if ($existedUser->role == "admin") {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Admin Already Exists',
+                    ], 400);
+                }
+
+
+                $existedUser->role = "admin";
+                $existedUser->save();
+
+                $details = [
+                    'first_name' => $existedUser->first_name,
+                    'email' => $existedUser->email,
+                ];
+
+                Mail::to($details['email'])->send(new SendMailExisted($details));
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Admin Assigned Successfully',
+                ], 200);
+            }
+
+            // Generate password
+            $password = $this->generatePassword();
+
+            if (!$request->pf_img_url) {
+                $pfImgUrl = "https://i.pinimg.com/564x/25/ee/de/25eedef494e9b4ce02b14990c9b5db2d.jpg";
+            } else {
+                $pfImgUrl = $request->pf_img_url;
+            }
+
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($password),
+                'role' => "admin",
+                'pf_img_url' => $pfImgUrl,
+            ]);
+
+            $user->save();
+
+            $details = [
+                'first_name' => $user->first_name,
+                'email' => $user->email,
+                'password' => $password
+            ];
+
+            Mail::to($details['email'])->send(new SendMail($details));
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Admin Created Successfully',
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+
+    private function generatePassword($length = 12)
+    {
+        $password = '';
+        $lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $numbers = '0123456789';
+        $specialChars = '@$!%*#?&';
+
+        // Ensure the password contains at least one character from each set
+        $password .= $lowercase[rand(0, strlen($lowercase) - 1)];
+        $password .= $uppercase[rand(0, strlen($uppercase) - 1)];
+        $password .= $numbers[rand(0, strlen($numbers) - 1)];
+        $password .= $specialChars[rand(0, strlen($specialChars) - 1)];
+
+        // Fill the remaining length with a random selection of all characters
+        $allChars = $lowercase . $uppercase . $numbers . $specialChars;
+        for ($i = 4; $i < $length; $i++) {
+            $password .= $allChars[rand(0, strlen($allChars) - 1)];
+        }
+
+        // Shuffle the password to ensure random order
+        return str_shuffle($password); // Use PHP's built-in str_shuffle function
+    }
     public function createUserMobile(Request $request)
     {
         try {
@@ -126,7 +249,6 @@ class UserController extends Controller
             $validateUser = Validator::make(
                 $request->all(),
                 [
-                    'username' => 'required|unique:users',
                     'email' => 'required|email|unique:users,email',
                     'password' => 'required',
                 ]
@@ -135,12 +257,6 @@ class UserController extends Controller
             if ($validateUser->fails()) {
                 print_r('Error' . $validateUser->errors()->first());
 
-                if ($validateUser->errors()->first() == "The username has already been taken.") {
-                    return response()->json([
-                        "status" => 400,
-                        "message" => "Username already taken"
-                    ], 403);
-                }
 
                 if ($validateUser->errors()->first() == "The email has already been taken.") {
                     return response()->json([
@@ -170,7 +286,6 @@ class UserController extends Controller
             $user = User::create([
                 'first_name' => "First Name",
                 'last_name' => "Last Name",
-                'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => "user",
@@ -342,7 +457,6 @@ class UserController extends Controller
             "id" => $user->id,
             "first_name" => $user->first_name,
             "last_name" => $user->last_name,
-            "username" => $user->username,
             "email" => $user->email,
             "role" => $user->role,
             "pf_img_url" => $user->pf_img_url,
@@ -396,7 +510,6 @@ class UserController extends Controller
             'id' => $user->id,
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
-            'username' => $user->username,
             'is_following' => $isFollowing,
             'email' => $user->email,
             'role' => $user->role,
@@ -495,12 +608,6 @@ class UserController extends Controller
         if ($validateUser->fails()) {
             print_r('Error' . $validateUser->errors()->first());
 
-            if ($validateUser->errors()->first() == "The username has already been taken.") {
-                return response()->json([
-                    "status" => 400,
-                    "message" => "Username already taken"
-                ], 403);
-            }
             return response()->json([
                 'status' => 401,
                 'message' => 'validation error',
@@ -619,5 +726,127 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function adminUpdateUserInfo(Request $request, $id)
+    {
+        $loggedUser = Auth::user();
 
+        $validatedData = $request->validate([
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'pf_img_url' => 'required',
+        ]);
+
+        // The validation check is handled by the `validate` method,
+        // so you don't need to manually check for validation errors
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'User Not Found'
+            ], 404);
+        }
+
+        // Check if logged-in user is admin
+        if ($loggedUser->role !== 'admin') {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Forbidden: You do not have permission to access this resource.'
+            ], 403);
+        }
+
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->pf_img_url = $request->pf_img_url;
+        $user->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Updated Successfully',
+        ], 200);
+    }
+
+    public function removeAdmin(Request $request, $id)
+    {
+        $loggedUser = Auth::user();
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'User Not Found'
+            ], 404);
+        }
+
+        // Check if logged-in user is admin
+        if ($loggedUser->role !== 'admin') {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Forbidden: You do not have permission to access this resource.'
+            ], 403);
+        }
+
+        $user->role = 'user';
+        $user->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Admin Removed Successfully',
+        ], 200);
+    }
+
+    public function deleteUser(Request $request, $id)
+    {
+        $loggedUser = Auth::user();
+
+        // Check if logged-in user is admin
+        if ($loggedUser->role !== 'admin') {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Forbidden: You do not have permission to access this resource.'
+            ], 403);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'User Not Found'
+            ], 404);
+        }
+
+        $user->delete();
+
+        //remove all group invites
+        GroupInvite::where('user_id', $id)->delete();
+
+        //remove all group requests
+        GroupRequest::where('user_id', $id)->delete();
+
+        //remove all group members
+        GroupMember::where('user_id', $id)->delete();
+
+        $groups = Group::where('owner_id', $id)->get();
+
+        foreach ($groups as $group) {
+            Post::where('group_id', $group->id)->delete();
+            $group->delete();
+        }
+
+        Post::where('user_id', $id)->delete();
+
+        Folder::where('user_id', $id)->delete();
+
+        PostLike::where('user_id', $id)->delete();
+
+        SavedPost::where('user_id', $id)->delete();
+
+        UserFollower::where('user_id', $id)->delete();
+        UserFollower::where('follower_id', $id)->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User Deleted Successfully',
+        ], 200);
+    }
 }

@@ -76,7 +76,7 @@ export function Navbar() {
   return (
     <div className="w-full flex items-center gap-10">
       <NavLink to="/">
-        <h1 className="scroll-m-20 text-lg text-primary font-extrabold tracking-tight lg:text-xl ">Meraki</h1>
+        <h1 className="scroll-m-20 text-lg text-primary font-bold tracking-tight lg:text-2xl ">ΜΣRΛΚΙ</h1>
       </NavLink>
       <NavigationMenu className="flex gap-2">
         {(window.location.href.includes("tag") || window.location.href == "/") && (

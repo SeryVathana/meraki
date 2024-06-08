@@ -90,7 +90,6 @@ class PostController extends Controller
                 "first_name" => $user->first_name,
                 "last_name" => $user->last_name,
                 "full_name" => $user->first_name . " " . $user->last_name,
-                "username" => $user->username,
                 "user_pf_img_url" => $user->pf_img_url,
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
@@ -227,7 +226,6 @@ class PostController extends Controller
                 "first_name" => $user->first_name,
                 "last_name" => $user->last_name,
                 "full_name" => $user->first_name . " " . $user->last_name,
-                "username" => $user->username,
                 "user_pf_img_url" => $user->pf_img_url,
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
@@ -347,7 +345,6 @@ class PostController extends Controller
                 "first_name" => $user->first_name,
                 "last_name" => $user->last_name,
                 "full_name" => $user->first_name . " " . $user->last_name,
-                "username" => $user->username,
                 "user_pf_img_url" => $user->pf_img_url,
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
@@ -429,23 +426,16 @@ class PostController extends Controller
             $posts = Post::where("group_id", $id)->get();
             $result = [];
             for ($i = 0; $i < count($posts); $i++) {
-                $tags = json_decode($posts[$i]->tag);
+                $postTags = PostTag::where("post_id", $posts[$i]->id)->get()->pluck("tag_id")->toArray();
+                $tags = Tag::whereIn("id", $postTags)->get();
 
-                $tagDetails = [];
-
-                for ($j = 0; $j < count($tags); $j++) {
-                    $tag = Tag::find($tags[$j]);
-                    if ($tag) {
-                        array_push($tagDetails, ["name" => $tag->name, "id" => $tag->id]);
-                    }
-                }
                 $user = User::find($posts[$i]->user_id);
 
                 $post = [
                     "id" => $posts[$i]->id,
                     "user_id" => $posts[$i]->user_id,
                     "group_id" => $posts[$i]->group_id,
-                    "tags" => $tagDetails,
+                    "tags" => $tags,
                     "title" => $posts[$i]->title,
                     "description" => $posts[$i]->description,
                     "img_url" => $posts[$i]->img_url,
@@ -782,9 +772,7 @@ class PostController extends Controller
     {
         $user = Auth::user();
         $userId = $user->id;
-
         $post = Post::find($id);
-
         if (!$post) {
             $data = [
                 "status" => 404,
@@ -792,24 +780,42 @@ class PostController extends Controller
             ];
             return response()->json($data, 404);
         }
-        if ($post->status == "private" && $post->user_id != $userId && $user->role != "admin") {
+        if ($post->status == "private" && $post->user_id != $userId) {
             $data = [
                 "status" => 401,
                 "message" => "Unauthorized",
             ];
-
-            return response()->json($data, 403);
+            return response()->json($data, 401);
         }
-
-        $relatedPosts = Post::where('tag', $post->tag)
+        $postTags = PostTag::where("post_id", $post->id)->get()->pluck("tag_id")->toArray();
+        $relatedPostIds = PostTag::whereIn("tag_id", $postTags)->get()->pluck("post_id")->toArray();
+        $relatedPostIds = array_unique($relatedPostIds);
+        $relatedPosts = Post::whereIn('id', $relatedPostIds)->orWhere('user_id', $post->user_id)
             ->where('id', '!=', $post->id)
-            ->get();
-
+            ->select('id', 'img_url', 'user_id')->inRandomOrder()->get();
+        $relatedPosts = $relatedPosts->filter(function ($relatedPost) use ($post) {
+            return $relatedPost->id != $post->id;
+        });
+        foreach ($relatedPosts as $relatedPost) {
+            // get user info
+            $user = User::find($relatedPost->user_id);
+            $relatedPost->full_name = $user->first_name . " " . $user->last_name;
+            $relatedPost->user_pf_img_url = $user->pf_img_url;
+            $relatedPost->username = $user->username;
+            // check if saved
+            $isSaved = SavedPost::where("post_id", $relatedPost->id)->where("user_id", $userId)->first();
+            if ($isSaved) {
+                $relatedPost->is_saved = true;
+            } else {
+                $relatedPost->is_saved = false;
+            }
+        }
+        //convert to array
+        $relatedPostsArray = $relatedPosts->values()->all();
         $data = [
-            "post" => $post,
-            "relatedPosts" => $relatedPosts,
+            "status" => 200,
+            "relatedPosts" => $relatedPostsArray,
         ];
-
         return response()->json($data, 200);
     }
 
@@ -855,7 +861,6 @@ class PostController extends Controller
             $user = User::find($relatedPost->user_id);
             $relatedPost->full_name = $user->first_name . " " . $user->last_name;
             $relatedPost->user_pf_img_url = $user->pf_img_url;
-            $relatedPost->username = $user->username;
 
             // check if saved
             $isSaved = SavedPost::where("post_id", $relatedPost->id)->where("user_id", $userId)->first();

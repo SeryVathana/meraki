@@ -307,7 +307,6 @@ const PostCard = ({ post, handleRemovePosts }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-
         if (data.status == 200) {
           setIsReportOpen(false);
           setReport("");
@@ -364,7 +363,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
         </Avatar>
 
         <div className="flex flex-col text-white">
-          <h1 className="font-medium text-sm line-clamp-1 truncate">@{post.username}</h1>
+          <h1 className="font-medium text-sm line-clamp-1 truncate">@{post.first_name + " " + post.last_name}</h1>
         </div>
       </div>
 

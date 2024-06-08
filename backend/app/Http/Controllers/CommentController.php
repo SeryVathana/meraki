@@ -16,7 +16,7 @@ class CommentController extends Controller
      * Display a listing of the resource.
      */
 
-      /**
+    /**
      * @OA\Get(
      *     path="/api/comment",
      *     operationId="getComment",
@@ -48,8 +48,13 @@ class CommentController extends Controller
         $comments->map(function ($comment) {
 
             $user = User::find($comment->user_id);
-            $comment->user_name = $user->first_name . ' ' . $user->last_name;
-            $comment->user_pf_img_url = $user->pf_img_url;
+            if ($user) {
+                $comment->user_name = $user->first_name . ' ' . $user->last_name;
+                $comment->user_pf_img_url = $user->pf_img_url;
+            } else {
+                $comment->user_name = 'Unknown';
+                $comment->user_pf_img_url = '';
+            }
 
             $arrCmt = Comment::where('reply_cmt_id', "=", $comment->id)->get();
 
@@ -57,8 +62,13 @@ class CommentController extends Controller
 
             $comment->replies->map(function ($reply) {
                 $user = User::find($reply->user_id);
-                $reply->user_name = $user->first_name . ' ' . $user->last_name;
-                $reply->user_pf_img_url = $user->pf_img_url;
+                if ($user) {
+                    $reply->user_name = $user->first_name . ' ' . $user->last_name;
+                    $reply->user_pf_img_url = $user->pf_img_url;
+                } else {
+                    $reply->user_name = 'Unknown';
+                    $reply->user_pf_img_url = '';
+                }
             });
         });
 
@@ -72,7 +82,7 @@ class CommentController extends Controller
         return response()->json($data);
     }
 
-       /**
+    /**
      * @OA\Post(
      *     path="/api/comment",
      *     operationId="storeComment",
@@ -157,7 +167,7 @@ class CommentController extends Controller
 
     }
 
-      /**
+    /**
      * @OA\Post(
      *     path="/api/comment/{id}/reply",
      *     operationId="storeReplyComment",
@@ -263,7 +273,7 @@ class CommentController extends Controller
 
     //Get ALL Comments
 
-     /**
+    /**
      * @OA\Get(
      *     path="/api/admin/comment",
      *     operationId="AdmingetComment",
@@ -295,7 +305,7 @@ class CommentController extends Controller
     }
 
     //Get Comment By Id
-     /**
+    /**
      * @OA\Get(
      *     path="/api/admin/comment/{id}",
      *     operationId="AdmingetCommnetById",
@@ -344,7 +354,7 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-     /**
+    /**
      * Remove the specified resource from storage.
      * @OA\Delete(
      *     path="/api/admin/comment/{id}",

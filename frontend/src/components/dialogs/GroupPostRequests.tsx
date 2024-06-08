@@ -5,26 +5,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 
-const pendingRequests = [
-  {
-    id: "1",
-    img_url: "https://github.com/shadcn.png",
-    username: "Kim",
-  },
-  {
-    id: "2",
-    img_url: "https://github.com/shadcn.png",
-    username: "Vath",
-  },
-  {
-    id: "3",
-    img_url: "https://github.com/shadcn.png",
-    username: "Nymol",
-  },
-];
-
 const GroupPostRequests = ({ group_id, type }: { group_id: string; type: string }) => {
-  const [requests, setRequests] = useState(pendingRequests);
+  const [requests, setRequests] = useState([]);
 
   const navigate = useNavigate();
   return (
@@ -43,7 +25,7 @@ const GroupPostRequests = ({ group_id, type }: { group_id: string; type: string 
           <DialogTitle className="my-3 flex items-center">Pending requests</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
-          {requests.map((user, index) => {
+          {requests?.map((user, index) => {
             return (
               <div key={index} className="flex w-full justify-between px-2 py-2 rounded-md border-[1px]">
                 <div className="flex w-full gap-5">
