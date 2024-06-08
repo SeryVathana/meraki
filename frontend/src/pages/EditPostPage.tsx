@@ -36,7 +36,7 @@ const EditPostPage = () => {
       .then((res) => res.json())
       .then((data) => {
         const post = data.post;
-        console.log(post.img_url);
+  
         setTitle(post.title);
         setDescription(post.description);
         setStatus(post.status);
@@ -68,7 +68,6 @@ const EditPostPage = () => {
       img_url: imgURL,
     };
 
-    console.log(reqBody);
 
     await fetch(`http://127.0.0.1:8000/api/post/${postId}`, {
       method: "PUT",
@@ -119,9 +118,6 @@ const EditPostPage = () => {
     handleFetchPostDetail();
   }, []);
 
-  useEffect(() => {
-    console.log(tempImgURL);
-  }, [tempImgURL]);
 
   if (isFetching) {
     return (

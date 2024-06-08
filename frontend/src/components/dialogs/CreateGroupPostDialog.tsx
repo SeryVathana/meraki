@@ -60,7 +60,6 @@ const CreateGroupPostDialog = ({ group, handleFetchGroupPosts }: { group: any; h
         handleFetchGroupPosts();
       })
       .catch((err) => {
-        console.log(err);
         setIsLoading(false);
         toast({
           title: "Failed to publish post.",

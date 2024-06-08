@@ -33,8 +33,6 @@ const CreateFolderDialog = ({ handleFetchFolders }) => {
       status: "private",
     };
 
-    console.log(reqBody);
-
     fetch("http://localhost:8000/api/folder", {
       method: "POST",
       headers: {

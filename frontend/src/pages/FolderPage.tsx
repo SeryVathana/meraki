@@ -25,7 +25,6 @@ const FolderPage = () => {
 
   const handleFetchFolderInfo = () => {
     // fetch folder info
-    console.log("Fetching folder info...");
     setIsLoading(true);
     fetch(`http://localhost:8000/api/folder/${idParam}`, {
       method: "GET",
@@ -51,8 +50,6 @@ const FolderPage = () => {
       return;
     }
     // fetch saved posts
-    console.log("Fetching saved posts...");
-
     fetch(`http://localhost:8000/api/post/savedPosts/${folder.id}`, {
       method: "GET",
       headers: {

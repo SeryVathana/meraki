@@ -14,7 +14,6 @@ const PostsPage = () => {
   const tag = useParams().tag;
 
   const handleFetchPosts = () => {
-    console.log("Fetching posts...");
     setIsLoading(true);
     // Fetch posts
     fetch(`http://127.0.0.1:8000/api/post?tag=${tag}`, {

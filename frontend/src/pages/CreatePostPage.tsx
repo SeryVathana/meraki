@@ -62,8 +62,6 @@ const CreatePostPage = () => {
       img_url: imgDownloadURL,
     };
 
-    console.log(reqBody);
-
     setIsLoading(true);
 
     await fetch("http://127.0.0.1:8000/api/post", {

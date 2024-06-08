@@ -59,7 +59,6 @@ const GroupInvitesContent = () => {
     fetch(`http://localhost:8000/api/group/pending/invite`, { method: "GET", headers: { Authorization: `Bearer ${auth.token}` } })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.invites);
         setGroups(data.invites);
       })
       .finally(() => {
