@@ -88,11 +88,7 @@ const DashboardReportPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem>View Post</DropdownMenuItem>
-                          <DropdownMenuItem>Approved</DropdownMenuItem>
-                          <DropdownMenuItem>Reply</DropdownMenuItem>
-                  
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
