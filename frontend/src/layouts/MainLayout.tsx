@@ -21,11 +21,11 @@ const MainLayout = () => {
   }, []);
   return (
     <div className="w-full relative">
-      <header className=" w-full h-[8vh] sticky top-0 z-50 bg-white flex items-center">
+      <header className=" w-full h-[8dvh] sticky top-0 z-50 flex items-center bg-card px-5 md:px-10">
         <Navbar />
       </header>
 
-      <main>
+      <main className="px-5 md:px-10">
         <Outlet />
       </main>
     </div>

@@ -41,7 +41,7 @@ class SearchController extends Controller
         $query = DB::table('users');
 
         if ($term) {
-            // with first name or last name or email or username
+            // with first name or last name or email
             $query->select("id", "first_name", "last_name", "email", "pf_img_url", "created_at")->where('first_name', 'ilike', '%' . $term . '%')
                 ->orWhere('last_name', 'ilike', '%' . $term . '%')
                 ->orWhere('email', 'ilike', '%' . $term . '%');

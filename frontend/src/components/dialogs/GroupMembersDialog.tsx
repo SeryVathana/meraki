@@ -152,7 +152,9 @@ const GroupMemberContent = ({ group, searchQuery }) => {
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <RemoveUserDialog group={group} user={user} handleFetchGroupMembers={handleFetchGroupMembers} />
+                          <>
+                            <RemoveUserDialog group={group} user={user} handleFetchGroupMembers={handleFetchGroupMembers} />
+                          </>
                         </DropdownMenuItem>
                       </>
                     )}

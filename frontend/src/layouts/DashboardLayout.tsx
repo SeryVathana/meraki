@@ -2,16 +2,11 @@ import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, Navigate, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 
 const DashboardLayout = () => {
   const [activePage, setActivePage] = useState("overview");
-
-  const auth = useSelector((state: RootState) => state.auth);
-
-  if (auth?.userData.role != "admin") {
-    return <Navigate to={"/"} />;
-  }
+  const location = useLocation();
 
   useEffect(() => {
     switch (window.location.pathname) {
@@ -37,74 +32,76 @@ const DashboardLayout = () => {
         setActivePage("overview");
         break;
     }
-  }, [window.location.pathname]);
+  }, [location.pathname]);
 
   return (
-    <main className="flex max-h-[90vh] flex-1 flex-col gap-4 py-4 md:gap-8 md:pb-4">
-      <div className="mx-auto grid w-full max-w-full items-start gap-6 md:grid-cols-[150px_1fr] lg:grid-cols-[200px_1fr]">
-        <nav className="grid gap-4 text-sm text-muted-foreground" x-chunk="dashboard-04-chunk-0">
-          <Link
-            to="/dashboard/overview"
-            className={cn(activePage == "overview" ? "font-semibold text-primary" : "")}
-            onClick={() => {
-              setActivePage("overview");
-            }}
-          >
-            Overview
-          </Link>
-          <Link
-            to="/dashboard/user"
-            className={cn(activePage == "user" ? "font-semibold text-primary" : "")}
-            onClick={() => {
-              setActivePage("user");
-            }}
-          >
-            Users
-          </Link>
-          <Link
-            to="/dashboard/report"
-            className={cn(activePage == "report" ? "font-semibold text-primary" : "")}
-            onClick={() => {
-              setActivePage("report");
-            }}
-          >
-            Report
-          </Link>
-          <Link
-            to="/dashboard/admin"
-            className={cn(activePage == "admin" ? "font-semibold text-primary" : "")}
-            onClick={() => {
-              setActivePage("admin");
-            }}
-          >
-            Admins
-          </Link>
-          <Link
-            to="/dashboard/group"
-            className={cn(activePage == "group" ? "font-semibold text-primary" : "")}
-            onClick={() => {
-              setActivePage("group");
-            }}
-          >
-            Groups
-          </Link>
-          <Link
-            to="/dashboard/categories"
-            className={cn(activePage == "categories" ? "font-semibold text-primary" : "")}
-            onClick={() => {
-              setActivePage("categories");
-            }}
-          >
-            Category
-          </Link>
+    <main className="mx-auto grid w-full max-w-full items-start gap-6 md:grid-cols-[150px_1fr] lg:grid-cols-[200px_1fr] my-5">
+      <nav
+        className="gap-1 border rounded-md font-semibold flex flex-col text-sm text-muted-foreground min-h-[92dvh] p-2"
+        x-chunk="dashboard-04-chunk-0"
+      >
+        <h1 className="text-lg border-b pb-2 mb-2">Dashboard</h1>
+        <Link
+          to="/dashboard/overview"
+          className={cn(activePage == "overview" ? "text-primary rounded-sm bg-primary p-2 text-white" : "p-2")}
+          onClick={() => {
+            setActivePage("overview");
+          }}
+        >
+          Overview
+        </Link>
+        <Link
+          to="/dashboard/user"
+          className={cn(activePage == "user" ? "text-primary rounded-sm bg-primary p-2 text-white" : "p-2")}
+          onClick={() => {
+            setActivePage("user");
+          }}
+        >
+          Users
+        </Link>
+        <Link
+          to="/dashboard/report"
+          className={cn(activePage == "report" ? "text-primary rounded-sm bg-primary p-2 text-white" : "p-2")}
+          onClick={() => {
+            setActivePage("report");
+          }}
+        >
+          Report
+        </Link>
+        <Link
+          to="/dashboard/admin"
+          className={cn(activePage == "admin" ? "text-primary rounded-sm bg-primary p-2 text-white" : "p-2")}
+          onClick={() => {
+            setActivePage("admin");
+          }}
+        >
+          Admins
+        </Link>
+        <Link
+          to="/dashboard/group"
+          className={cn(activePage == "group" ? "text-primary rounded-sm bg-primary p-2 text-white" : "p-2")}
+          onClick={() => {
+            setActivePage("group");
+          }}
+        >
+          Groups
+        </Link>
+        <Link
+          to="/dashboard/categories"
+          className={cn(activePage == "categories" ? "text-primary rounded-sm bg-primary p-2 text-white" : "p-2")}
+          onClick={() => {
+            setActivePage("categories");
+          }}
+        >
+          Category
+        </Link>
 
-          {/* <Link to="#">Support</Link>
+        {/* <Link to="#">Support</Link>
           <Link to="#">Organizations</Link>
           <Link to="#">Advanced</Link> */}
-        </nav>
-        <div className="grid gap-6 max-h-[88vh] overflow-y-auto">
-          <Outlet />
-        </div>
+      </nav>
+      <div className="grid gap-6 max-h-[88vh] overflow-y-auto p-2">
+        <Outlet />
       </div>
     </main>
   );

@@ -71,7 +71,6 @@ const PostCard = ({ post, handleRemovePosts }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-
         if (data.status == 200) {
           setIsReportOpen(false);
           setReport("");
@@ -128,7 +127,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
         </Avatar>
 
         <div className="flex flex-col text-white">
-          <h1 className="font-medium text-sm line-clamp-1 truncate">@{post.username}</h1>
+          <h1 className="font-medium text-xs line-clamp-1 truncate">{post.first_name + " " + post.last_name}</h1>
         </div>
       </div>
 
@@ -143,66 +142,66 @@ const PostCard = ({ post, handleRemovePosts }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {auth.userData.id == post.user_id || auth.userData.role == "admin" ? (
-            <>
-              <DropdownMenuItem asChild>
-                <Link to={`/post/edit/${post.id}`} className="w-full py-0 text-left cursor-pointer">
-                  <div className="flex gap-2 justify-start items-center py-1">
-                    <Pen className="w-4 h-4" />
-                    <span>Edit</span>
-                  </div>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Dialog open={isDeleteOpen} onOpenChange={() => setIsDeleteOpen(!isDeleteOpen)}>
-                  <DialogTrigger asChild>
-                    <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
-                      <Trash className="w-4 h-4" />
-                      <span>Delete</span>
+          {auth.userData.id == post.user_id ||
+            (auth.userData.role == "admin" && (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link to={`/post/edit/${post.id}`} className="w-full py-0 text-left cursor-pointer">
+                    <div className="flex gap-2 justify-start items-center py-1">
+                      <Pen className="w-4 h-4" />
+                      <span>Edit</span>
                     </div>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle>Delete Post</DialogTitle>
-                    <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
-                    <div className="flex gap-5 justify-end">
-                      <Button variant="outline" onClick={() => setIsDeleteOpen(!isDeleteOpen)}>
-                        Cancel
-                      </Button>
-                      <Button variant="destructive" onClick={() => handleDeletePost()}>
-                        Delete
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </DropdownMenuItem>
-            </>
-          ) : (
-            <DropdownMenuItem asChild>
-              <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
-                <DialogTrigger asChild>
-                  <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
-                    <AlertTriangle className="w-4 h-4" />
-                    <span>Report</span>
-                  </div>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogTitle>Report Post</DialogTitle>
-                  <DialogDescription>If you believe this post violates our community guidelines, please report it.</DialogDescription>
-                  <div className="flex flex-col gap-5">
-                    <Textarea
-                      placeholder="Add reason here."
-                      className="border-2 min-h-[150px]"
-                      value={report}
-                      onChange={(e) => setReport(e.target.value)}
-                    />
-                    <Button variant="default" className="w-full font-semibold" onClick={() => handleSubmitReport()}>
-                      Report
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </DropdownMenuItem>
-          )}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Dialog open={isDeleteOpen} onOpenChange={() => setIsDeleteOpen(!isDeleteOpen)}>
+                    <DialogTrigger asChild>
+                      <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                        <Trash className="w-4 h-4" />
+                        <span>Delete</span>
+                      </div>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogTitle>Delete Post</DialogTitle>
+                      <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
+                      <div className="flex gap-5 justify-end">
+                        <Button variant="outline" onClick={() => setIsDeleteOpen(!isDeleteOpen)}>
+                          Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={() => handleDeletePost()}>
+                          Delete
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </DropdownMenuItem>
+              </>
+            ))}
+          <DropdownMenuItem asChild>
+            <Dialog open={isReportOpen} onOpenChange={() => setIsReportOpen(!isReportOpen)}>
+              <DialogTrigger asChild>
+                <div className="flex gap-2 justify-start items-center py-2 px-2 text-sm cursor-pointer hover:bg-gray-100 rounded-sm">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>Report</span>
+                </div>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogTitle>Report Post</DialogTitle>
+                <DialogDescription>If you believe this post violates our community guidelines, please report it.</DialogDescription>
+                <div className="flex flex-col gap-5">
+                  <Textarea
+                    placeholder="Add reason here."
+                    className="border-2 min-h-[150px]"
+                    value={report}
+                    onChange={(e) => setReport(e.target.value)}
+                  />
+                  <Button variant="default" className="w-full font-semibold" onClick={() => handleSubmitReport()}>
+                    Report
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

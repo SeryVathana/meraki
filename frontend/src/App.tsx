@@ -57,7 +57,7 @@ const router = createBrowserRouter(
           <Route path="dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="overview" element={<DashboardOverviewPage />} />
-            <Route path="users" element={<DashboardUserPage />} />
+            <Route path="user" element={<DashboardUserPage />} />
             <Route path="report" element={<DashboardReportPage />} />
             <Route path="group" element={<DashboardGroupPage />} />
             <Route path="admin" element={<DashboardAdminPage />} />

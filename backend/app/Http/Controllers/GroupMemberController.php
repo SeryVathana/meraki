@@ -159,8 +159,7 @@ class GroupMemberController extends Controller
             $user = User::where("id", $member->user_id)->where(function ($query) use ($searchQuery) {
                 $query->where('first_name', 'like', '%' . $searchQuery . '%')
                     ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
-                    ->orWhere('email', 'like', '%' . $searchQuery . '%')
-                    ->orWhere('username', 'like', '%' . $searchQuery . '%');
+                    ->orWhere('email', 'like', '%' . $searchQuery . '%');
             })->first();
 
             if (!$user) {

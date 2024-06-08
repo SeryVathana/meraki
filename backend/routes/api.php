@@ -1,11 +1,15 @@
 <?php
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\SavedPostController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\UserFollowerController;
+use App\Mail\SendMail;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestEmail;
 use App\Models\UserFollower;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +39,19 @@ Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProvi
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
+
+    Route::get('/send-email', function () {
+        $details = [
+            'first_name' => 'John',
+            'email' => 'znaaamz@gmail.com',
+            'password' => 'generated_password123'
+        ];
+
+        Mail::to($details['email'])->send(new SendMail($details));
+
+        return 'Admin notification email sent!';
+    });
+
     Route::get("user", [UserController::class, "getUserData"]);
     Route::put('auth/logout', [UserController::class, 'logout']);
     Route::get('auth/logoutAll', [UserController::class, 'logoutAll']);
@@ -117,7 +134,6 @@ Route::group([
     //Report 
     Route::post('report', [ReportController::class, 'store']);
 
-
     //Tag
     Route::get('tag', [TagController::class, "index"]);
     Route::get('tag/{id}', [TagController::class, "show"]);
@@ -138,13 +154,26 @@ Route::group([
     Route::group([
         'middleware' => AdminRoleMiddleware::class
     ], function () {
-        Route::get('admin/users', [UserController::class, 'getAllUsers']);
-        //Group
-        Route::post('tag', [TagController::class, "store"]);
-        Route::put('tag/{id}', [TagController::class, "update"]);
-        Route::delete('tag/{id}', [TagController::class, "destroy"]);
-        Route::get('admin/group', [GroupController::class, 'index']);
+        Route::get('admin/getTotalUsers', [DashboardController::class, 'getTotalUsers']);
+        Route::get('admin/getTotalPosts', [DashboardController::class, 'getTotalPosts']);
+        Route::get('admin/getTotalGroups', [DashboardController::class, 'getTotalGroups']);
+        Route::get('admin/getWeeklyNewUsers', [DashboardController::class, 'getWeeklyNewUsers']);
+        Route::get('admin/get10NewUsers', [DashboardController::class, 'get10NewUsers']);
+        Route::get('admin/getTotalPostsOfLastSixMonths', [DashboardController::class, 'getTotalPostsOfLastSixMonths']);
 
+        Route::get('admin/users', [DashboardController::class, 'getAllUsers']);
+        Route::put('admin/user/{id}', [UserController::class, 'adminUpdateUserInfo']);
+        Route::get('admin/admins', [DashboardController::class, 'getAllAdmins']);
+        Route::post('admin/createAdmin', [UserController::class, 'createAdmin']);
+        Route::put('admin/removeAdmin/{id}', [UserController::class, 'removeAdmin']);
+        Route::delete('admin/deleteUser/{id}', [UserController::class, 'deleteUser']);
+        //Group
+        Route::get('admin/tag', [TagController::class, 'index']);
+        Route::post('admin/tag', [TagController::class, "store"]);
+        Route::put('admin/tag/{id}', [TagController::class, "update"]);
+        Route::delete('admin/tag/{id}', [TagController::class, "destroy"]);
+
+        Route::get('admin/group', [GroupController::class, 'index']);
 
         //comment
         Route::get('admin/comment', [CommentController::class, 'adminIndex']);

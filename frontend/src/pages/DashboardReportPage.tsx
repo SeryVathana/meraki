@@ -12,13 +12,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Input } from "@/components/ui/input";
-import { ListFilterIcon} from "lucide-react";
+import { ListFilterIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getToken } from "@/utils/HelperFunctions";
+import { format } from "date-fns";
+import { Avatar } from "@radix-ui/react-avatar";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const DashboardReportPage = () => {
+  const [reports, setReports] = useState([]);
+
+  const handleFetchReports = async () => {
+    const response = await fetch("http://localhost:8000/api/admin/report", {
+      method: "GET",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await response.json();
+    setReports(data.reports);
+  };
+
+  useEffect(() => {
+    handleFetchReports();
+  }, []);
+
   return (
-    <main className="grid flex-1 items-start gap-4 p-2">
+    <main className="grid flex-1 items-start gap-4">
       <div className="flex items-center justify-between">
         <div className="w-auto flex gap-3 items-center">
           <Input type="text" placeholder="Search by name or email" className="w-[500px]" />
@@ -55,46 +78,20 @@ const DashboardReportPage = () => {
                 <TableHead className="hidden w-[100px] sm:table-cell">
                   <span className="sr-only">Image</span>
                 </TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Post</TableHead>
+                <TableHead>Reporter (Email)</TableHead>
+                <TableHead>Post ID</TableHead>
                 <TableHead className="hidden md:table-cell">Post Owner (Email)</TableHead>
-                <TableHead className="hidden md:table-cell">Description</TableHead>
+                <TableHead className="hidden md:table-cell">Reason</TableHead>
                 <TableHead className="hidden md:table-cell">Created at</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="">Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {[1, 2, 3, 4, 5].map((admin, index) => {
-                return (
-                  <TableRow className="" key={index}>
-                    <TableCell className="hidden sm:table-cell">
-                      <img alt="Product image" className="aspect-square rounded-full object-cover" height="48" src="/placeholder.svg" width="48" />
-                    </TableCell>
-                    <TableCell className="font-medium">Laser Lemonade Machine</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">Draft</Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">$499.99</TableCell>
-                    <TableCell className="hidden md:table-cell">25</TableCell>
-                    <TableCell className="hidden md:table-cell">2023-07-12 10:42 AM</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontalIcon className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Post</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {reports.map((report, index) => (
+                <ReportItem key={index} report={report} />
+              ))}
             </TableBody>
           </Table>
         </CardContent>
@@ -107,6 +104,75 @@ const DashboardReportPage = () => {
         </CardFooter>
       </Card>
     </main>
+  );
+};
+
+const ReportItem = ({ report }) => {
+  const navigate = useNavigate();
+  return (
+    <TableRow className="">
+      <TableCell className="hidden sm:table-cell">
+        <Avatar className="">
+          <AvatarImage src={report.post_img_url} alt="@shadcn" className="object-cover w-12 h-12" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      </TableCell>
+      <TableCell className="font-medium">{report.reporter_email}</TableCell>
+      <TableCell>{report.post_id}</TableCell>
+      <TableCell className="hidden md:table-cell">{report.port_owner_email}</TableCell>
+      <TableCell className="hidden md:table-cell truncate max-w-[250px]">{report.reason}</TableCell>
+      <TableCell className="hidden md:table-cell">{format(new Date(report.created_at), "Pp")}</TableCell>
+      <TableCell>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-haspopup="true" size="icon" variant="ghost">
+              <MoreHorizontalIcon className="h-4 w-4" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <p className="hover:bg-secondary relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                    Report Detail
+                  </p>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>Report Detail</DialogTitle>
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-12 items-center">
+                      <p className="col-span-3 text-sm font-semibold">Reporter: </p>
+                      <p className="col-span-9">{report.reporter_email}</p>
+                    </div>
+                    <div className="grid grid-cols-12 items-center">
+                      <p className="col-span-3 text-sm font-semibold">Post ID: </p>
+                      <p className="col-span-9">{report.post_id}</p>
+                    </div>
+                    <div className="grid grid-cols-12 items-center">
+                      <p className="col-span-3 text-sm font-semibold">Post Owner: </p>
+                      <p className="col-span-9">{report.port_owner_email}</p>
+                    </div>
+                    <div className="grid grid-cols-12 items-center">
+                      <p className="col-span-3 text-sm font-semibold">Date: </p>
+                      <p className="col-span-9">{format(new Date(report.created_at), "Pp")}</p>
+                    </div>
+                    <div className="grid grid-cols-12 items-start">
+                      <p className="col-span-3 text-sm font-semibold">Reason: </p>
+                      <div className="col-span-9 p-2 border rounded-md ">
+                        <p>{report.reason}</p>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
+
+            <DropdownMenuItem onClick={() => navigate(`/post/${report.post_id}`)}>View Post</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
   );
 };
 

@@ -179,7 +179,9 @@ const GroupPage = () => {
         <div className="flex items-center gap-5">
           <p>{capitalizeFirstLetter(group?.status)} group</p>
           <Dot className="" />
-          <GroupMembersDialog group={group} type="link" />
+          <>
+            <GroupMembersDialog group={group} type="link" />
+          </>
         </div>
 
         <div className="w-full flex justify-center gap-5">

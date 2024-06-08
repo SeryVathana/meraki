@@ -9,6 +9,7 @@ use App\Models\GroupRequest;
 use App\Models\Post;
 use App\Http\Requests\StoreGroupRequest;
 use App\Http\Requests\UpdateGroupRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -44,18 +45,37 @@ class GroupController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $group = Group::get();
+        $searchQuery = $request->query("q");
+
+        $users = User::where("email", "ilike", "%" . $searchQuery . "%")->get()->pluck("id")->toArray();
+
+        $groups = Group::where("title", "ilike", "%" . $searchQuery . "%")
+            ->orWhereIn("owner_id", $users)
+            ->orderByRaw("(title ilike ?) DESC, title", ["%" . $searchQuery . "%"])
+            ->get();
+
+        foreach ($groups as $group) {
+            $membersCount = GroupMember::where('group_id', $group->id)->count();
+            $group["members_count"] = $membersCount;
+
+            $postsCount = Post::where("group_id", $group->id)->count();
+            $group["posts_count"] = $postsCount;
+
+            $owner = User::find($group->owner_id);
+            $group["owner_email"] = $owner ? $owner->email : "Unknown";
+        }
 
 
         $data = [
             'status' => 200,
-            'groups' => $group
+            'groups' => $groups
         ];
 
         return response()->json($data, 200);
     }
+
     public function getMyGroups(Request $request)
     {
         $user = Auth::user();
@@ -461,9 +481,6 @@ class GroupController extends Controller
     public function update(UpdateGroupRequest $request, $id)
     {
         $user = Auth::user();
-        $userId = $user->id;
-
-        print ($userId);
 
         $group = Group::find($id);
 
@@ -472,7 +489,6 @@ class GroupController extends Controller
                 "status" => 404,
                 "message" => "Group not found",
             ];
-
             return response()->json($data, 404);
         }
 
