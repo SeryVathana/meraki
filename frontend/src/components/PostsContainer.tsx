@@ -61,7 +61,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
       reason: report,
     };
 
-    fetch("http://localhost:8000/api/report", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/report`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
   };
 
   const handleDeletePost = () => {
-    fetch(`http://localhost:8000/api/post/${post.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/${post.id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${getToken()}`,

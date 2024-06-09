@@ -19,7 +19,7 @@ const DashboardCategoriesPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleFetchCategories = async () => {
-    fetch("http://localhost:8000/api/admin/tag?" + new URLSearchParams({ q: searchQuery }), {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/tag?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     })
@@ -37,7 +37,7 @@ const DashboardCategoriesPage = () => {
       name: newCategory.trim(),
     };
 
-    fetch("http://localhost:8000/api/admin/tag", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/tag`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify(reqBody),
@@ -170,7 +170,7 @@ const CategoryItem = ({ category, index, handleFetchCategories }) => {
   const [editErrMsg, setEditErrMsg] = useState<string>("");
 
   const handleRemoveCategory = () => {
-    fetch(`http://localhost:8000/api/admin/tag/${category.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/tag/${category.id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     })
@@ -185,7 +185,7 @@ const CategoryItem = ({ category, index, handleFetchCategories }) => {
   };
 
   const handleEditCategory = () => {
-    fetch(`http://localhost:8000/api/admin/tag/${category.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/tag/${category.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ name: name, id: category.id }),

@@ -56,7 +56,10 @@ const GroupJoinRequestsContent = ({ groupId }) => {
   const handleFetchRequests = () => {
     setIsLoading(true);
     // fetch requests
-    fetch(`http://localhost:8000/api/group/request/pending/${groupId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/request/pending/${groupId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
       .then((res) => res.json())
       .then((data) => {
         setRequests(data.data);
@@ -68,7 +71,7 @@ const GroupJoinRequestsContent = ({ groupId }) => {
   };
 
   const handleAcceptRequest = (reqId) => {
-    fetch(`http://localhost:8000/api/group/request/accept/${reqId}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/request/accept/${reqId}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${getToken()}` },
     })

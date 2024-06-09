@@ -16,7 +16,7 @@ const PostsPage = () => {
   const handleFetchPosts = () => {
     setIsLoading(true);
     // Fetch posts
-    fetch(`http://127.0.0.1:8000/api/post?tag=${tag}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post?tag=${tag}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -77,7 +77,7 @@ const EditGroupContent = ({ group, setOpenDialog, handleFetchGroupInfo }: { grou
       img_url: imgDownloadURL != "" ? imgDownloadURL : null,
     };
 
-    fetch(`http://localhost:8000/api/group/${group.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/${group.id}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       body: JSON.stringify(reqBody),
@@ -210,7 +210,7 @@ const DeleteGroupContent = ({ group }: { group: any }) => {
 
   function handleDeleteGroup() {
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/group/${group.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/${group.id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken()}` },
     })

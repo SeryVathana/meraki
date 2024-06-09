@@ -48,7 +48,7 @@ const UserContent = ({ group, searchQuery }) => {
 
   const handleFetchUsers = () => {
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/group/notmember/${group.id}?` + new URLSearchParams({ q: searchQuery }), {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/notmember/${group.id}?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -66,7 +66,7 @@ const UserContent = ({ group, searchQuery }) => {
     const reqBody = {
       user_id: userId,
     };
-    fetch(`http://localhost:8000/api/group/invite/${group.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/invite/${group.id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify(reqBody),
@@ -86,7 +86,7 @@ const UserContent = ({ group, searchQuery }) => {
 
   const handleUninvite = (userId) => {
     setIsCanceling(userId);
-    fetch(`http://localhost:8000/api/group/invite/${group.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/invite/${group.id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ user_id: userId }),

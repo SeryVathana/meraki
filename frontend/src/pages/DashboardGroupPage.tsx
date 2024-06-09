@@ -28,7 +28,7 @@ const DashboardGroupPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleFetchGroups = async () => {
-    fetch("http://localhost:8000/api/admin/group?" + new URLSearchParams({ q: searchQuery }), {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/group?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     })
@@ -116,7 +116,7 @@ const GroupItem = ({ group, handleFetchGroups }) => {
   const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
 
   const handleRemoveGroup = () => {
-    fetch(`http://localhost:8000/api/group/${group.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/${group.id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     })
@@ -215,7 +215,7 @@ const EditGroupDialog = ({ group, handleFetchGroups }) => {
       imgDownloadURL = await getDownloadURL(uploadDisplay.ref);
     }
 
-    fetch(`http://localhost:8000/api/group/${group.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/${group.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ status: groupStatus, title: groupTitle, img_url: imgDownloadURL ? imgDownloadURL : group.img_url }),

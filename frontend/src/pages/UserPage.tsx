@@ -28,7 +28,7 @@ const UserPage = () => {
 
   const handleFetchUserPosts = () => {
     // fetch user posts
-    fetch(`http://localhost:8000/api/post/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setPosts(data.posts);
@@ -38,7 +38,7 @@ const UserPage = () => {
   const handleFollow = () => {
     setIsFollowing((prev) => !prev);
     if (isFollowing) {
-      fetch(`http://localhost:8000/api/user/unfollow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
+      fetch(`${import.meta.env.VITE_SERVER_URL}/user/unfollow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
         .then((data) => {
           if (data.status == 200) {
@@ -46,7 +46,7 @@ const UserPage = () => {
           }
         });
     } else {
-      fetch(`http://localhost:8000/api/user/follow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
+      fetch(`${import.meta.env.VITE_SERVER_URL}/user/follow/${userId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
         .then((res) => res.json())
         .then((data) => {
           if (data.status == 200) {
@@ -59,7 +59,7 @@ const UserPage = () => {
   };
 
   const handleFetchUserInfo = () => {
-    fetch(`http://localhost:8000/api/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/user/${userId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setUser(data.user);

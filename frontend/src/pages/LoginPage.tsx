@@ -74,7 +74,7 @@ const LoginPage = () => {
 
   // Redirect user to the provider
   function authenticate(provider) {
-    window.location.href = `http://127.0.0.1:8000/api/auth/${provider}`;
+    window.location.href = `${import.meta.env.VITE_SERVER_URL}/auth/${provider}`;
   }
 
   // Handle the callback

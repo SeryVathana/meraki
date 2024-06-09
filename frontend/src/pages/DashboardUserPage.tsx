@@ -26,7 +26,7 @@ const DashboardUserPage = () => {
   const [users, setUsers] = useState<any[]>([]);
 
   const handleFetchUsers = async () => {
-    fetch("http://localhost:8000/api/admin/users", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/users`, {
       method: "GET",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     })
@@ -111,7 +111,7 @@ const UserItem = ({ user, handleFetchUsers }) => {
   const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
 
   const handleRemoveUser = () => {
-    fetch(`http://localhost:8000/api/admin/deleteUser/${user.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/deleteUser/${user.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -239,7 +239,7 @@ const EditUserDialog = ({ user, handleFetchUsers }) => {
     console.log("Payload:", payload);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/user/${user.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/admin/user/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

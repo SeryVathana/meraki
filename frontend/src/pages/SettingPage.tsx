@@ -63,7 +63,7 @@ const SettingPage = () => {
       new_password: values.new_password,
     };
 
-    fetch(`http://localhost:8000/api/user/password`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/user/password`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -104,7 +104,7 @@ const SettingPage = () => {
   const myParams = postParams.get("section");
 
   const handleFetchUser = async () => {
-    await fetch(`http://localhost:8000/api/user/${auth.userData.id}`, {
+    await fetch(`${import.meta.env.VITE_SERVER_URL}/user/${auth.userData.id}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -279,7 +279,7 @@ const EditUserPfDialog = ({ user, handleFetchUserInfo }: { user: User; handleFet
     if (!values.first_name && !values.last_name) {
       return;
     }
-    fetch(`http://localhost:8000/api/user/edit`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/user/edit`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

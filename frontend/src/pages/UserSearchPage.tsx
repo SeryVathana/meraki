@@ -11,7 +11,7 @@ const UserSearchPage = () => {
   const searchQuery = searchParams.get("search");
 
   const searchUsers = async () => {
-    const response = await fetch(`http://localhost:8000/api/search/user?term=${searchQuery}`, {
+    const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/search/user?term=${searchQuery}`, {
       method: "GET",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     });

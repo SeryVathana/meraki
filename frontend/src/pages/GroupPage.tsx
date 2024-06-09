@@ -33,7 +33,7 @@ const GroupPage = () => {
   const { groupId } = useParams();
 
   const handleFetchGroupInfo = () => {
-    fetch(`http://localhost:8000/api/group/${groupId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/${groupId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setGroup(data.group);
@@ -43,14 +43,14 @@ const GroupPage = () => {
 
   const handleFetchGroupPosts = () => {
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/post/group/${groupId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/group/${groupId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => setPosts(data.posts))
       .finally(() => setIsLoading(false));
   };
 
   const handleJoinPublicGroup = () => {
-    fetch(`http://localhost:8000/api/group/public/join/${groupId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/public/join/${groupId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setIsMember(true);
@@ -60,7 +60,7 @@ const GroupPage = () => {
 
   const handleRequestJoinPrivateGroup = () => {
     setIsRequesting((prev) => !prev);
-    fetch(`http://localhost:8000/api/group/request/${groupId}`, { method: "POST", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/request/${groupId}`, { method: "POST", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         if (data.status == 200) {
@@ -75,7 +75,7 @@ const GroupPage = () => {
   };
 
   const handleLeaveGroup = () => {
-    fetch(`http://localhost:8000/api/group/leave/${groupId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/leave/${groupId}`, { method: "PUT", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setIsMember(false);
@@ -87,7 +87,7 @@ const GroupPage = () => {
   };
 
   const handleAcceptInvite = () => {
-    fetch(`http://localhost:8000/api/group/invite/accept/${group.invite_id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/invite/accept/${group.invite_id}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${auth.token}` },
     })

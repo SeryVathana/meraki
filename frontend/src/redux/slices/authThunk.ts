@@ -6,7 +6,7 @@ export const fetchUserData = createAsyncThunk("auth/fetchUserData", async (_, { 
   try {
     const accessToken = getToken();
 
-    const response = await axios.get("http://localhost:8000/api/user", {
+    const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/user`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -21,14 +21,14 @@ export const fetchUserData = createAsyncThunk("auth/fetchUserData", async (_, { 
 });
 
 export const login = createAsyncThunk("auth/login", async (payload: any) => {
-  const response = await axios.post("http://localhost:8000/api/auth/login", payload);
+  const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/auth/login`, payload);
   return response.data.data;
 });
 
 export const signOut = createAsyncThunk("auth/signOut", async () => {
   removeToken();
 
-  await axios.put("http://localhost:8000/api/auth/logout", null, {
+  await axios.put(`${import.meta.env.VITE_SERVER_URL}/auth/logout`, null, {
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },

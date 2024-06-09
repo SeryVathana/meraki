@@ -33,7 +33,7 @@ const CreateFolderDialog = ({ handleFetchFolders }) => {
       status: "private",
     };
 
-    fetch("http://localhost:8000/api/folder", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/folder`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -48,7 +48,7 @@ const DashboardOverviewPage = () => {
   const [isLoadingNewUsers, setIsLoadingNewUsers] = useState<boolean>(false);
 
   const handleFetchTotalUsers = async () => {
-    fetch("http://localhost:8000/api/admin/getTotalUsers", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/getTotalUsers`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -62,7 +62,7 @@ const DashboardOverviewPage = () => {
   };
 
   const handleFetchTotalPosts = async () => {
-    fetch("http://localhost:8000/api/admin/getTotalPosts", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/getTotalPosts`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -76,7 +76,7 @@ const DashboardOverviewPage = () => {
   };
 
   const handleFetchTotalGroups = async () => {
-    fetch("http://localhost:8000/api/admin/getTotalGroups", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/getTotalGroups`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -90,7 +90,7 @@ const DashboardOverviewPage = () => {
   };
 
   const handleFetchWeeklyNewUsers = async () => {
-    fetch("http://localhost:8000/api/admin/getWeeklyNewUsers", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/getWeeklyNewUsers`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -105,7 +105,7 @@ const DashboardOverviewPage = () => {
 
   const handleFetchNewUsers = async () => {
     setIsLoadingNewUsers(true);
-    fetch("http://localhost:8000/api/admin/get10NewUsers", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/get10NewUsers`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -121,7 +121,7 @@ const DashboardOverviewPage = () => {
   };
 
   const handleFetchLastSixMonthsPosts = async () => {
-    fetch("http://localhost:8000/api/admin/getTotalPostsOfLastSixMonths", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/getTotalPostsOfLastSixMonths`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken()}`,

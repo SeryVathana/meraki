@@ -29,14 +29,14 @@ const EditPostPage = () => {
 
   const handleFetchPostDetail = () => {
     setIsFetching(true);
-    fetch(`http://localhost:8000/api/post/${postId}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/${postId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
       .then((res) => res.json())
       .then((data) => {
         const post = data.post;
-  
+
         setTitle(post.title);
         setDescription(post.description);
         setStatus(post.status);
@@ -68,8 +68,7 @@ const EditPostPage = () => {
       img_url: imgURL,
     };
 
-
-    await fetch(`http://127.0.0.1:8000/api/post/${postId}`, {
+    await fetch(`${import.meta.env.VITE_SERVER_URL}/post/${postId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -117,7 +116,6 @@ const EditPostPage = () => {
   useEffect(() => {
     handleFetchPostDetail();
   }, []);
-
 
   if (isFetching) {
     return (

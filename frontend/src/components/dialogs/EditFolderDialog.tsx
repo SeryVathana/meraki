@@ -35,7 +35,7 @@ const EditFolderDialog = ({ folder, handleFetchFolderInfo }: { folder: any; hand
 
     setIsLoading(true);
 
-    await fetch(`http://localhost:8000/api/folder/${folder.id}`, {
+    await fetch(`${import.meta.env.VITE_SERVER_URL}/folder/${folder.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

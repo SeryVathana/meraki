@@ -14,7 +14,7 @@ export type Tag = {
 function TagDropDown({ selectedTags, setSelectedTags }: { selectedTags: any[]; setSelectedTags: any }) {
   const [tags, setTags] = useState([]);
   useEffect(() => {
-    fetch("http://localhost:8000/api/tag", { headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/tag`, { headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setTags(data.tags);
