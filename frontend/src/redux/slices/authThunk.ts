@@ -12,6 +12,11 @@ export const fetchUserData = createAsyncThunk("auth/fetchUserData", async (_, { 
       },
     });
 
+    if (response.data.status != 200) {
+      removeToken();
+      return rejectWithValue("");
+    }
+
     return { ...response.data.data, accessToken };
   } catch (e) {
     // console.log(e);

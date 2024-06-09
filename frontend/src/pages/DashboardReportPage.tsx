@@ -1,8 +1,7 @@
-import { Badge } from "@/components/ui/badge";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontalIcon, PlusCircleIcon, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -13,15 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { ListFilterIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getToken } from "@/utils/HelperFunctions";
-import { format } from "date-fns";
 import { Avatar } from "@radix-ui/react-avatar";
-import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ListFilterIcon, MoreHorizontalIcon, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const DashboardReportPage = () => {
@@ -42,31 +39,6 @@ const DashboardReportPage = () => {
 
   return (
     <main className="grid flex-1 items-start gap-4">
-      <div className="flex items-center justify-between">
-        <div className="w-auto flex gap-3 items-center">
-          <Input type="text" placeholder="Search by name or email" className="w-[500px]" />
-          <Button type="button" variant={"secondary"}>
-            <Search className="w-4 mr-2" />
-            Search
-          </Button>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="gap-1" variant="outline">
-              <ListFilterIcon className="h-4 w-4" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Filter</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem checked>None</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Name</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Newest</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Oldest</DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="py-4">
           <CardTitle>Reported</CardTitle>
@@ -95,13 +67,6 @@ const DashboardReportPage = () => {
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Showing
-            <strong>1-10</strong> of <strong>32</strong>
-            products
-          </div>
-        </CardFooter>
       </Card>
     </main>
   );

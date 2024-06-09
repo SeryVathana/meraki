@@ -100,7 +100,7 @@ const GroupInvitesContent = () => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    // setIsLoading(true);
     handleFetchGroups();
   }, [auth]);
 

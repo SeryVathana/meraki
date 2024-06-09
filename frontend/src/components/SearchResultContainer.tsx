@@ -1,19 +1,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { RootState } from "@/redux/store";
+import { getToken } from "@/utils/HelperFunctions";
+import { AlertTriangle, Ellipsis, Pen, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import SavePostDialog from "./dialogs/SavePostDialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { AlertTriangle, Ellipsis, Pen, Trash } from "lucide-react";
-import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "./ui/use-toast";
-import { getToken } from "@/utils/HelperFunctions";
-import { Skeleton } from "@/components/ui/skeleton";
-import { set } from "date-fns";
-import { cn } from "@/lib/utils";
 
 const SearchResultContainer = ({ searchQuery }) => {
   return (
@@ -28,6 +27,7 @@ const SearchResultContainer = ({ searchQuery }) => {
 const GroupsContainer = ({ searchQuery }) => {
   const [groups, setGroups]: any[] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSeeMoreClicked, setIsSeeMoreClicked] = useState<boolean>(false);
 
   const handleFetchGroups = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/search/group?` + new URLSearchParams({ term: searchQuery }), {
@@ -65,17 +65,17 @@ const GroupsContainer = ({ searchQuery }) => {
     <section className="">
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Groups:</h1>
-        {groups.length > 0 && (
-          <Link to="/users" className="text-sm text-primary">
-            See all
-          </Link>
+        {groups.length > 0 && !isSeeMoreClicked && (
+          <Button className="text-sm text-primary" variant="ghost" size={"sm"} onClick={() => setIsSeeMoreClicked(true)}>
+            See more
+          </Button>
         )}
       </div>
-      <div className="flex gap-2 overflow-auto py-2 pb-4">
+      <div className="grid grid-cols-4 gap-2 py-2 pb-4">
         {isLoading
-          ? [1, 2, 3, 4].map((item) => {
+          ? [1, 2, 3, 4].map((_, i) => {
               return (
-                <div className="flex w-64 items-center space-x-4 border p-2 rounded-lg">
+                <div className="flex items-center space-x-4 border p-2 rounded-lg" key={i}>
                   <Skeleton className="h-12 w-12 rounded-full" />
                   <div className="space-y-2">
                     <Skeleton className="h-4 w-32" />
@@ -84,8 +84,8 @@ const GroupsContainer = ({ searchQuery }) => {
                 </div>
               );
             })
-          : groups?.map((group: any, index: number) => {
-              return <GroupCard group={group} />;
+          : groups?.slice(0, isSeeMoreClicked ? groups.length : 4)?.map((group: any, index: number) => {
+              return <GroupCard group={group} key={index} />;
             })}
       </div>
     </section>
@@ -116,6 +116,7 @@ const GroupCard = ({ group }) => {
 const UsersContainer = ({ searchQuery }) => {
   const [users, setUsers]: any[] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSeeMoreClicked, setIsSeeMoreClicked] = useState<boolean>(false);
 
   const handleFetchUsers = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/search/user?term=${searchQuery}`, {
@@ -156,17 +157,17 @@ const UsersContainer = ({ searchQuery }) => {
     <section className="">
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Users:</h1>
-        {users.length > 0 && (
-          <Link to="/users" className="text-sm text-primary">
-            See all
-          </Link>
+        {users.length > 0 && !isSeeMoreClicked && (
+          <Button className="text-sm text-primary" variant="ghost" size={"sm"} onClick={() => setIsSeeMoreClicked(true)}>
+            See more
+          </Button>
         )}
       </div>
-      <div className="flex gap-2 overflow-auto py-2 pb-4">
+      <div className="grid grid-cols-4 gap-2 py-2 pb-4">
         {isLoading
-          ? [1, 2, 3, 4].map((item) => {
+          ? [1, 2, 3, 4].map((_, i) => {
               return (
-                <div className="flex w-64 items-center space-x-4 border p-2 rounded-lg">
+                <div className="flex items-center space-x-4 border p-2 rounded-lg" key={i}>
                   <Skeleton className="h-12 w-12 rounded-full" />
                   <div className="space-y-2">
                     <Skeleton className="h-4 w-32" />
@@ -175,8 +176,8 @@ const UsersContainer = ({ searchQuery }) => {
                 </div>
               );
             })
-          : users?.map((user: any, index: number) => {
-              return <UserCard user={user} />;
+          : users?.slice(0, isSeeMoreClicked ? users.length : 4)?.map((user: any, index: number) => {
+              return <UserCard user={user} key={index} />;
             })}
       </div>
     </section>
@@ -205,6 +206,7 @@ const UserCard = ({ user }) => {
 const PostsContainer = ({ searchQuery }) => {
   const [posts, setPosts]: any[] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSeeMoreClicked, setIsSeeMoreClicked] = useState<boolean>(false);
 
   const handleRemovePosts = (postId: number) => {
     const updatedPosts = [posts].filter((post) => post.id !== postId);
@@ -250,10 +252,10 @@ const PostsContainer = ({ searchQuery }) => {
     <section className="">
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Posts:</h1>
-        {posts.length > 0 && (
-          <Link to="/users" className="text-sm text-primary">
-            See all
-          </Link>
+        {posts.length > 0 && !isSeeMoreClicked && (
+          <Button className="text-sm text-primary" variant="ghost" size={"sm"} onClick={() => setIsSeeMoreClicked(true)}>
+            See more
+          </Button>
         )}
       </div>
       {isLoading ? (
@@ -264,8 +266,8 @@ const PostsContainer = ({ searchQuery }) => {
         </div>
       ) : (
         <div className="columns-2  md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-5 space-y-1 sm:space-y-2 md:space-y-3 lg:space-y-4 xl:space-y-5 mt-3">
-          {posts?.map((post: any, index: number) => {
-            return <PostCard post={post} handleRemovePosts={handleRemovePosts} />;
+          {posts?.slice(0, isSeeMoreClicked ? posts.length : 20).map((post: any, index: number) => {
+            return <PostCard post={post} handleRemovePosts={handleRemovePosts} key={index} />;
           })}
         </div>
       )}

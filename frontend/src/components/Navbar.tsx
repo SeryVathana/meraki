@@ -79,7 +79,7 @@ export function Navbar() {
         <h1 className="scroll-m-20 text-lg text-primary font-bold tracking-tight lg:text-2xl ">ΜΣRΛΚΙ</h1>
       </NavLink>
       <NavigationMenu className="flex gap-2">
-        {(window.location.href.includes("tag") || window.location.href == "/") && (
+        {user && (window.location.href.includes("tag") || window.location.href == "/") && (
           <NavigationMenuList>
             <Select
               value={selectedTag}
@@ -136,6 +136,11 @@ export function Navbar() {
               <DropdownMenuLabel>{getFullName()}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                  <NavLink to={"/profile"} className="cursor-pointer">
+                    My Profile
+                  </NavLink>
+                </DropdownMenuItem>
                 {auth.userData.role == "admin" && (
                   <DropdownMenuItem asChild>
                     <NavLink to={"/dashboard"} className="cursor-pointer">
@@ -143,24 +148,9 @@ export function Navbar() {
                     </NavLink>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem asChild>
-                  <NavLink to={"/profile"} className="cursor-pointer">
-                    Profile
-                  </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <NavLink to={"/profile/setting"} className="cursor-pointer">
-                    Setting
-                  </NavLink>
-                </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <NavLink to={"/profile?post=my-posts"} className="cursor-pointer">
-                    My Posts
-                  </NavLink>
-                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <NavLink to={"/profile?post=my-posts"} className="cursor-pointer">
                     Created Posts
@@ -189,6 +179,11 @@ export function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <NavLink to={"/profile/setting"} className="cursor-pointer">
+                  Setting
+                </NavLink>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleUserLogout()} className="cursor-pointer">
                 Log out
               </DropdownMenuItem>

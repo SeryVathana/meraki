@@ -24,9 +24,10 @@ import { storage } from "@/lib/firebase";
 
 const DashboardUserPage = () => {
   const [users, setUsers] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleFetchUsers = async () => {
-    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/users`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/users?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     })
@@ -37,35 +38,28 @@ const DashboardUserPage = () => {
   };
 
   useEffect(() => {
+    if (searchQuery && searchQuery.length < 2) {
+      return;
+    }
     handleFetchUsers();
-  }, []);
+  }, [searchQuery]);
 
   return (
     <main className="grid flex-1 items-start gap-4">
       <div className="flex items-center justify-between">
         <div className="w-auto flex gap-3 items-center">
-          <Input type="text" placeholder="Search by name or email" className="w-[500px]" />
-          <Button type="button" variant={"secondary"}>
+          <Input
+            type="text"
+            placeholder="Search by name or email"
+            className="w-[500px]"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Button type="button" variant={"secondary"} onClick={handleFetchUsers}>
             <Search className="w-4 mr-2" />
             Search
           </Button>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="gap-1" variant="outline">
-              <ListFilterIcon className="h-4 w-4" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Filter</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem checked>None</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Name</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Newest</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Oldest</DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="py-4">
@@ -96,12 +90,6 @@ const DashboardUserPage = () => {
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Showing
-            <strong> 1-10</strong> of <strong>32</strong> users
-          </div>
-        </CardFooter>
       </Card>
     </main>
   );

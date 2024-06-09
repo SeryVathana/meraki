@@ -10,13 +10,13 @@ const MainLayout = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     // Store the interval id in a const, so you can cleanup later
-    const intervalId = setInterval(() => {
-      dispatch(fetchUserData());
-    }, 5000);
+    // const intervalId = setInterval(() => {
+    dispatch(fetchUserData());
+    // }, 10000);
 
     return () => {
       // Since useEffect dependency array is empty, this will be called only on unmount
-      clearInterval(intervalId);
+      // clearInterval(intervalId);
     };
   }, []);
   return (

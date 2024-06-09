@@ -408,6 +408,7 @@ class GroupMemberController extends Controller
         }
 
         $member->delete();
+        
 
         $data = [
             'status' => 200,

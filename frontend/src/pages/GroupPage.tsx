@@ -36,6 +36,7 @@ const GroupPage = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/group/${groupId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
+        console.log(data.group);
         setGroup(data.group);
       })
       .finally(() => setIsLoading(false));
@@ -225,37 +226,36 @@ const GroupPage = () => {
                     <GroupMembersDialog group={group} type="dropdown" />
                   </>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                {group.is_admin && (
                   <>
-                    <GroupJoinRequestsDailog group={group} type="dropdown" />
-                  </>
-                </DropdownMenuItem>
-                {isOwner && (
-                  <>
-                    {isPublicGroup ?? (
-                      <DropdownMenuItem asChild>
-                        <>
-                          <GroupJoinRequestsDailog group={group} type="dropdown" />
-                        </>
-                      </DropdownMenuItem>
-                    )}
+                    <DropdownMenuItem asChild>
+                      <>
+                        <GroupJoinRequestsDailog group={group} type="dropdown" />
+                      </>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <>
+                        <GroupJoinRequestsDailog group={group} type="dropdown" />
+                      </>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <>
                         <GroupAddMembersDialog group={group} type="dropdown" />
                       </>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <>
-                        <EditGroupDialog group={group} handleFetchGroupInfo={handleFetchGroupInfo} type="dropdown" />
-                      </>
-                    </DropdownMenuItem>
-                    {/* <DropdownMenuSeparator /> */}
+                    {isOwner && (
+                      <DropdownMenuItem asChild>
+                        <>
+                          <EditGroupDialog group={group} handleFetchGroupInfo={handleFetchGroupInfo} type="dropdown" />
+                        </>
+                      </DropdownMenuItem>
+                    )}
                   </>
                 )}
 
-                {isOwner ? null : (
-                  <>
-                    <DropdownMenuItem asChild>
+                {!isOwner && (
+                  <DropdownMenuItem asChild>
+                    <>
                       <Dialog open={openAlert} onOpenChange={() => setOpenAlert(!openAlert)}>
                         <DialogTrigger asChild>
                           <p className="text-sm w-full px-2 py-1.5 hover:bg-secondary rounded-sm cursor-pointer ">Leave Group</p>
@@ -275,8 +275,8 @@ const GroupPage = () => {
                           </div>
                         </DialogContent>
                       </Dialog>
-                    </DropdownMenuItem>
-                  </>
+                    </>
+                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
