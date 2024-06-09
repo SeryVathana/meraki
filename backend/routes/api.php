@@ -99,6 +99,7 @@ Route::group([
     Route::put('group/member/{id}', [GroupMemberController::class, "update"]); // $id = group id
     Route::delete('group/member/{id}', [GroupMemberController::class, "destroy"]); // $id = group id
     Route::put("group/promote/{id}", [GroupController::class, "promoteToAdmin"]); // $id = group id
+    Route::put("group/demote/{id}", [GroupController::class, "demoteAdmin"]); // $id = group id
 
 
     // Group invite

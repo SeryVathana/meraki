@@ -1,19 +1,16 @@
 import PostsContainer from "@/components/PostsContainer";
 import FollowerDialog from "@/components/dialogs/FollowerDialog";
 import FollowingDialog from "@/components/dialogs/FollowingDialog";
-
-import GroupsDialog from "@/components/dialogs/GroupsDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User } from "@/redux/slices/authSlice";
 import { RootState } from "@/redux/store";
 import { capitalizeFirstLetter, getToken } from "@/utils/HelperFunctions";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import NotFoundPage from "./NotFoundPage";
-import { LoaderCircle } from "lucide-react";
-import { set } from "date-fns";
 
 const UserPage = () => {
   const { userId } = useParams();

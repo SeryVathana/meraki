@@ -135,7 +135,7 @@ const GroupMemberContent = ({ group, searchQuery }) => {
             </div>
             {
               // check if user is group admin
-              group.owner_id != user.user_id && (
+              group.is_admin && user.user_id != group.owner_id && user.user_id != auth.userData.id && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant={"ghost"} className="z-10" size={"icon"}>
@@ -143,21 +143,28 @@ const GroupMemberContent = ({ group, searchQuery }) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    {group.is_member && group.is_admin && user.group_role != "admin" && (
-                      <DropdownMenuItem asChild>
-                        <PromotionDialog user={user} handleFetchGroupMembers={handleFetchGroupMembers} />
-                      </DropdownMenuItem>
-                    )}
-                    {user.user_id != auth.userData.id && group.owner_id != user.user_id && (
-                      <>
-                        <DropdownMenuSeparator />
+                    {group.owner_id == auth.userData.id ? (
+                      user.group_role == "member" ? (
                         <DropdownMenuItem asChild>
                           <>
-                            <RemoveUserDialog group={group} user={user} handleFetchGroupMembers={handleFetchGroupMembers} />
+                            <PromotionDialog user={user} handleFetchGroupMembers={handleFetchGroupMembers} />
                           </>
                         </DropdownMenuItem>
-                      </>
+                      ) : (
+                        <DropdownMenuItem asChild>
+                          <>
+                            <DemotionDialog user={user} handleFetchGroupMembers={handleFetchGroupMembers} />
+                          </>
+                        </DropdownMenuItem>
+                      )
+                    ) : (
+                      ""
                     )}
+                    <DropdownMenuItem asChild>
+                      <>
+                        <RemoveUserDialog group={group} user={user} handleFetchGroupMembers={handleFetchGroupMembers} />
+                      </>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )
@@ -200,9 +207,7 @@ const PromotionDialog = ({ user, handleFetchGroupMembers }) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-lg">Group Promotion</DialogTitle>
-          <DialogDescription>
-            <h1>Are you sure you want to promote user to group admin?</h1>
-          </DialogDescription>
+          <DialogDescription>Are you sure you want to promote user to group admin?</DialogDescription>
         </DialogHeader>
         <div className="flex gap-2 items-center">
           <Avatar className="border">
@@ -226,6 +231,66 @@ const PromotionDialog = ({ user, handleFetchGroupMembers }) => {
             Cancel
           </Button>
           <Button variant={"default"} onClick={() => handlePromoteUser(user.id)}>
+            Confirm
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+const DemotionDialog = ({ user, handleFetchGroupMembers }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleDemoteAdmin = (id) => {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/demote/${id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setIsOpen(false);
+        handleFetchGroupMembers();
+      })
+      .catch((err) => console.log(err));
+  };
+
+  return (
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        setIsOpen(!isOpen);
+      }}
+    >
+      <DialogTrigger asChild>
+        <p className="text-sm w-full px-2 py-1 hover:bg-slate-100 rounded-sm cursor-pointer">Remove Admin Role</p>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-lg">Admin Removal</DialogTitle>
+          <DialogDescription>Are you sure you want to remove user from group admin?</DialogDescription>
+        </DialogHeader>
+        <div className="flex gap-2 items-center">
+          <Avatar className="border">
+            <AvatarImage src={user.pf_img_url} className="object-cover w-full h-full" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-lg font-semibold">
+              {user.first_name} {user.last_name}
+            </h1>
+            <h1 className="text-sm text-gray-500">{user.email}</h1>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant={"outline"}
+            onClick={() => {
+              setIsOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button variant={"destructive"} onClick={() => handleDemoteAdmin(user.id)}>
             Confirm
           </Button>
         </div>

@@ -110,7 +110,7 @@ const UserContent = ({ group, searchQuery }) => {
     handleFetchUsers();
   }, [group, searchQuery]);
 
-  if (isLoading && users.length == 0) {
+  if (isLoading && users?.length == 0) {
     return (
       <div className="h-full w-full flex flex-col gap-2 justify-center items-center">
         <LoaderCircle className="w-10 h-10 text-gray-400 animate-spin" />
@@ -119,7 +119,7 @@ const UserContent = ({ group, searchQuery }) => {
     );
   }
 
-  if (!isLoading && users.length == 0) {
+  if (!isLoading && users?.length == 0) {
     return (
       <div className="h-full w-full flex flex-col gap-2 justify-center items-center">
         <SearchX className="w-10 h-10 text-gray-400" />

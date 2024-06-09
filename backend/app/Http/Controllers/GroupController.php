@@ -570,6 +570,37 @@ class GroupController extends Controller
         ];
         return response()->json($data, 200);
     }
+    public function demoteAdmin($id)
+    {
+        $auth = Auth::user();
+
+        $member = GroupMember::find($id);
+        if (!$member) {
+            return response()->json([
+                "status" => 404,
+                "message" => "Member not found"
+            ], 404);
+        }
+
+        $group = Group::find($member->group_id);
+
+        $isOwner = Group::where("id", $group->id)->where("owner_id", $auth->id)->first();
+        if (!$isOwner) {
+            return response()->json([
+                "status" => 401,
+                "message" => "Unauthorized"
+            ], 401);
+        }
+        //change group member role with id to admin
+        $member->role = "member";
+        $member->save();
+
+        $data = [
+            "status" => 200,
+            "message" => "Member demoted to user successfully"
+        ];
+        return response()->json($data, 200);
+    }
 
     /**
      * Remove the specified resource from storage.

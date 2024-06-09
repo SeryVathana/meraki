@@ -155,6 +155,7 @@ class DashboardController extends Controller
 
     public function getAllUsers(Request $request)
     {
+        $searchQuery = $request->query("q");
         // Check if the authenticated user is an admin
         $loggedUser = Auth::user();
         if ($loggedUser->role !== 'admin') {
@@ -165,8 +166,22 @@ class DashboardController extends Controller
         }
 
 
-        // Get all users
-        $users = User::select(["id", "first_name", "last_name", "email", "pf_img_url", "created_at"])->where("role", "!=", "admin")->orderByDesc("created_at")->get();
+        // Build the query to search users
+        $usersQuery = User::select(["id", "first_name", "last_name", "email", "pf_img_url", "created_at"])
+            ->where("role", "!=", "admin")
+            ->orderByDesc("created_at");
+
+        if ($searchQuery) {
+            $usersQuery->where(function ($query) use ($searchQuery) {
+                $query->where('first_name', 'like', "%{$searchQuery}%")
+                    ->orWhere('last_name', 'like', "%{$searchQuery}%")
+                    ->orWhere('email', 'like', "%{$searchQuery}%");
+            });
+        }
+
+        // Execute the query and get the users
+        $users = $usersQuery->get();
+
 
         foreach ($users as $user) {
             $posts = Post::where("user_id", $user->id)->count();

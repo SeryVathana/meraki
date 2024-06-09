@@ -8,6 +8,9 @@ const DashboardLayout = () => {
   const [activePage, setActivePage] = useState("overview");
   const location = useLocation();
 
+  const token = localStorage.getItem("token");
+  const auth = useSelector((state: RootState) => state.auth);
+
   useEffect(() => {
     switch (window.location.pathname) {
       case "/dashboard/overview":
@@ -34,10 +37,14 @@ const DashboardLayout = () => {
     }
   }, [location.pathname]);
 
+  if (token && !auth.userData.role) return <h1>Loading</h1>;
+
+  if (token && auth.userData.role != "admin") return <Navigate to="/" />;
+
   return (
-    <main className="mx-auto grid w-full max-w-full items-start gap-6 md:grid-cols-[150px_1fr] lg:grid-cols-[200px_1fr] my-5">
+    <main className="mx-auto grid w-full max-w-full items-start gap-6 md:grid-cols-[150px_1fr] lg:grid-cols-[200px_1fr]">
       <nav
-        className="gap-1 border rounded-md font-semibold flex flex-col text-sm text-muted-foreground min-h-[92dvh] p-2"
+        className="gap-1 border rounded-md font-semibold flex flex-col text-sm text-muted-foreground min-h-[90dvh] p-2 pb-0"
         x-chunk="dashboard-04-chunk-0"
       >
         <h1 className="text-lg border-b pb-2 mb-2">Dashboard</h1>
@@ -100,7 +107,7 @@ const DashboardLayout = () => {
           <Link to="#">Organizations</Link>
           <Link to="#">Advanced</Link> */}
       </nav>
-      <div className="grid gap-6 max-h-[88vh] overflow-y-auto p-2">
+      <div className="grid gap-6 max-h-[90vh] overflow-y-auto p-2">
         <Outlet />
       </div>
     </main>

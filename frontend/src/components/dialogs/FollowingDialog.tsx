@@ -64,7 +64,7 @@ const FollowingContent = ({ user, searchQuery }) => {
     };
   }, [searchQuery]);
 
-  if (followings.length == 0 && !isLoading) {
+  if (followings?.length == 0 && !isLoading) {
     return (
       <div className="h-full w-full flex flex-col gap-2 justify-center items-center">
         <SearchX className="w-10 h-10 text-gray-400" />
@@ -73,7 +73,7 @@ const FollowingContent = ({ user, searchQuery }) => {
     );
   }
 
-  if (followings.length == 0 && isLoading) {
+  if (followings?.length == 0 && isLoading) {
     return (
       <div className="h-full w-full flex flex-col gap-2 justify-center items-center">
         <LoaderCircle className="w-10 h-10 text-gray-400 animate-spin" />
