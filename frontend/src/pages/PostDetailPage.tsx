@@ -74,7 +74,7 @@ const PostDetailPage = () => {
 
   const handlePostComment = (postId: number, comment: string) => {
     if (comment) {
-      fetch(`http://localhost:8000/api/comment`, {
+      fetch(`${import.meta.env.VITE_SERVER_URL}/comment`, {
         method: "POST",
         body: JSON.stringify({ post_id: postId, comment }),
         headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
@@ -92,7 +92,7 @@ const PostDetailPage = () => {
 
   const handlePostReply = (cmtId: string, comment: string) => {
     if (comment.trim()) {
-      fetch(`http://localhost:8000/api/comment/${cmtId}/reply`, {
+      fetch(`${import.meta.env.VITE_SERVER_URL}/comment/${cmtId}/reply`, {
         method: "POST",
         body: JSON.stringify({ comment }),
         headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
@@ -113,7 +113,7 @@ const PostDetailPage = () => {
     setIsLiking(true);
     if (!isLiked) {
       setIsLiked(true);
-      fetch(`http://localhost:8000/api/post/like/${postId}`, {
+      fetch(`${import.meta.env.VITE_SERVER_URL}/post/like/${postId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -129,7 +129,7 @@ const PostDetailPage = () => {
         .finally(() => setIsLiking(false));
     } else {
       setIsLiked(false);
-      fetch(`http://localhost:8000/api/post/like/${postId}`, {
+      fetch(`${import.meta.env.VITE_SERVER_URL}/post/like/${postId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const PostDetailPage = () => {
   };
 
   const handleFetchComments = () => {
-    fetch(`http://localhost:8000/api/comment/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/comment/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setComments(data.comments);
@@ -156,14 +156,14 @@ const PostDetailPage = () => {
   };
 
   const handleFetchPost = () => {
-    fetch(`http://localhost:8000/api/post/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => setPost(data.post))
       .finally(() => setIsLoading(false));
   };
 
   const handleFetchRelatedPosts = () => {
-    fetch(`http://localhost:8000/api/post/related/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/related/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => setPosts(data.relatedPosts));
   };
@@ -185,7 +185,7 @@ const PostDetailPage = () => {
       reason: report,
     };
 
-    fetch("http://localhost:8000/api/report", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/report`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -216,7 +216,7 @@ const PostDetailPage = () => {
   };
 
   const handleDeletePost = () => {
-    fetch(`http://localhost:8000/api/post/${post.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/${post.id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${getToken()}`,

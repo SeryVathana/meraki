@@ -40,7 +40,7 @@ const FollowingContent = ({ user, searchQuery }) => {
 
   const handleFetchFollowings = () => {
     // fetch user followings
-    fetch(`http://localhost:8000/api/user/following/${user.id}?` + new URLSearchParams({ q: searchQuery }), {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/user/following/${user.id}?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })

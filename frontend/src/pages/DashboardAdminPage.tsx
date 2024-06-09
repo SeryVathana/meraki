@@ -23,7 +23,7 @@ const DashboardAdminPage = () => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
 
   const handleFetchAdmins = async () => {
-    const response = await fetch("http://localhost:8000/api/admin/admins?" + new URLSearchParams({ q: searchQuery }), {
+    const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/admin/admins?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     });
@@ -43,7 +43,7 @@ const DashboardAdminPage = () => {
       email: adminEmail,
     };
 
-    const response = await fetch("http://localhost:8000/api/admin/createAdmin", {
+    const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/admin/createAdmin`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify(payload),
@@ -190,7 +190,7 @@ const UserItem = ({ user, handleFetchAdmins }) => {
   const [openRemoveAlert, setOpenRemoveAlert] = useState<boolean>(false);
 
   const handleRemoveAdmin = () => {
-    fetch(`http://localhost:8000/api/admin/removeAdmin/${user.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/admin/removeAdmin/${user.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -315,7 +315,7 @@ const EditAdminDialog = ({ user, handleFetchAdmins }) => {
     console.log("Payload:", payload);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/user/${user.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/admin/user/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

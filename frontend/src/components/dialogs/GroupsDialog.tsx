@@ -98,11 +98,14 @@ const GroupDialogContent = ({ userId, searchQuery, searchStatus, searchType }) =
     const signal = abortController.signal;
 
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/group/mygroups?` + new URLSearchParams({ search: searchQuery, type: searchType, status: searchStatus }), {
-      method: "GET",
-      headers: { Authorization: `Bearer ${getToken()}` },
-      signal,
-    })
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/group/mygroups?` + new URLSearchParams({ search: searchQuery, type: searchType, status: searchStatus }),
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${getToken()}` },
+        signal,
+      }
+    )
       .then((res) => res.json())
       .then((data) => setGroups(data.groups))
       .catch((err) => console.log(err))

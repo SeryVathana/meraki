@@ -30,7 +30,7 @@ const GroupsContainer = ({ searchQuery }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handleFetchGroups = () => {
-    fetch(`http://localhost:8000/api/search/group?` + new URLSearchParams({ term: searchQuery }), {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/search/group?` + new URLSearchParams({ term: searchQuery }), {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -40,7 +40,7 @@ const GroupsContainer = ({ searchQuery }) => {
   };
 
   const handleFetchRandomGroups = () => {
-    fetch(`http://localhost:8000/api/random/group`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/random/group`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -118,7 +118,7 @@ const UsersContainer = ({ searchQuery }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handleFetchUsers = () => {
-    fetch(`http://localhost:8000/api/search/user?term=${searchQuery}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/search/user?term=${searchQuery}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -130,7 +130,7 @@ const UsersContainer = ({ searchQuery }) => {
   };
 
   const handleFetchRandomUsers = () => {
-    fetch(`http://localhost:8000/api/random/user`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/random/user`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -212,7 +212,7 @@ const PostsContainer = ({ searchQuery }) => {
   };
 
   const handleFetchPosts = () => {
-    fetch(`http://localhost:8000/api/search/post?term=${searchQuery}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/search/post?term=${searchQuery}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -224,7 +224,7 @@ const PostsContainer = ({ searchQuery }) => {
   };
 
   const handleFetchRandomPosts = () => {
-    fetch(`http://localhost:8000/api/random/post`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/random/post`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -297,7 +297,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
       reason: report,
     };
 
-    fetch("http://localhost:8000/api/report", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/report`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -328,7 +328,7 @@ const PostCard = ({ post, handleRemovePosts }) => {
   };
 
   const handleDeletePost = () => {
-    fetch(`http://localhost:8000/api/post/${post.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/${post.id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${getToken()}`,

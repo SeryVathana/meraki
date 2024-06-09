@@ -58,14 +58,14 @@ const ProfilePage = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("http://127.0.0.1:8000/api/post/mypost", { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/mypost`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => setPosts(data.posts))
       .finally(() => setIsLoading(false));
   }, [auth.token]);
 
   const handleFetchFolders = () => {
-    fetch("http://localhost:8000/api/folder", { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/folder`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setFolders(data.folders);
@@ -81,7 +81,7 @@ const ProfilePage = () => {
     const uploadDisplay = await uploadBytes(imgs, pfImgFile);
     const imgDownloadURL = await getDownloadURL(uploadDisplay.ref);
 
-    fetch("http://localhost:8000/api/user/updatepf", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/user/updatepf`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       body: JSON.stringify({ pf_img_url: imgDownloadURL }),

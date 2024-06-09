@@ -56,7 +56,7 @@ const GroupInvitesContent = () => {
   const [isOpenAlert, setIsOpenAlert] = useState(false);
 
   const handleFetchGroups = () => {
-    fetch(`http://localhost:8000/api/group/pending/invite`, { method: "GET", headers: { Authorization: `Bearer ${auth.token}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/pending/invite`, { method: "GET", headers: { Authorization: `Bearer ${auth.token}` } })
       .then((res) => res.json())
       .then((data) => {
         setGroups(data.invites);
@@ -71,7 +71,7 @@ const GroupInvitesContent = () => {
   const handleAcceptInvite = (inviteId) => {
     // accept invite
 
-    fetch(`http://localhost:8000/api/group/invite/accept/${inviteId}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/invite/accept/${inviteId}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${auth.token}` },
     })
@@ -86,7 +86,7 @@ const GroupInvitesContent = () => {
 
   const handleDeclineInvite = (inviteId) => {
     // decline invite
-    fetch(`http://localhost:8000/api/group/invite/${inviteId}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/invite/${inviteId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${auth.token}` },
     })

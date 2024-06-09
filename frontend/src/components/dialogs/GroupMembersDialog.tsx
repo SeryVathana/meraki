@@ -58,7 +58,7 @@ const GroupMemberContent = ({ group, searchQuery }) => {
   const handleFetchGroupMembers = () => {
     setIsLoading(true);
     // fetch group members
-    fetch(`http://127.0.0.1:8000/api/group/member/${group.id}?` + new URLSearchParams({ q: searchQuery }), {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/member/${group.id}?` + new URLSearchParams({ q: searchQuery }), {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -175,7 +175,7 @@ const PromotionDialog = ({ user, handleFetchGroupMembers }) => {
 
   const handlePromoteUser = (id) => {
     // promote user to group admin
-    fetch(`http://localhost:8000/api/group/promote/${id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/promote/${id}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
     })
@@ -239,7 +239,7 @@ const RemoveUserDialog = ({ user, group, handleFetchGroupMembers }) => {
 
   const handleRemoveUser = () => {
     // remove user from group
-    fetch(`http://localhost:8000/api/group/member/${group.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group/member/${group.id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: user.user_id }),

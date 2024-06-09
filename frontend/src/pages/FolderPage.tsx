@@ -26,7 +26,7 @@ const FolderPage = () => {
   const handleFetchFolderInfo = () => {
     // fetch folder info
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/folder/${idParam}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/folder/${idParam}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const FolderPage = () => {
       return;
     }
     // fetch saved posts
-    fetch(`http://localhost:8000/api/post/savedPosts/${folder.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/savedPosts/${folder.id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const FolderPage = () => {
   const handleSavePost = (postId: number) => {
     // remove this post from saved posts state
 
-    fetch(`http://localhost:8000/api/post/savepost`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/savepost`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

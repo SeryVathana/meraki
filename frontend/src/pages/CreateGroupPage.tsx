@@ -50,7 +50,7 @@ const CreateGroupPage = () => {
       img_url: imgDownloadURL,
     };
 
-    fetch("http://localhost:8000/api/group", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/group`, {
       method: "POST",
       headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       body: JSON.stringify(reqBody),

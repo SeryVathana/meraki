@@ -28,7 +28,7 @@ const DashboardReportPage = () => {
   const [reports, setReports] = useState([]);
 
   const handleFetchReports = async () => {
-    const response = await fetch("http://localhost:8000/api/admin/report", {
+    const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/admin/report`, {
       method: "GET",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     });

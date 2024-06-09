@@ -73,7 +73,7 @@ const FolderContent = ({ postId, setIsSavedPost }) => {
       });
     });
 
-    fetch(`http://localhost:8000/api/post/savepost`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/post/savepost`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -92,7 +92,7 @@ const FolderContent = ({ postId, setIsSavedPost }) => {
   };
   const handleFetchFolders = () => {
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/folder/post/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
+    fetch(`${import.meta.env.VITE_SERVER_URL}/folder/post/${postId}`, { method: "GET", headers: { Authorization: `Bearer ${getToken()}` } })
       .then((res) => res.json())
       .then((data) => {
         setFolders(data.folders);

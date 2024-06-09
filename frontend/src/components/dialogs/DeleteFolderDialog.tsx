@@ -11,7 +11,7 @@ const DeleteFolderDialog = ({ folder }: { folder: any }) => {
   const handleDeletFolder = () => {
     setIsLoading(true);
 
-    fetch(`http://localhost:8000/api/folder/${folder.id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/folder/${folder.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
